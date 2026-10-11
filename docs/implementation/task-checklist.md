@@ -5,16 +5,16 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 
 ## Gate 0 — Before Code
 - [x] G0.1 Owner approves the implementation plan (2026-10-11)
-- [ ] G0.2 Host PHP 8.3/8.4 availability + DB version confirmed
-- [ ] G0.3 Composer decision (global update or marketplace-only phar)
-- [x] G0.4 Local `marketplace` database approved (2026-10-11)
+- [!] G0.2 Host PHP 8.3/8.4 availability + DB version — **not yet checked; owner chose to proceed** (risk accepted 2026-10-11). Composer platform pinned to PHP 8.3 meanwhile.
+- [x] G0.3 Composer decision: marketplace-only Composer 2.10.3 at `C:\php8.4\composer.phar`, isolated `COMPOSER_HOME` (2026-10-11)
+- [x] G0.4 Local `marketplace` database approved (2026-10-11). **Not created yet:** local MariaDB (XAMPP) isn't running. SQLite is used until the owner starts it (needed by T1.1).
 - [x] G0.5 Initial commit + branch workflow approved (2026-10-11)
 - [ ] G0.6 Defaults confirmed (G-1–G-13, Q-UX-1–6) — can be gradual
 
 ## Phase 5 — Backend
 ### M0 Foundation
 - [x] T0.1 Initial docs commit, `.gitignore`, branch workflow (commit a38ecda)
-- [ ] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php`
+- [~] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php` — done on `feature/T0.2-scaffold-laravel-13`, **awaiting owner review/merge**
 - [ ] T0.3 Pint, Larastan, PHPUnit, GitHub Actions CI (SQLite + MySQL 8)
 - [ ] T0.4 Security/portability baseline + guard tests
 - [ ] T0.5 Install approved packages

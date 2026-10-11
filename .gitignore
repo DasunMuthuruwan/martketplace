@@ -6,21 +6,30 @@
 .env
 .env.*
 !.env.example
-auth.json
+/auth.json
 
 # Laravel runtime and build output
 /public/build
 /public/hot
 /public/storage
 /public/uploads
+/public/fonts-manifest.dev.json
 /storage/*.key
 /storage/pail
 .phpunit.result.cache
-.phpunit.cache
+/.phpunit.cache
+_ide_helper.php
+.phpactor.json
+Homestead.json
+Homestead.yaml
 
 # Local tooling
 /.idea
 /.vscode
+/.zed
+/.nova
+/.cursor/
+/.codex
 /.qodo
 *.log
 .DS_Store

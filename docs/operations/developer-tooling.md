@@ -61,7 +61,7 @@ Rollback should rarely be needed. The usual reason would be a plugin in an old p
 
 If you prefer not to touch the global Composer yet, the marketplace can use its **own** Composer phar, e.g. `C:\php8.4\composer.phar` (downloaded and checksum-verified from getcomposer.org) and run as `C:\php8.4\php.exe C:\php8.4\composer.phar …`. This affects no other project. **It also needs approval** (it adds a tool to the machine). Decide before Phase 5 scaffolding.
 
-**Status:** Awaiting owner approval. The marketplace work is not blocked, since no dependencies are installed before Phase 5.
+**Status (2026-10-11): owner chose §1.5.** Composer **2.10.3** was downloaded from getcomposer.org to `C:\php8.4\composer.phar` (SHA-256 verified) and is used only for the marketplace with an **isolated `COMPOSER_HOME=C:\php8.4\composer-home`**, so it never reads the global config or its GitHub token. The global Composer 2.8.2 is unchanged. Updating the global Composer is still recommended for other projects (owner decision).
 
 ## 2. Invalid GitHub OAuth Token in Global Composer Config
 

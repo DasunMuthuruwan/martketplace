@@ -4,7 +4,7 @@ Source of truth for project status. Update after every task.
 
 ## Current Phase
 
-**Phase 4 — Implementation planning: draft complete, awaiting owner approval** ([implementation plan](implementation/implementation-plan.md)). Also awaiting review: **global marketplace revision** The owner changed scope from Sri Lanka-only to multi-country. Requirements v0.4, architecture doc 13, database/category/routes/packages updates, ADR-019–023, design doc 05 and the prototype were revised. **Phase 3 UI/UX design** is also awaiting approval ([design/README.md](design/README.md)). Phase 2 was approved on 2026-10-11 (global changes to it pending approval).
+**Phase 5 — Backend development: started.** Phase 4 plan approved 2026-10-11. Current task: **T0.2 awaiting owner review** ([task checklist](implementation/task-checklist.md)). Also awaiting review: **global marketplace revision** The owner changed scope from Sri Lanka-only to multi-country. Requirements v0.4, architecture doc 13, database/category/routes/packages updates, ADR-019–023, design doc 05 and the prototype were revised. **Phase 3 UI/UX design** is also awaiting approval ([design/README.md](design/README.md)). Phase 2 was approved on 2026-10-11 (global changes to it pending approval).
 Implementation (Phase 5) must still not start until Phases 3 and 4 are approved and the hosting conditions are verified.
 
 ## Phase Checklist
@@ -14,7 +14,7 @@ Implementation (Phase 5) must still not start until Phases 3 and 4 are approved 
 | 1 | Requirements analysis | Approved (v0.3) | [requirements/requirements-specification.md](requirements/requirements-specification.md) |
 | 2 | System architecture & technical design | **Approved 2026-10-11** | [architecture/README.md](architecture/README.md), [decisions/README.md](decisions/README.md) |
 | 3 | UI/UX design | Draft, awaiting review | [design/README.md](design/README.md) (docs 01–04 + clickable prototype) |
-| 4 | Implementation planning | **Draft, awaiting approval** | [implementation/implementation-plan.md](implementation/implementation-plan.md), [task checklist](implementation/task-checklist.md) |
+| 4 | Implementation planning | **Approved 2026-10-11** | [implementation/implementation-plan.md](implementation/implementation-plan.md), [task checklist](implementation/task-checklist.md) |
 | 5–10 | Build, test, security, deploy, maintain | Not started | — |
 
 ## Completed Tasks
@@ -26,6 +26,7 @@ Implementation (Phase 5) must still not start until Phases 3 and 4 are approved 
 | 2026-10-11 | Dev Talk read-only inspection | Domain `dev-talk.com`, register.lk cPanel, LiteSpeed + `ea-php83`. Nothing modified. |
 | 2026-10-11 | Phase 2 design rev. 1 and rev. 2 | Docs 01–12, ADR-001–017. Package compatibility verified from official sources. |
 | 2026-10-11 | **Owner approved revised Phase 2 design** | ADR-014–017 accepted. Final package list approved. 2FA method + recovery approved. Q-MOD-1: price edits immediate + moderation feed. Category tree approved as listed. |
+| 2026-10-11 | **Plan approved; T0.1 + T0.2** | T0.1: initial docs commit `a38ecda` on `main`. T0.2 (branch `feature/T0.2-scaffold-laravel-13`): Laravel **13.35.0** scaffolded (skeleton v13.11.0, Symfony 7.4, PHPUnit 12), Composer platform pinned to PHP 8.3, `composer audit` clean, `.env.example` env inventory, `config/marketplace.php`, README. Skeleton Laravel Boost `CLAUDE.md`/`AGENTS.md` not copied (they instruct remote installers). Migrations + 2 default tests pass. App serves HTTP 200. Marketplace-only Composer 2.10.3 installed. |
 | 2026-10-11 | Phase 4 implementation plan draft | Gate 0, 11 milestones, ~45 tasks with dependencies/acceptance/tests, defaults for undecided G-/Q-UX- items with gated tasks marked, testing strategy, risks, task checklist |
 | 2026-10-11 | Global marketplace impact assessment and design | Verified: GeoNames (CC BY 4.0) coverage per country (LK 9 provinces / 25 districts, curation needed for towns), ICU currency formatting (lakh grouping, 0/3 decimals, Rs override needed), packages (laravel-phone MIT, flag-icons MIT, symfony/intl not needed). Docs: architecture 13, design 05, requirements §4.11, DB/category/routes/packages updates, ADR-019–023, prototype global flows checked in headless Edge. |
 | 2026-10-11 | Phase 3 UI/UX design draft | Design system (tokens with verified contrast, Geist, Lucide), components, IA + wireframes, forms/states/accessibility, clickable prototype checked in headless Edge (desktop/mobile, light/dark) |
