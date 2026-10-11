@@ -17,6 +17,23 @@ return [
     // ISO 3166-1 alpha-2 of the fallback country. Null = first active country.
     'default_country' => env('MARKETPLACE_DEFAULT_COUNTRY'),
 
+    // Extra hosts trusted temporarily during a domain migration (APP_ALIASES, comma-separated).
+    'app_aliases' => array_values(array_filter(array_map('trim', explode(',', (string) env('APP_ALIASES', ''))))),
+
+    // Proxies/CDNs in front of the site (TRUSTED_PROXIES, comma-separated IPs/CIDRs or *).
+    'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) env('TRUSTED_PROXIES', ''))))),
+
+    // Content-Security-Policy additions. Hosts are configuration, never code.
+    'csp' => [
+        'report_only' => (bool) env('CSP_REPORT_ONLY', false),
+        'script' => [],
+        'style' => [],
+        'img' => array_filter([env('LISTINGS_URL')]),
+        'font' => [],
+        'connect' => [],
+        'frame' => [],
+    ],
+
     'listings' => [
         'expiry_days' => (int) env('MARKETPLACE_LISTING_EXPIRY_DAYS', 60),
         'expiry_reminder_days' => 3,

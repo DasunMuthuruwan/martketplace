@@ -22,6 +22,8 @@
 | P10 | **Domain-independent signed links where possible.** | Draft-preview and similar app-generated signed links use relative signatures (`signed:relative`). Email verification links (Fortify, absolute signature) expire in 60 minutes. After a cutover, users with an in-flight link use "Resend verification". Password reset uses DB tokens (domain-independent). |
 | P11 | **Feature with domain binding avoided:** passkeys (ADR-015). | TOTP only for 2FA. |
 
+**Implementation status (T0.4, 2026-10-11):** P1 guard test (`tests/Unit/Guards/NoHardcodedValuesTest.php`, scanner in `tests/Support/HardcodedValueScanner.php`), P3 (`App\Support\RootUrl`: forces `APP_URL` root **and scheme**, HTTPS in production), P4 (`TrustConfiguredHosts`) and P5 (session defaults) are implemented and tested.
+
 ## 2. Environment Variable Inventory
 
 `.env.example` (committed, no secrets) documents every key:

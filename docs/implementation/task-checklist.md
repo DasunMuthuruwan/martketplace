@@ -16,7 +16,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T0.1 Initial docs commit, `.gitignore`, branch workflow (commit a38ecda)
 - [x] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php` (merged 6f298b8)
 - [x] T0.3 Pint, Larastan, PHPUnit, GitHub Actions CI (SQLite + MySQL 8) (merged f681a98; all checks green locally; **first GitHub CI run pending** — push blocked by GitHub credential 403)
-- [ ] T0.4 Security/portability baseline + guard tests
+- [~] T0.4 Security/portability baseline + guard tests — done on `feature/T0.4-security-portability-baseline`, **awaiting owner review**
 - [ ] T0.5 Install approved packages
 ### M1 Geo and money
 - [ ] T1.1 Currencies, countries, country_currencies

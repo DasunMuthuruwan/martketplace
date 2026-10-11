@@ -100,6 +100,8 @@ Used on: register, login (after 3 failures), password reset, listing submit, rep
 
 ## 7. HTTP Security Headers
 
+> **Implemented in T0.4 (2026-10-11):** `App\Http\Middleware\SecurityHeaders` (global). CSP nonce via `Vite::useCspNonce()`. Inline `<style>`/`<script>` must use `nonce="{{ Vite::cspNonce() }}"`. Extra CSP sources only via `config/marketplace.php` → `csp.*` (`LISTINGS_URL` is added to `img-src` automatically). `CSP_REPORT_ONLY=true` switches to Report-Only temporarily. The Vite dev server is allowed only in `local` while `public/hot` exists. `TrustConfiguredHosts` (exact `APP_URL` host + `APP_ALIASES`, no subdomains, enforced in every environment except `local`; forged hosts get HTTP 400). `TrustConfiguredProxies` reads `TRUSTED_PROXIES`. Session cookie `dtm_session`, host-only, HttpOnly, SameSite=Lax, Secure by default in production.
+
 `SecurityHeaders` middleware: `Strict-Transport-Security` (production; `includeSubDomains` **not** set, because this app must not affect other Dev Talk subdomains), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (camera, mic and geolocation off), and a **Content-Security-Policy** from day one with nonces for inline scripts (Livewire supports CSP nonces). Allowed sources: self, `challenges.cloudflare.com`. Analytics sources are added only if approved.
 
 ## 8. Privacy Controls
