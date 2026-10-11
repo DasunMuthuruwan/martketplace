@@ -54,7 +54,7 @@ Labels: **[VERIFIED]** checked from source data · **[RECOMMENDED]** proposal ·
 
 - **Flags:** rendered from `iso2` using the **flag-icons** SVG set (MIT) bundled with Vite. No flag images are stored. Emoji flags are not used because Windows doesn't render them.
 - **Adding a country** = activate it + import its regions/cities (§4.3) + set labels/units. No code change.
-- All ~250 countries are seeded (inactive). Owner activates the launch countries ([OPEN G-1]).
+- All countries are seeded inactive. Owner activates the launch countries ([OPEN G-1]). **Implemented (T1.1):** 250 countries from the GeoNames `countryInfo.txt` snapshot (`database/data/geonames/`, obsolete `CS`/`AN` excluded), with phone codes from libphonenumber, `number_locale = en_{ISO2}` (ICU falls back to `en` where no such locale exists), and a default timezone (capital-matching zone or `database/data/countries.php` override). Seeders never modify existing rows, so admin changes survive a re-run.
 
 ### 2.2 `country_currencies` (Allowed Listing Currencies)
 
@@ -79,7 +79,7 @@ MVP proposal: **only the default currency per country** [OPEN G-4]. The table ex
 | display_decimals | enum(`auto`,`always`,`never`) default `auto` | `auto`: hide decimals when the amount is whole (`Rs 12,500,000`, not `Rs 12,500,000.00`) |
 | is_active | bool | |
 
-Seeded from ICU data available through PHP `intl` (no extra package) plus the ISO 4217 list. Reviewed by the owner for symbol overrides.
+Seeded from ICU data available through PHP `intl` (no extra package). **Implemented (T1.1):** 154 currencies (every currency used by a seeded country), English names, ISO numeric codes and minor units from ICU/CLDR, `LKR → Rs` override in `database/data/countries.php`. Further overrides are an owner/admin decision.
 
 ### 3.2 Listing Price Storage (ADR-020)
 

@@ -19,7 +19,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T0.4 Security/portability baseline + guard tests (merged 1942a94)
 - [x] T0.5 Install approved packages (merged 748383e) — **Milestone M0 complete**
 ### M1 Geo and money
-- [ ] T1.1 Currencies, countries, country_currencies
+- [~] T1.1 Currencies, countries, country_currencies — done on `feature/T1.1-currencies-countries`, **awaiting owner review**
 - [ ] T1.2 Regions, cities, localities, location requests + LocationChain rule
 - [ ] T1.3 GeoNames import commands
 - [!] T1.4 Sri Lanka curated data — gated by G-1, G-3 and owner review C1
