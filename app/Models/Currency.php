@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\DisplayDecimals;
+use Database\Factories\CurrencyFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
@@ -21,7 +23,8 @@ use Spatie\Translatable\HasTranslations;
  */
 class Currency extends Model
 {
-    use HasTranslations;
+    /** @use HasFactory<CurrencyFactory> */
+    use HasFactory, HasTranslations;
 
     protected $primaryKey = 'code';
 

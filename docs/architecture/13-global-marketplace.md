@@ -118,8 +118,8 @@ countries ─< regions (level 1: state / province / nation)
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `regions` | id, country_id, parent_id null, level (1/2), name json, slug, code (e.g. GeoNames `LK.36`), geonames_id null, is_active, sort_order | Unique `(country_id, parent_id, slug)`. Labels come from the country (no global "Province" label). |
-| `cities` | id, country_id, region_id (deepest level), name json, ascii_name, slug, latitude/longitude decimal(9,6) null, population int null, geonames_id null, is_active, is_curated | Unique `(region_id, slug)`. `country_id` is denormalised for fast lookups. |
+| `regions` | id, country_id, parent_id null, level (1/2), name json, slug, code (e.g. GeoNames `LK.36`), geonames_id null, is_active, sort_order | **Unique `(country_id, slug)`** (implemented T1.2): location URLs accept a level-1 or level-2 slug, so slugs must be unique per country. This also avoids MySQL treating NULL parents as distinct. Labels come from the country (no global "Province" label). |
+| `cities` | id, country_id, region_id (deepest level; **null only for countries with 0 region levels**), name json, ascii_name, slug, latitude/longitude decimal(9,6) null, population int null, geonames_id null, is_active, is_curated | Unique `(country_id, region_id, slug)`. `country_id` is denormalised for fast lookups. |
 | `localities` | id, city_id, name json, slug, is_active | Optional, curated. Only countries/cities where the Owner adds them. |
 | `location_requests` | id, user_id, country_id, region_id, proposed_city, proposed_locality, status, handled_by | "My town isn't listed": queued for staff to add (§4.5). |
 
@@ -135,6 +135,8 @@ countries ─< regions (level 1: state / province / nation)
 ### 4.2 Listing Location Columns
 
 `listings.country_id` (required), `region_id` (level 1), `subregion_id` (level 2, null), `city_id`, `locality_id` (null), `locality_text` varchar(80) null (free text when no curated locality; shown but not filterable; moderated). All IDs are stored (owner requirement: filtering stays reliable when names change). Server-side validation checks that the chain is consistent (city ∈ subregion ∈ region ∈ country) and active.
+
+**Validation (implemented T1.2):** `App\Validation\LocationChain` is an after-validation hook (`FormRequest::after()` / `Validator::after()`). Errors land on the exact field, and messages use the country's terms ("Select the province.", "The selected district is not in this province."). It checks existence, active state, parent/country membership, the country's region levels and `require_*` flags, rejects a child given without its parent, and rejects malformed IDs before any query.
 
 **No street address** is collected. Location display: `Nugegoda, Colombo District, Western Province, Sri Lanka` on detail pages (configurable display depth: cards show `Nugegoda, Colombo` within one country, plus the flag/country on cross-country results).
 

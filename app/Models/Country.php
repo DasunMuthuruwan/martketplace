@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\CountryFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -30,7 +32,8 @@ use Spatie\Translatable\HasTranslations;
  */
 class Country extends Model
 {
-    use HasTranslations;
+    /** @use HasFactory<CountryFactory> */
+    use HasFactory, HasTranslations;
 
     /** Location levels whose label can be set per country. */
     public const LABEL_LEVELS = ['region', 'subregion', 'city', 'locality'];
