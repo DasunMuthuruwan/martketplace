@@ -14,7 +14,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ## Phase 5 — Backend
 ### M0 Foundation
 - [x] T0.1 Initial docs commit, `.gitignore`, branch workflow (commit a38ecda)
-- [~] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php` — done on `feature/T0.2-scaffold-laravel-13`, **awaiting owner review/merge**
+- [x] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php` (merged 6f298b8)
 - [ ] T0.3 Pint, Larastan, PHPUnit, GitHub Actions CI (SQLite + MySQL 8)
 - [ ] T0.4 Security/portability baseline + guard tests
 - [ ] T0.5 Install approved packages

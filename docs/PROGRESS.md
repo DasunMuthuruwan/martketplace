@@ -4,7 +4,7 @@ Source of truth for project status. Update after every task.
 
 ## Current Phase
 
-**Phase 5 — Backend development: started.** Phase 4 plan approved 2026-10-11. Current task: **T0.2 awaiting owner review** ([task checklist](implementation/task-checklist.md)). Also awaiting review: **global marketplace revision** The owner changed scope from Sri Lanka-only to multi-country. Requirements v0.4, architecture doc 13, database/category/routes/packages updates, ADR-019–023, design doc 05 and the prototype were revised. **Phase 3 UI/UX design** is also awaiting approval ([design/README.md](design/README.md)). Phase 2 was approved on 2026-10-11 (global changes to it pending approval).
+**Phase 5 — Backend development: started.** Phase 4 plan approved 2026-10-11. T0.2 merged. Next task: **T0.3** (Pint, Larastan, CI) ([task checklist](implementation/task-checklist.md)). Also awaiting review: **global marketplace revision** The owner changed scope from Sri Lanka-only to multi-country. Requirements v0.4, architecture doc 13, database/category/routes/packages updates, ADR-019–023, design doc 05 and the prototype were revised. **Phase 3 UI/UX design** is also awaiting approval ([design/README.md](design/README.md)). Phase 2 was approved on 2026-10-11 (global changes to it pending approval).
 Implementation (Phase 5) must still not start until Phases 3 and 4 are approved and the hosting conditions are verified.
 
 ## Phase Checklist
