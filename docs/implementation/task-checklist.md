@@ -20,7 +20,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T0.5 Install approved packages (merged 748383e) — **Milestone M0 complete**
 ### M1 Geo and money
 - [x] T1.1 Currencies, countries, country_currencies (merged 43ca29f)
-- [~] T1.2 Regions, cities, localities, location requests + LocationChain rule — done on `feature/T1.2-locations`, **awaiting owner review**
+- [x] T1.2 Regions, cities, localities, location requests + LocationChain rule (merged 2a76ed3)
 - [ ] T1.3 GeoNames import commands
 - [!] T1.4 Sri Lanka curated data — gated by G-1, G-3 and owner review C1
 - [!] T1.5 Money, units, AreaConverter, UnitPrice — gated by G-5, G-6
