@@ -33,7 +33,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ### M3 Catalogue
 - [x] T3.1 Categories + seed (merged 815cf1b)
 - [x] T3.2 Attributes, options, AttributeSchema (merged 4aa86cb)
-- [~] T3.3 Attribute/option seed data (owner review C2) — in progress on `feature/T3.3-attribute-seed`
+- [~] T3.3 Attribute/option seed data — done on `feature/T3.3-attribute-seed`, **awaiting owner review (C2: makes/models list in `database/data/attributes.php`)**
 ### M4 Listings core
 - [ ] T4.1 Listings tables, indexes, public scope
 - [ ] T4.2 Draft actions (location, details, price, units)

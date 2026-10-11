@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             MeasurementUnitSeeder::class,
             RolesAndPermissionsSeeder::class,
             CategorySeeder::class,
+            AttributeSeeder::class,
         ]);
     }
 }

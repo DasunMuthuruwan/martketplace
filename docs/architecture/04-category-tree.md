@@ -152,6 +152,14 @@ Most leaves use only core fields plus an optional `brand`. Fashion adds Gender (
 
 "Other" with free text is always available, so missing options never block a seller. Moderators can promote common "Other" values to real options.
 
+> **Seeded in T3.3 (`database/data/attributes.php`, owner review C2 pending):** 56 attributes, about 800 options and links for all 48 leaves. Choices made while compiling it, all editable in Admin later:
+> - **Separate make/model pairs per vehicle type:** `make`/`model` (cars, vans, SUVs, lorries, buses; 33 makes, about 330 models), `motorcycle_make`/`motorcycle_model`, `three_wheeler_make`/`three_wheeler_model`, `machinery_make`. One shared list would show motorcycle models under car makes (Honda, Suzuki). Parts reuse the matching make list as "compatible make". Micro is scoped to LK.
+> - **Phones:** `phone_brand`/`phone_model` (12 brands; Xiaomi, Redmi and POCO grouped), models up to the 2025 releases. Newer models are added by admins, and "Other" covers gaps.
+> - **Floor area** is an area attribute limited to sq ft and m² (`rules.units`), so it is never entered in land units; land size uses the country's land units. Land's calculated price per unit uses `land_size`.
+> - **Land type crops** (tea, rubber, coconut, paddy) are scoped to IN and LK. **Deed type** and **clear deed** are LK only. **Tenure** is offered everywhere, including LK (scopes cannot yet say "all except LK"; tell us if LK should hide it).
+> - **Year of registration** left empty means unregistered, instead of a separate "Unregistered" option.
+> - Fields on cards and filters follow §3 (R/F/C columns). Re-running the seeder never overwrites attributes or options and never re-links a category that already has links.
+
 ## 5. Questions for the Owner
 
 Status after owner approval of the tree as documented (2026-10-11). Phase 3 will raise any remaining point again before the seed data is finalised.

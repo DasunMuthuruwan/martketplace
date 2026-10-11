@@ -23,7 +23,7 @@ use Spatie\Translatable\HasTranslations;
  * @property AttributeType $type
  * @property string|null $unit display unit for plain numbers (km, cc, GB)
  * @property string|null $dimension "area": entered as value + a unit offered by the listing country
- * @property array<string, int|float>|null $rules
+ * @property array<string, mixed>|null $rules {min, max, step, maxlength, max_years_ahead, units (area: allowed unit codes)}
  * @property int|null $depends_on_attribute_id
  * @property bool $allows_other
  * @property string|null $help_text

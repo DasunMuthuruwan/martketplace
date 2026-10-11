@@ -72,7 +72,7 @@ class AttributeSchema
 
             $units = [];
             if ($attribute->dimension === MeasurementUnit::AREA) {
-                $units = $areaUnits ??= $this->areaUnits($iso2);
+                $units = $this->unitsFor($attribute, $areaUnits ??= $this->areaUnits($iso2));
                 if ($units === []) {
                     continue; // no unit to enter it in
                 }
@@ -109,9 +109,42 @@ class AttributeSchema
     private function areaUnits(string $iso2): array
     {
         return $this->units->forCountry(Country::where('iso2', $iso2)->first())
-            ->map(fn (MeasurementUnit $unit) => ['code' => $unit->code, 'symbol' => $unit->symbol, 'name' => $unit->getTranslations('name')])
+            ->map(fn (MeasurementUnit $unit) => $this->unitArray($unit))
             ->values()
             ->all();
+    }
+
+    /**
+     * Units for one area attribute. `rules.units` limits an attribute to suitable units (floor
+     * area: building units only, never land units): the country's units in that list, or, when the
+     * country offers none of them, the attribute's own list in its order.
+     *
+     * @param  list<array{code: string, symbol: string, name: array<string, string>}>  $countryUnits
+     * @return list<array{code: string, symbol: string, name: array<string, string>}>
+     */
+    private function unitsFor(Attribute $attribute, array $countryUnits): array
+    {
+        $allowed = $attribute->rules['units'] ?? null;
+        if (! is_array($allowed) || $allowed === []) {
+            return $countryUnits;
+        }
+
+        $matching = array_values(array_filter($countryUnits, fn (array $unit) => in_array($unit['code'], $allowed, true)));
+        if ($matching !== []) {
+            return $matching;
+        }
+
+        return MeasurementUnit::area()->active()->whereIn('code', $allowed)->get()
+            ->sortBy(fn (MeasurementUnit $unit) => array_search($unit->code, $allowed, true))
+            ->map(fn (MeasurementUnit $unit) => $this->unitArray($unit))
+            ->values()
+            ->all();
+    }
+
+    /** @return array{code: string, symbol: string, name: array<string, string>} */
+    private function unitArray(MeasurementUnit $unit): array
+    {
+        return ['code' => $unit->code, 'symbol' => $unit->symbol, 'name' => $unit->getTranslations('name')];
     }
 
     /**
