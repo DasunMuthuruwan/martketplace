@@ -17,7 +17,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php` (merged 6f298b8)
 - [x] T0.3 Pint, Larastan, PHPUnit, GitHub Actions CI (SQLite + MySQL 8) (merged f681a98; all checks green locally; **first GitHub CI run pending** — push blocked by GitHub credential 403)
 - [x] T0.4 Security/portability baseline + guard tests (merged 1942a94)
-- [~] T0.5 Install approved packages — done on `feature/T0.5-install-packages`, **awaiting owner review**
+- [x] T0.5 Install approved packages (merged 748383e) — **Milestone M0 complete**
 ### M1 Geo and money
 - [ ] T1.1 Currencies, countries, country_currencies
 - [ ] T1.2 Regions, cities, localities, location requests + LocationChain rule
