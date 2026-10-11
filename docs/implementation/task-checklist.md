@@ -33,9 +33,9 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ### M3 Catalogue
 - [x] T3.1 Categories + seed (merged 815cf1b)
 - [x] T3.2 Attributes, options, AttributeSchema (merged 4aa86cb)
-- [~] T3.3 Attribute/option seed data — done on `feature/T3.3-attribute-seed`, **awaiting owner review (C2: makes/models list in `database/data/attributes.php`)**
+- [x] T3.3 Attribute/option seed data (merged b3ede9a; C2 approved 2026-10-11)
 ### M4 Listings core
-- [ ] T4.1 Listings tables, indexes, public scope
+- [~] T4.1 Listings tables, indexes, public scope — in progress on `feature/T4.1-listings-tables`
 - [ ] T4.2 Draft actions (location, details, price, units)
 - [ ] T4.3 Image pipeline (also decide the skeleton's `storage.local` serve/upload routes from `config/filesystems.php` → `local.serve`: signed-URL only, unused by our design; disable unless needed)
 - [ ] T4.4 Lifecycle and moderation actions
