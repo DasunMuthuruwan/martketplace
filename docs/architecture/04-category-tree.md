@@ -174,6 +174,8 @@ One global category tree is used for every country. Items that only make sense i
 | Vehicle makes/models | Global. Options can be scoped later if a market needs local brands (e.g. Micro, Perodua). |
 | Everything else | Global |
 
+> **Seeded in T3.1 (`database/data/categories.php`, review welcome):** the tree in §1 with these per-leaf refinements, all editable later in Admin: **Land** allows only `fixed` / `negotiable` prices; **Rooms & Annexes** and **Holiday & Short-stay Rentals** allow Rent and Wanted only (a room or holiday stay is not sold); **Three-wheeler Parts** is scoped like Three-wheelers (IN, LK); Vehicles and Property allow 10 images, other groups 8; Home/Furniture and Other Items allow "free" giveaways; Property hides the item condition. The seeder only creates missing categories (matched by slug), so admin edits survive a re-run.
+
 Rules:
 - Validation rejects a scoped category, attribute or option posted for a country outside its scope.
 - Attribute schemas are cached **per category + country**.

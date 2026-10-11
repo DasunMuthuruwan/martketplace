@@ -198,6 +198,8 @@ Indexes: `email` (unique), `phone`, `(status)`, `deleted_at`.
 
 Indexes: `(parent_id, sort_order)`, `(is_active)`.
 
+> **Implementation note (T3.1):** `unit_price_label` is **not** created. ADR-021 moved the "price per" unit to the listing country (`countries.land_price_unit_id`), and a per-category `perch` label would hardcode a land unit. `unit_price_attribute_id` is added in T3.2 together with the `attributes` table it references. `parent_id` uses `ON DELETE RESTRICT`; the two-level rule, self-parent, empty `allowed_types` and unknown enum values are rejected in `App\Models\Category` (`InvalidCategoryTree`). The "no children under a category that has listings" rule and the listings FK (`RESTRICT`) arrive with the listings table in T4.1.
+
 ### 2.4 `attributes`
 
 | Column | Type | Notes |

@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             CountrySeeder::class,
             RolesAndPermissionsSeeder::class,
+            CategorySeeder::class,
         ]);
     }
 }

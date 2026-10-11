@@ -31,7 +31,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T2.3 Account settings backend (merged 0fbd474)
 - [x] T2.4 Staff session limits (follow-up to T2.2: 30-min idle, 8-h absolute, no remember-me for staff) (merged 5b5614a)
 ### M3 Catalogue
-- [~] T3.1 Categories + seed (G-13 default accepted) — in progress on `feature/T3.1-categories`
+- [~] T3.1 Categories + seed (G-13 default accepted) — done on `feature/T3.1-categories`, **awaiting owner review**
 - [ ] T3.2 Attributes, options, AttributeSchema
 - [ ] T3.3 Attribute/option seed data (owner review C2)
 ### M4 Listings core
