@@ -5,6 +5,8 @@
 | Status | **Approved 2026-10-11** (TOTP only, recovery process, two Owner accounts recommended) |
 | Decision basis | CD-11 approved: 2FA mandatory for Owner and Admin. Owner asked for the method and recovery process to be documented first. |
 
+> **Implementation status (T2.2, 2026-10-11):** TOTP with confirmation, recovery codes, the challenge screen, Owner/Admin enforcement on `/admin`, a 15-minute password re-check (`auth.password_timeout = 900`, applied to every user, not only staff: simpler and stricter), and `marketplace:reset-2fa` (clears 2FA, ends sessions, emails the user) are implemented and tested. **Not yet implemented:** the staff idle timeout (30 min) and absolute session lifetime (8 h) in §6; email alerts for password/role changes; audit-log entries (these arrive with the audit log, M4/M6); Owner-initiated 2FA reset in Admin → Staff (T6.2).
+
 ## 1. Method
 
 | Item | Design |

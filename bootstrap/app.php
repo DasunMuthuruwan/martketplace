@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountActive;
+use App\Http\Middleware\EnsureStaffTwoFactor;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\TrustConfiguredHosts;
 use App\Http\Middleware\TrustConfiguredProxies;
@@ -20,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->replace(TrustProxies::class, TrustConfiguredProxies::class);
         $middleware->prepend(TrustConfiguredHosts::class);
         $middleware->append(SecurityHeaders::class);
+
+        // Suspended/banned users are signed out on their next request (AUTH-09).
+        $middleware->appendToGroup('web', EnsureAccountActive::class);
+        $middleware->alias(['staff.2fa' => EnsureStaffTwoFactor::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

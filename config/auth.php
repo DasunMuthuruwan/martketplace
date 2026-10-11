@@ -112,6 +112,7 @@ return [
     |
     */
 
-    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+    // 15 minutes: sensitive actions (2FA changes, staff/settings changes) re-ask the password (CD-11).
+    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 900),
 
 ];

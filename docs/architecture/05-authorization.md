@@ -16,6 +16,8 @@
 6. **Admin area** (`/admin`) requires `access-admin` (any staff role), a verified email, an active account and, for Owner/Admin, confirmed 2FA (CD-11). Sensitive actions also need password re-confirmation within 15 minutes ([2FA doc](12-authentication-and-2fa.md) §6).
 7. **Audit:** every staff action that changes data writes an `audit_logs` row.
 
+> **Implemented in T2.2 (2026-10-11).** Matrix in `App\Authorization\Permissions` (single source for seeder, gates and tests; a test checks every cell against §3). Hierarchy in `App\Authorization\StaffHierarchy`. **Refinement:** Owners may act on every account except their own, including other Owners. This is needed to reset a locked-out Owner's 2FA (2FA doc §5). Everyone else needs a strictly higher rank. The last-Owner guard (`ChangeStaffRole` locks the Owner set in a transaction) stops two Owners demoting each other at the same moment from leaving zero Owners. The first Owner is appointed with `php artisan marketplace:make-owner {email}` (server access only). `EnsureAccountActive` signs out suspended/banned users on their next request; `EnsureStaffTwoFactor` (`staff.2fa`) guards `/admin`.
+
 ## 2. Permissions
 
 | Permission | Description |

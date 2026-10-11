@@ -27,7 +27,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [!] T1.6 CountryContext — gated by G-2
 ### M2 Accounts and roles
 - [x] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot (merged eb97d18)
-- [ ] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm
+- [~] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm — done on `feature/T2.2-roles-staff-security`, **awaiting owner review** (staff idle/absolute session timeouts still open)
 - [ ] T2.3 Account settings backend
 ### M3 Catalogue
 - [!] T3.1 Categories + seed — gated by G-13

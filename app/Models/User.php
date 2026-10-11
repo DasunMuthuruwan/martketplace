@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ContactVisibility;
+use App\Enums\StaffRole;
 use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Marketplace account (buyer and seller). Status, visibility and staff fields are never
@@ -33,13 +36,29 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $suspended_until
  * @property Carbon|null $last_login_at
  * @property bool $legal_hold
+ * @property string|null $two_factor_secret encrypted
+ * @property string|null $two_factor_recovery_codes encrypted
+ * @property Carbon|null $two_factor_confirmed_at
  */
 #[Fillable(['name', 'email', 'password', 'phone', 'phone_country', 'country_id'])]
 #[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, HasRoles, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+
+    /**
+     * Same defaults as the database columns, so a freshly created instance (e.g. right after
+     * registration, before it is reloaded) already has its status and visibility.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'active',
+        'contact_visibility' => 'hidden',
+        'locale' => 'en',
+        'legal_hold' => false,
+    ];
 
     /**
      * @return array<string, string>
@@ -57,6 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'last_login_at' => 'datetime',
             'legal_hold' => 'boolean',
             'anonymised_at' => 'datetime',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 
@@ -82,5 +102,39 @@ class User extends Authenticatable implements MustVerifyEmail
             UserStatus::Suspended => $this->suspended_until !== null && $this->suspended_until->isPast(),
             UserStatus::Banned => false,
         };
+    }
+
+    /** Highest staff role, or null for buyers/sellers. */
+    public function staffRole(): ?StaffRole
+    {
+        foreach (StaffRole::cases() as $role) {
+            if ($this->hasRole($role->value)) {
+                return $role;
+            }
+        }
+
+        return null;
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->staffRole() !== null;
+    }
+
+    /** 0 for regular users; see StaffRole::rank(). */
+    public function staffRank(): int
+    {
+        return $this->staffRole()?->rank() ?? 0;
+    }
+
+    public function hasConfirmedTwoFactor(): bool
+    {
+        return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
+    }
+
+    /** Owner/Admin without confirmed 2FA may not enter the admin area (CD-11). */
+    public function mustSetUpTwoFactor(): bool
+    {
+        return ($this->staffRole()?->requiresTwoFactor() ?? false) && ! $this->hasConfirmedTwoFactor();
     }
 }

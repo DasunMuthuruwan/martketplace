@@ -43,12 +43,12 @@ class InstalledPackagesTest extends TestCase
 
     public function test_only_the_enabled_fortify_features_expose_routes(): void
     {
-        foreach (['login', 'register', 'password.request', 'password.reset', 'verification.notice', 'password.confirm'] as $name) {
-            $this->assertTrue(Route::has($name), "Fortify route [{$name}] should be enabled (T2.1)");
+        foreach (['login', 'register', 'password.request', 'password.reset', 'verification.notice', 'password.confirm', 'two-factor.login', 'two-factor.enable'] as $name) {
+            $this->assertTrue(Route::has($name), "Fortify route [{$name}] should be enabled (T2.1/T2.2)");
         }
 
-        // Two-factor arrives in T2.2, profile and password updates in T2.3.
-        foreach (['two-factor.login', 'two-factor.enable', 'user-profile-information.update', 'user-password.update'] as $name) {
+        // Profile and password updates arrive in T2.3.
+        foreach (['user-profile-information.update', 'user-password.update'] as $name) {
             $this->assertFalse(Route::has($name), "Fortify route [{$name}] must not be live yet");
         }
     }
