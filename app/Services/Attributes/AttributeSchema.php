@@ -6,7 +6,10 @@ use App\Models\Attribute;
 use App\Models\AttributeOption;
 use App\Models\Category;
 use App\Models\CategoryAttribute;
+use App\Models\Country;
+use App\Models\MeasurementUnit;
 use App\Services\Catalogue\CatalogueCache;
+use App\Services\Money\AreaUnits;
 use App\Support\CountryScope;
 
 /**
@@ -17,6 +20,8 @@ use App\Support\CountryScope;
  */
 class AttributeSchema
 {
+    public function __construct(private readonly AreaUnits $units) {}
+
     public function for(Category $category, string $iso2): CategorySchema
     {
         $iso2 = strtoupper($iso2);
@@ -55,6 +60,7 @@ class AttributeSchema
         $presentKeys = array_map(fn (array $entry) => $entry['attribute']->key, $entries);
 
         $fields = [];
+        $areaUnits = null;
         foreach ($entries as $entry) {
             $attribute = $entry['attribute'];
             $dependsOn = $attribute->dependsOn?->key;
@@ -64,12 +70,22 @@ class AttributeSchema
                 continue;
             }
 
+            $units = [];
+            if ($attribute->dimension === MeasurementUnit::AREA) {
+                $units = $areaUnits ??= $this->areaUnits($iso2);
+                if ($units === []) {
+                    continue; // no unit to enter it in
+                }
+            }
+
             $fields[] = [
                 'key' => $attribute->key,
                 'type' => $attribute->type->value,
                 'label' => $attribute->getTranslations('label'),
                 'help' => $attribute->getTranslations('help_text'),
                 'unit' => $attribute->unit,
+                'dimension' => $attribute->dimension,
+                'units' => $units,
                 'rules' => $attribute->rules ?? [],
                 'required' => $entry['link']->is_required,
                 'required_for_conditions' => $entry['link']->required_for_conditions,
@@ -83,6 +99,19 @@ class AttributeSchema
         }
 
         return $fields;
+    }
+
+    /**
+     * Area units of the country, default first.
+     *
+     * @return list<array{code: string, symbol: string, name: array<string, string>}>
+     */
+    private function areaUnits(string $iso2): array
+    {
+        return $this->units->forCountry(Country::where('iso2', $iso2)->first())
+            ->map(fn (MeasurementUnit $unit) => ['code' => $unit->code, 'symbol' => $unit->symbol, 'name' => $unit->getTranslations('name')])
+            ->values()
+            ->all();
     }
 
     /**

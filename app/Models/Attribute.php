@@ -21,7 +21,8 @@ use Spatie\Translatable\HasTranslations;
  * @property string $key
  * @property string $label
  * @property AttributeType $type
- * @property string|null $unit
+ * @property string|null $unit display unit for plain numbers (km, cc, GB)
+ * @property string|null $dimension "area": entered as value + a unit offered by the listing country
  * @property array<string, int|float>|null $rules
  * @property int|null $depends_on_attribute_id
  * @property bool $allows_other
@@ -37,7 +38,7 @@ class Attribute extends Model
     public array $translatable = ['label', 'help_text'];
 
     /** @var list<string> */
-    protected $fillable = ['key', 'label', 'type', 'unit', 'rules', 'depends_on_attribute_id', 'allows_other', 'help_text', 'is_active'];
+    protected $fillable = ['key', 'label', 'type', 'unit', 'dimension', 'rules', 'depends_on_attribute_id', 'allows_other', 'help_text', 'is_active'];
 
     /** @var array<string, mixed> */
     protected $attributes = ['allows_other' => false, 'is_active' => true];
@@ -58,6 +59,9 @@ class Attribute extends Model
         static::saving(function (Attribute $attribute): void {
             if (! preg_match('/^[a-z][a-z0-9_]{0,59}$/', $attribute->key)) {
                 throw new InvalidArgumentException("Attribute key [{$attribute->key}] must be snake_case (used in filter URLs).");
+            }
+            if ($attribute->dimension !== null && ($attribute->dimension !== MeasurementUnit::AREA || $attribute->type !== AttributeType::Number)) {
+                throw new InvalidArgumentException('Only number attributes can have a dimension, and only "area" is supported.');
             }
             if ($attribute->depends_on_attribute_id !== null) {
                 $parent = self::find($attribute->depends_on_attribute_id);

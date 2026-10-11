@@ -30,6 +30,7 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $is_active
  * @property int $sort_order
  * @property int|null $geonames_id
+ * @property int|null $land_price_unit_id unit for the calculated land price per unit (null = none)
  */
 class Country extends Model
 {
@@ -46,7 +47,7 @@ class Country extends Model
     protected $fillable = [
         'iso2', 'iso3', 'name', 'slug', 'default_currency', 'number_locale', 'phone_country_code', 'timezone',
         'region_levels', 'region_label', 'subregion_label', 'city_label', 'locality_label',
-        'require_region', 'require_city', 'is_active', 'sort_order', 'geonames_id',
+        'require_region', 'require_city', 'is_active', 'sort_order', 'geonames_id', 'land_price_unit_id',
     ];
 
     protected function casts(): array
@@ -58,6 +59,7 @@ class Country extends Model
             'is_active' => 'boolean',
             'sort_order' => 'integer',
             'geonames_id' => 'integer',
+            'land_price_unit_id' => 'integer',
         ];
     }
 
@@ -67,6 +69,26 @@ class Country extends Model
     public function defaultCurrency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'default_currency', 'code');
+    }
+
+    /**
+     * Area units offered in this country's inputs (global design §5). Use AreaUnits for the
+     * effective list, which also handles countries without their own units.
+     *
+     * @return BelongsToMany<MeasurementUnit, $this, CountryMeasurementUnit>
+     */
+    public function areaUnits(): BelongsToMany
+    {
+        return $this->belongsToMany(MeasurementUnit::class, 'country_measurement_units')
+            ->using(CountryMeasurementUnit::class)
+            ->withPivot('is_default', 'sort_order')
+            ->orderByPivot('sort_order');
+    }
+
+    /** @return BelongsTo<MeasurementUnit, $this> */
+    public function landPriceUnit(): BelongsTo
+    {
+        return $this->belongsTo(MeasurementUnit::class, 'land_price_unit_id');
     }
 
     /**

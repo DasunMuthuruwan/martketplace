@@ -4,12 +4,14 @@ namespace App\Services\Attributes;
 
 use App\Enums\AttributeType;
 use App\Models\AttributeOption;
+use App\Models\MeasurementUnit;
 use App\Rules\DependentOption;
 use Illuminate\Validation\Rule;
 
 /**
  * The attribute schema of one leaf category in one country (built by AttributeSchema).
- * Input shape: `attributes[<key>]`, plus `attributes[<key>__other]` for a free-text "Other".
+ * Input shape: `attributes[<key>]`, plus `attributes[<key>__other]` for a free-text "Other" and
+ * `attributes[<key>__unit]` for the unit of an area (a code offered by the country).
  * rules() and form() read the same field definitions.
  */
 final class CategorySchema
@@ -17,6 +19,9 @@ final class CategorySchema
     public const INPUT = 'attributes';
 
     public const OTHER_SUFFIX = '__other';
+
+    /** Unit of an area attribute: `attributes[<key>__unit]` = a unit code offered by the country. */
+    public const UNIT_SUFFIX = '__unit';
 
     public const OTHER_MAX_LENGTH = 80;
 
@@ -86,6 +91,11 @@ final class CategorySchema
                 $rules[$name.'.*'] = ['string', 'distinct', Rule::in(array_column($field['options'], 'value'))];
             }
 
+            if ($this->isArea($field)) {
+                $allowedKeys[] = $key.self::UNIT_SUFFIX;
+                $rules[$name.self::UNIT_SUFFIX] = ['nullable', 'required_with:'.$name, 'string', Rule::in(array_column($field['units'], 'code'))];
+            }
+
             if ($type === AttributeType::Select && $field['allows_other']) {
                 $allowedKeys[] = $key.self::OTHER_SUFFIX;
                 $rules[$name.self::OTHER_SUFFIX] = [
@@ -114,6 +124,7 @@ final class CategorySchema
             $names[self::INPUT.'.'.$field['key']] = $label;
             $names[self::INPUT.'.'.$field['key'].'.*'] = $label;
             $names[self::INPUT.'.'.$field['key'].self::OTHER_SUFFIX] = $label;
+            $names[self::INPUT.'.'.$field['key'].self::UNIT_SUFFIX] = $label;
         }
 
         return $names;
@@ -143,6 +154,13 @@ final class CategorySchema
                 'min' => $this->min($field, $type),
                 'max' => $this->max($field, $type),
                 'step' => $field['rules']['step'] ?? null,
+                'dimension' => $field['dimension'],
+                'units' => array_map(fn (array $unit) => [
+                    'code' => $unit['code'],
+                    'symbol' => $unit['symbol'],
+                    'label' => $this->translate($unit['name']) ?? $unit['code'],
+                ], $field['units']),
+                'default_unit' => $field['units'][0]['code'] ?? null,
                 'options' => array_map(fn (array $option) => [
                     'value' => $option['value'],
                     'label' => $this->translate($option['label']) ?? $option['value'],
@@ -177,7 +195,8 @@ final class CategorySchema
             AttributeType::Text => ['string', 'max:'.($field['rules']['maxlength'] ?? self::DEFAULT_TEXT_MAX_LENGTH)],
             AttributeType::Number => array_filter([
                 $this->isWholeNumber($field) ? 'integer' : 'numeric',
-                'min:'.$this->min($field, $type),
+                // An area must be positive (ADR-018: no zero or negative land size).
+                $this->isArea($field) ? 'gt:0' : 'min:'.$this->min($field, $type),
                 ($max = $this->max($field, $type)) !== null ? 'max:'.$max : null,
             ]),
             AttributeType::Year => ['integer', 'between:'.$this->min($field, $type).','.$this->max($field, $type)],
@@ -209,6 +228,12 @@ final class CategorySchema
             AttributeType::Year => $field['rules']['max'] ?? (int) now()->year + (int) ($field['rules']['max_years_ahead'] ?? 0),
             default => null,
         };
+    }
+
+    /** @param  array<string, mixed>  $field */
+    private function isArea(array $field): bool
+    {
+        return $field['dimension'] === MeasurementUnit::AREA;
     }
 
     /** @param  array<string, mixed>  $field */

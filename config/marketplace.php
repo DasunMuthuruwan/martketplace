@@ -93,6 +93,11 @@ return [
         'import_path' => env('GEONAMES_PATH', storage_path('app/geonames')),
     ],
 
+    // Area units (global design §5). Countries without their own units offer these unit codes.
+    'area' => [
+        'fallback_units' => ['sqm', 'hectare'],
+    ],
+
     // Staff session limits (docs/architecture/12-authentication-and-2fa.md §6).
     'staff_session' => [
         'idle_minutes' => (int) env('STAFF_SESSION_IDLE_MINUTES', 30),

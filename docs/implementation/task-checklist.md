@@ -23,7 +23,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T1.2 Regions, cities, localities, location requests + LocationChain rule (merged 2a76ed3)
 - [x] T1.3 GeoNames import commands (merged 52fe7c4)
 - [ ] T1.4 Sri Lanka curated data — G-1/G-3 defaults accepted; owner review C1 of the curated lists still required
-- [~] T1.5 Money, units, AreaConverter, UnitPrice (G-5, G-6 defaults accepted) — also adds area attributes with units (`land_size`) to AttributeSchema and sets Land's `unit_price_attribute_id`
+- [~] T1.5 Money, units, AreaConverter, UnitPrice + area attributes in AttributeSchema — done on `feature/T1.5-money-units`, **awaiting owner review** (Land's `unit_price_attribute_id` is set in T3.3 with `land_size`)
 - [ ] T1.6 CountryContext (G-2 default accepted)
 ### M2 Accounts and roles
 - [x] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot (merged eb97d18)

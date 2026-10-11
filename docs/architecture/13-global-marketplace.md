@@ -105,6 +105,8 @@ One `Money::format(amount, currency, locale)` service using ICU `NumberFormatter
 - The currency is always visible: symbol or code. Where symbols are ambiguous (`$` = USD/AUD/CAD…), cross-country pages show the ISO code next to the price (`$12,500 USD`).
 - Future currency conversion (not built): a separate "≈ €12,000 at 11 Oct 2026 rate" line from an `exchange_rates` table (`base`, `quote`, `rate`, `source`, `fetched_at`). It is never stored on the listing and never replaces the original price.
 
+> **Implementation status (T1.5):** `AppServicesMoneyMoney::format()` / `forCountry()` produce the table above (tested). Notes: ICU separates letter symbols from digits with a no-break space (`Rs 12,500,000` stays on one line); the JPY example uses the seeded `en_JP` locale (`¥`, not the full-width `￥` of `ja_JP`); amounts are rounded exactly with bcmath before ICU lays them out, so formatting is exact up to about 15 significant digits (prices above ~1 trillion with cents may lose the last cent in display only, never in storage); `withCode: true` adds the ISO code on cross-country pages unless ICU already shows it (e.g. `USD 12,500` in `en_AU`).
+
 ## 4. Locations
 
 ### 4.1 Hierarchy and Tables
@@ -209,6 +211,8 @@ Countries (activate, labels, currency, locale, units, requirements) · Regions (
 **Storage (attribute `land_size`):** `listing_attribute_values` gains `input_value DECIMAL(18,4)`, `input_unit_id` (what the seller typed, the source of truth) and `value_number` = normalised **m²** (for filtering and sorting across units). 1 perch = 25.29285264 m², 1 acre = 4,046.8564224 m², 1 rood = 1,011.7141056 m².
 
 **Per-unit price:** shown only when the category enables it (`categories.unit_price_attribute_id`, Land) **and** the listing country has `land_price_unit_id`. If the seller typed the area in that unit, it is computed from `input_value` exactly. Otherwise it is converted from m² with bcmath and rounded per the currency's display rules. Guards from ADR-018 still apply (area > 0, price > 0, sale/rent only, no manual entry).
+
+> **Implementation status (T1.5, 2026-10-11):** `measurement_units` (sqm, sq ft, sq yd, perch, cent, rood, acre, hectare; exact factors in `database/data/measurement_units.php`) and `country_measurement_units` are seeded with the G-6 defaults (LK, IN, GB, US as in the table above); other countries get the metric fallback `marketplace.area.fallback_units` (sqm, hectare) and no per-unit price. **Deviation:** no `countries.default_area_unit_id` column; the default unit is the `is_default` row of `country_measurement_units` (one source of truth). Services: `AppSupportDecimal` (bcmath, half-up rounding), `AppServicesMoneyAreaConverter`, `AreaUnits`, `UnitPrice` (null-safe guards above; exact when the seller used the target unit, otherwise converted without intermediate rounding) and `Money`. Area attributes: `attributes.dimension = area` makes `AttributeSchema` add `attributes[<key>__unit]`, limited to the country's units, with value > 0. Land's `unit_price_attribute_id` is set when `land_size` is seeded (T3.3).
 
 ## 6. Search and Filtering Rules
 
