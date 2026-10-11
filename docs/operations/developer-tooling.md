@@ -136,3 +136,17 @@ While creating the approved local `marketplace` database on XAMPP's MariaDB 10.4
 1. **Back up `C:\php8.2\mysql\data` now** (stop MySQL, copy the whole folder elsewhere), and export important databases with `mysqldump`/phpMyAdmin.
 2. Don't use this server for the marketplace. Options: a separate portable MariaDB 10.11 LTS / MySQL 8.4 LTS on another port (e.g. 3307), or SQLite locally with MySQL 8 in CI.
 3. Repairing XAMPP (e.g. `mysqlcheck --repair mysql`, InnoDB recovery) is a separate task for the owner's local environment. Do it only after the backup.
+
+**Owner decision (2026-10-11):** separate MariaDB for the marketplace; leave the XAMPP leftovers for now.
+
+### 3.1 Marketplace Local Database (Standalone MariaDB 10.11)
+
+| Item | Value |
+|---|---|
+| Version | MariaDB **10.11.19** LTS (official Windows zip, SHA-256 verified) |
+| Location | `C:\mariadb10.11` (binaries) · `C:\mariadb10.11\data` (data + `my.ini`) |
+| Listening | `127.0.0.1:3307` only (XAMPP keeps 3306). utf8mb4 / utf8mb4_unicode_ci. |
+| Start / stop | `C:\mariadb10.11\start-marketplace-db.bat` · `C:\mariadb10.11\stop-marketplace-db.bat` (asks for the root password). Not a Windows service: start it after a reboot. |
+| Root password | `C:\mariadb10.11oot-password.txt` (local only, never in git; readable by SYSTEM, Administrators and the owner account) |
+| App access | Database `marketplace`, users `marketplace@localhost` / `@127.0.0.1` with privileges on `marketplace.*` only. Credentials only in the marketplace `.env` (`DB_CONNECTION=mariadb`, port 3307). |
+| Verified | `php artisan db:show` → MariaDB 10.11.19. Default migrations ran. Tests pass. |

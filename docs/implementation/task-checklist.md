@@ -7,7 +7,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] G0.1 Owner approves the implementation plan (2026-10-11)
 - [!] G0.2 Host PHP 8.3/8.4 availability + DB version — **not yet checked; owner chose to proceed** (risk accepted 2026-10-11). Composer platform pinned to PHP 8.3 meanwhile.
 - [x] G0.3 Composer decision: marketplace-only Composer 2.10.3 at `C:\php8.4\composer.phar`, isolated `COMPOSER_HOME` (2026-10-11)
-- [!] G0.4 Local database — XAMPP MariaDB 10.4 has pre-existing corruption (Aria system tables + InnoDB log mismatch); GRANT failed. SQLite in use. Owner decision pending (see docs/operations/developer-tooling.md §3).
+- [x] G0.4 Local database: standalone **MariaDB 10.11.19** at `C:\mariadb10.11`, `127.0.0.1:3307`, database `marketplace` + own user (2026-10-11). XAMPP MariaDB (pre-existing corruption) not used, see docs/operations/developer-tooling.md §3.
 - [x] G0.5 Initial commit + branch workflow approved (2026-10-11)
 - [ ] G0.6 Defaults confirmed (G-1–G-13, Q-UX-1–6) — can be gradual
 

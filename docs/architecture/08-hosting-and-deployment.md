@@ -153,7 +153,7 @@ The previous release zip and a DB backup are taken before each deploy. Migration
   - Once the app is scaffolded, `composer.json` gets `config.platform.php` pinned to the production PHP version.
 - Not installed: Imagick (GD is the default driver), Xdebug/PCOV (coverage; can be added to `C:\php8.4\ext` later if needed).
 - An older Herd Lite PHP 8.4.0 exists at `C:\Users\ASUS\.config\herd-lite\bin`. It is unused and was not modified.
-- Local DB: a separate `marketplace` database (and user) on the existing MariaDB/MySQL server. **Never** reuse Dev Talk's database. Local MariaDB 10.4 is below the recommended 10.6 minimum; tests use SQLite and a CI MySQL 8 job covers FULLTEXT.
+- Local DB: **standalone MariaDB 10.11.19** at `C:\mariadb10.11` on `127.0.0.1:3307` with its own `marketplace` database and user (XAMPP's MariaDB 10.4 was not used: pre-existing corruption, and below the 10.6 minimum). Details: [developer tooling](../operations/developer-tooling.md) §3.1. Automated tests use SQLite in memory; CI adds a MySQL 8 job.
 - Node 22 is available locally for Vite builds.
 - **Known tooling issue:** the global Composer is 2.8.2, which has published security advisories (2.10.3 is current). Updating it (`composer self-update`) affects all projects, so it needs owner approval. `composer diagnose` also reports an invalid stored GitHub OAuth token. Plan, rollback and token instructions: [developer tooling](../operations/developer-tooling.md).
 
