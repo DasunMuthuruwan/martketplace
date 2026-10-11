@@ -1,0 +1,1 @@
+Read CLAUDE.md and the approved architecture, database design and backend instructions. Implement the next approved backend task only. Use migrations, server-side validation, policies, authorization, safe file handling and automated tests. Preserve existing functionality and report test results before continuing.

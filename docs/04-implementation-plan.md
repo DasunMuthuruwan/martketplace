@@ -1,0 +1,1 @@
+Read CLAUDE.md and all approved requirements and design documents. Create an implementation plan with small tasks, dependencies, acceptance criteria, testing requirements and milestones. Prioritize a working classifieds MVP. Do not start coding until the task plan is approved.

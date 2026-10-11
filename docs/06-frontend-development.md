@@ -1,0 +1,1 @@
+Read CLAUDE.md, the approved UI/UX design, API contracts and docs/06-frontend-development.md. Implement the next approved frontend feature using the existing supported stack. Integrate with real backend APIs, handle errors and loading states, verify responsive layouts and run build checks.

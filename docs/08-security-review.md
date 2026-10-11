@@ -1,0 +1,1 @@
+Read CLAUDE.md and docs/08-security-review.md. Perform a security review of the implemented marketplace. Inspect authorization, validation, uploads, sessions, CSRF, XSS, SQL injection, rate limiting, secrets and privacy. Reproduce issues safely, fix approved findings and provide evidence of retesting. Do not expose production secrets or perform destructive tests.

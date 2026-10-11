@@ -1,0 +1,1 @@
+Read CLAUDE.md, approved requirements and docs/03-ui-ux-design.md. Design the complete responsive marketplace UI, reusable components, navigation, forms, listing cards, dashboards and light/dark themes. Inspect existing frontend conventions first. Avoid implementing backend features during this phase. Present the design for approval.

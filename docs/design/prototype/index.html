@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketplace Prototype</title>
+<meta name="description" content="Phase 3 UI prototype for the Dev Talk Marketplace (static demo data).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css">
+<script>
+  // Apply saved theme before paint (prototype of the production behaviour).
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('mp-theme'); } catch (e) {}
+    var dark = t === 'dark' || (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (dark) document.documentElement.classList.add('dark');
+  })();
+</script>
+<style>
+:root {
+  --canvas:#F7F7F7; --surface:#FFFFFF; --surface-muted:#F0F0F0; --surface-hover:#F0F0F0;
+  --line:#E5E5E5; --control:#858585;
+  --fg:#0A0A0A; --fg-muted:#4D4D4D; --fg-subtle:#666666;
+  --primary:#0A0A0A; --primary-fg:#FFFFFF; --primary-hover:#262626;
+  --success:#137333; --danger:#C5221F; --warning:#8A5300; --info:#1A56DB;
+  --overlay:rgb(10 10 10 / .5);
+  --shadow-pop:0 12px 32px -8px rgb(0 0 0 / .18);
+  --ph1:#E9E9E9; --ph2:#D6D6D6;
+  color-scheme: light;
+}
+.dark {
+  --canvas:#0A0A0A; --surface:#141414; --surface-muted:#1C1C1C; --surface-hover:#1F1F1F;
+  --line:#2A2A2A; --control:#6E6E6E;
+  --fg:#F5F5F5; --fg-muted:#B3B3B3; --fg-subtle:#949494;
+  --primary:#F5F5F5; --primary-fg:#0A0A0A; --primary-hover:#D9D9D9;
+  --success:#4CC38A; --danger:#FF7A70; --warning:#F5B83D; --info:#7EA6FF;
+  --overlay:rgb(0 0 0 / .7);
+  --shadow-pop:0 16px 40px -8px rgb(0 0 0 / .7);
+  --ph1:#222222; --ph2:#2E2E2E;
+  color-scheme: dark;
+}
+*,*::before,*::after { box-sizing:border-box; }
+html { scroll-padding-top:80px; }
+body { margin:0; background:var(--canvas); color:var(--fg); font:400 15px/24px "Geist Variable","Geist",system-ui,-apple-system,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:inherit; text-decoration:none; }
+button, input, select, textarea { font:inherit; color:inherit; }
+img, svg { display:block; }
+.num { font-variant-numeric:tabular-nums; }
+:focus-visible { outline:2px solid var(--primary); outline-offset:2px; border-radius:6px; }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.skip { position:absolute; left:8px; top:-40px; background:var(--primary); color:var(--primary-fg); padding:8px 12px; border-radius:6px; z-index:100; }
+.skip:focus { top:8px; }
+.container { max-width:1240px; margin:0 auto; padding:0 16px; }
+@media (min-width:1024px) { .container { padding:0 24px; } }
+.icon { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.icon-sm { width:16px; height:16px; }
+
+/* Prototype switcher (not part of the product UI) */
+.proto { background:repeating-linear-gradient(45deg,var(--surface-muted),var(--surface-muted) 8px,var(--canvas) 8px,var(--canvas) 16px); border-bottom:1px solid var(--line); font-size:13px; }
+.proto .container { display:flex; gap:8px; align-items:center; padding-top:8px; padding-bottom:8px; overflow-x:auto; }
+.proto strong { white-space:nowrap; margin-right:4px; }
+.proto button { border:1px solid var(--control); background:var(--surface); border-radius:999px; padding:4px 12px; cursor:pointer; white-space:nowrap; }
+.proto button[aria-pressed="true"] { background:var(--primary); color:var(--primary-fg); border-color:var(--primary); }
+
+/* Buttons */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px; border-radius:6px; border:1px solid transparent; font-size:14px; font-weight:550; cursor:pointer; white-space:nowrap; transition:background .12s, border-color .12s; }
+.btn-primary { background:var(--primary); color:var(--primary-fg); }
+.btn-primary:hover { background:var(--primary-hover); }
+.btn-secondary { background:var(--surface); border-color:var(--control); }
+.btn-secondary:hover { background:var(--surface-hover); }
+.btn-ghost { background:transparent; }
+.btn-ghost:hover { background:var(--surface-hover); }
+.btn-danger { background:var(--danger); color:#fff; }
+.dark .btn-danger { color:#0A0A0A; }
+.btn-sm { height:32px; padding:0 12px; font-size:13px; }
+.btn-lg { height:44px; padding:0 20px; font-size:15px; }
+.btn-icon { width:40px; padding:0; }
+.btn-block { width:100%; }
+
+/* Header */
+.header { position:sticky; top:0; z-index:30; background:var(--surface); border-bottom:1px solid var(--line); }
+.header .container { display:flex; align-items:center; gap:16px; height:56px; }
+@media (min-width:1024px) { .header .container { height:64px; } }
+.logo { display:flex; align-items:center; gap:8px; font-weight:650; font-size:17px; letter-spacing:-.01em; }
+.logo-mark { width:24px; height:24px; border-radius:6px; background:var(--primary); color:var(--primary-fg); display:grid; place-items:center; font-size:13px; font-weight:700; }
+.search { flex:1; display:none; max-width:640px; border:1px solid var(--control); border-radius:6px; overflow:hidden; background:var(--surface); height:40px; }
+.search input { flex:1; border:0; padding:0 12px; background:transparent; min-width:0; }
+.search input:focus { outline:none; }
+.search:focus-within { outline:2px solid var(--primary); outline-offset:2px; }
+.search select { border:0; border-left:1px solid var(--line); background:transparent; padding:0 8px; }
+.search button { border:0; background:var(--primary); color:var(--primary-fg); width:44px; display:grid; place-items:center; cursor:pointer; }
+.header-actions { margin-left:auto; display:flex; align-items:center; gap:4px; }
+.hide-mobile { display:none; }
+@media (min-width:1024px) { .search { display:flex; } .hide-mobile { display:inline-flex; } .show-mobile { display:none !important; } }
+.catbar { display:none; border-top:1px solid var(--line); }
+.catbar .container { display:flex; gap:4px; height:44px; align-items:center; }
+.catbar a { padding:6px 10px; border-radius:6px; font-size:14px; color:var(--fg-muted); }
+.catbar a:hover, .catbar a[aria-current] { color:var(--fg); background:var(--surface-hover); }
+@media (min-width:1024px) { .catbar { display:block; } }
+
+/* Bottom nav (mobile) */
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:30; background:var(--surface); border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(5,1fr); height:60px; padding-bottom:env(safe-area-inset-bottom); }
+.bottom-nav a { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:11px; color:var(--fg-subtle); }
+.bottom-nav a[aria-current] { color:var(--fg); }
+.bottom-nav .post span.circle { width:40px; height:40px; border-radius:999px; background:var(--primary); color:var(--primary-fg); display:grid; place-items:center; margin-top:-14px; border:4px solid var(--surface); box-sizing:content-box; }
+@media (min-width:1024px) { .bottom-nav { display:none; } }
+main { padding-bottom:84px; }
+@media (min-width:1024px) { main { padding-bottom:48px; } }
+
+/* Typography helpers */
+h1, h2, h3 { margin:0; letter-spacing:-.01em; }
+.h1 { font-size:22px; line-height:28px; font-weight:650; }
+.h2 { font-size:20px; line-height:28px; font-weight:600; }
+.h3 { font-size:16px; line-height:24px; font-weight:600; }
+@media (min-width:1024px) { .h1 { font-size:26px; line-height:32px; } }
+.muted { color:var(--fg-muted); }
+.subtle { color:var(--fg-subtle); }
+.small { font-size:13px; line-height:18px; }
+.section { margin-top:24px; }
+@media (min-width:1024px) { .section { margin-top:40px; } }
+.section-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
+.link { text-decoration:underline; text-underline-offset:3px; }
+
+/* Cards */
+.card { background:var(--surface); border:1px solid var(--line); border-radius:10px; }
+.grid { display:grid; gap:12px; grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (min-width:768px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; } }
+@media (min-width:1280px) { .grid.g4 { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+.lcard { position:relative; overflow:hidden; display:flex; flex-direction:column; transition:border-color .12s; }
+.lcard:hover { border-color:var(--control); }
+.lcard:focus-within { outline:2px solid var(--primary); outline-offset:2px; }
+.ph { position:relative; aspect-ratio:4/3; background:linear-gradient(135deg,var(--ph1),var(--ph2)); display:grid; place-items:center; color:var(--fg-subtle); }
+.ph .icon { width:36px; height:36px; opacity:.55; }
+.photo-count .icon { width:14px; height:14px; opacity:1; }
+.photo-count { position:absolute; left:8px; bottom:8px; background:rgb(0 0 0 / .6); color:#fff; font-size:12px; padding:2px 6px; border-radius:4px; display:flex; gap:4px; align-items:center; }
+.fav { position:absolute; top:6px; right:6px; z-index:2; width:36px; height:36px; border-radius:999px; border:0; background:rgb(255 255 255 / .92); color:#0A0A0A; display:grid; place-items:center; cursor:pointer; }
+.fav[aria-pressed="true"] svg { fill:#0A0A0A; }
+.lcard-body { padding:10px 12px 12px; display:flex; flex-direction:column; gap:2px; }
+.price { font-weight:700; font-size:16px; line-height:22px; font-variant-numeric:tabular-nums; }
+.price small { font-weight:500; font-size:12px; color:var(--fg-subtle); margin-left:4px; }
+.perch { font-size:13px; line-height:18px; color:var(--fg-muted); font-variant-numeric:tabular-nums; }
+.ltitle { font-size:14px; line-height:20px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ltitle a::after { content:""; position:absolute; inset:0; z-index:1; }
+.ltitle a:focus-visible { outline:none; }
+.lmeta { font-size:12.5px; line-height:18px; color:var(--fg-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lloc { font-size:12.5px; line-height:18px; color:var(--fg-subtle); }
+.badge { display:inline-flex; align-items:center; gap:4px; font-size:12px; line-height:16px; font-weight:550; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:var(--surface-muted); white-space:nowrap; }
+.badge.success { color:var(--success); }
+.badge.warning { color:var(--warning); }
+.badge.danger { color:var(--danger); }
+.sold-tag { position:absolute; top:8px; left:8px; background:#0A0A0A; color:#FFFFFF; border-color:#0A0A0A; }
+
+/* Home */
+.hero { padding:24px 0 8px; }
+.hero h1 { font-size:26px; line-height:32px; font-weight:650; }
+@media (min-width:1024px) { .hero h1 { font-size:32px; line-height:40px; } .hero { padding:40px 0 8px; } }
+.hero-search { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+@media (min-width:1024px) { .hero-search { display:none; } }
+.input, .select { height:44px; width:100%; border:1px solid var(--control); border-radius:6px; background:var(--surface); padding:0 12px; font-size:16px; }
+@media (min-width:1024px) { .input, .select { height:40px; font-size:14px; } }
+textarea.input { height:auto; padding:10px 12px; min-height:120px; resize:vertical; line-height:22px; }
+.cats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+@media (min-width:1024px) { .cats { gap:12px; } }
+.cat { display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 4px; text-align:center; font-size:12.5px; line-height:16px; font-weight:500; }
+.cat:hover { border-color:var(--control); }
+.cat .icon { width:24px; height:24px; }
+.cat .count { color:var(--fg-subtle); font-weight:400; display:none; }
+@media (min-width:768px) { .cat { flex-direction:row; justify-content:flex-start; padding:14px 16px; text-align:left; font-size:14px; gap:12px; } .cat .count { display:block; font-size:12.5px; } }
+.safety { display:flex; gap:12px; align-items:center; padding:14px 16px; }
+
+/* Search page */
+.crumbs { display:flex; flex-wrap:wrap; gap:6px; font-size:13px; color:var(--fg-subtle); padding:16px 0 8px; }
+.crumbs a:hover { color:var(--fg); text-decoration:underline; }
+.layout { display:grid; gap:24px; }
+@media (min-width:1024px) { .layout { grid-template-columns:272px minmax(0,1fr); } }
+.filters { display:none; }
+@media (min-width:1024px) { .filters { display:block; position:sticky; top:128px; align-self:start; max-height:calc(100vh - 140px); overflow:auto; } }
+.fgroup { padding:14px 16px; border-bottom:1px solid var(--line); }
+.fgroup:last-child { border-bottom:0; }
+.fgroup legend, .fgroup .flabel { font-size:13px; font-weight:600; margin-bottom:8px; padding:0; }
+fieldset { border:0; margin:0; padding:0; min-width:0; }
+.range { display:grid; grid-template-columns:1fr auto 1fr; gap:6px; align-items:center; }
+.check { display:flex; align-items:center; gap:8px; font-size:14px; padding:4px 0; cursor:pointer; }
+.check input { width:18px; height:18px; accent-color:var(--primary); margin:0; }
+.toolbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.toolbar .count { font-weight:600; margin-right:auto; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.chip { display:inline-flex; align-items:center; gap:4px; height:30px; padding:0 6px 0 12px; border-radius:999px; border:1px solid var(--control); background:var(--surface); font-size:13px; cursor:pointer; }
+.mobile-filterbar { display:flex; gap:8px; margin-bottom:12px; }
+@media (min-width:1024px) { .mobile-filterbar { display:none; } }
+.pager { display:flex; gap:4px; justify-content:center; margin-top:24px; flex-wrap:wrap; }
+.pager a { min-width:40px; height:40px; display:grid; place-items:center; border-radius:6px; border:1px solid var(--line); background:var(--surface); font-size:14px; padding:0 10px; }
+.pager a[aria-current] { background:var(--primary); color:var(--primary-fg); border-color:var(--primary); }
+
+/* Drawer */
+.drawer { position:fixed; inset:0; z-index:50; display:none; }
+.drawer.open { display:block; }
+.drawer .backdrop { position:absolute; inset:0; background:var(--overlay); }
+.drawer .panel { position:absolute; inset:0 0 0 auto; width:min(420px,100%); background:var(--surface); display:flex; flex-direction:column; box-shadow:var(--shadow-pop); }
+.drawer .panel header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); }
+.drawer .panel .body { overflow:auto; flex:1; }
+.drawer .panel footer { padding:12px 16px; border-top:1px solid var(--line); display:flex; gap:8px; }
+
+/* Detail */
+.detail { display:grid; gap:24px; }
+@media (min-width:1024px) { .detail { grid-template-columns:minmax(0,1fr) 360px; } }
+.gallery .main { aspect-ratio:4/3; border-radius:10px; overflow:hidden; }
+.gallery .main .ph .icon { width:56px; height:56px; }
+.thumbs { display:flex; gap:8px; margin-top:8px; overflow-x:auto; }
+.thumbs button { width:76px; flex:none; aspect-ratio:4/3; border-radius:6px; border:2px solid transparent; padding:0; overflow:hidden; cursor:pointer; background:none; }
+.thumbs button[aria-current="true"] { border-color:var(--primary); }
+.thumbs .ph .icon { width:18px; height:18px; }
+.facts { display:flex; flex-wrap:wrap; gap:6px; }
+.dl { display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); margin:0; }
+@media (min-width:640px) { .dl { grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:24px; } }
+.dl div { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px; }
+.dl dt { color:var(--fg-subtle); }
+.dl dd { margin:0; font-weight:500; text-align:right; }
+.side { display:flex; flex-direction:column; gap:12px; }
+@media (min-width:1024px) { .side { position:sticky; top:128px; align-self:start; } }
+.panel-pad { padding:16px; }
+.price-xl { font-size:28px; line-height:34px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+.tip { display:flex; gap:8px; font-size:13px; line-height:18px; color:var(--fg-muted); margin-top:12px; }
+.seller { display:flex; gap:12px; align-items:center; }
+.avatar { width:44px; height:44px; border-radius:999px; background:var(--surface-muted); display:grid; place-items:center; font-weight:600; border:1px solid var(--line); }
+.mobile-contact { position:fixed; left:0; right:0; bottom:0; z-index:31; background:var(--surface); border-top:1px solid var(--line); padding:8px 16px calc(8px + env(safe-area-inset-bottom)); display:flex; gap:8px; align-items:center; }
+.mobile-contact .price { margin-right:auto; }
+@media (min-width:1024px) { .mobile-contact { display:none; } }
+
+/* Wizard */
+.wizard { max-width:760px; margin:0 auto; }
+.steps { display:flex; gap:4px; list-style:none; padding:0; margin:16px 0 20px; counter-reset:s; overflow-x:auto; }
+.steps li { flex:1; min-width:92px; font-size:12.5px; line-height:16px; color:var(--fg-subtle); counter-increment:s; }
+.steps li::before { content:""; display:block; height:3px; border-radius:2px; background:var(--line); margin-bottom:6px; }
+.steps li.done::before, .steps li[aria-current]::before { background:var(--primary); }
+.steps li[aria-current] { color:var(--fg); font-weight:600; }
+.field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+.field label, .field .label { font-size:14px; font-weight:550; }
+.hint { font-size:13px; line-height:18px; color:var(--fg-subtle); }
+.err { font-size:13px; line-height:18px; color:var(--danger); display:flex; gap:6px; align-items:center; }
+.input[aria-invalid="true"] { border-color:var(--danger); }
+.row2 { display:grid; gap:12px; grid-template-columns:1fr; }
+@media (min-width:640px) { .row2 { grid-template-columns:1fr 1fr; } }
+.radio-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.radio-cards label { border:1px solid var(--control); border-radius:6px; padding:10px; text-align:center; font-size:14px; cursor:pointer; background:var(--surface); }
+.radio-cards input { position:absolute; opacity:0; pointer-events:none; }
+.radio-cards input:checked + span { font-weight:600; }
+.radio-cards label:has(input:checked) { border-color:var(--primary); box-shadow:inset 0 0 0 1px var(--primary); }
+.radio-cards label:has(input:focus-visible) { outline:2px solid var(--primary); outline-offset:2px; }
+.prefix { display:flex; border:1px solid var(--control); border-radius:6px; overflow:hidden; background:var(--surface); }
+.prefix span { display:grid; place-items:center; padding:0 12px; background:var(--surface-muted); border-right:1px solid var(--line); font-size:14px; color:var(--fg-muted); }
+.prefix input, .prefix select { border:0; border-radius:0; }
+.prefix:focus-within { outline:2px solid var(--primary); outline-offset:2px; }
+.prefix input:focus, .prefix select:focus { outline:none; }
+.calc { display:flex; gap:8px; align-items:center; padding:10px 12px; border-radius:6px; background:var(--surface-muted); font-size:14px; }
+.wizard-foot { display:flex; justify-content:space-between; gap:8px; margin-top:8px; padding-top:16px; border-top:1px solid var(--line); }
+.uploader { border:1.5px dashed var(--control); border-radius:10px; padding:20px; text-align:center; }
+.thumbgrid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:12px; }
+@media (min-width:640px) { .thumbgrid { grid-template-columns:repeat(6,minmax(0,1fr)); } }
+.thumbgrid .t { position:relative; border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+.thumbgrid .t .cover { position:absolute; left:4px; top:4px; font-size:11px; background:var(--primary); color:var(--primary-fg); padding:1px 6px; border-radius:4px; }
+.thumbgrid .t.failed { border-color:var(--danger); }
+.thumbgrid .t .ph .icon { width:18px; height:18px; }
+
+/* Account list */
+.tabs { display:flex; gap:4px; border-bottom:1px solid var(--line); overflow-x:auto; margin:16px 0; }
+.tabs a { padding:10px 12px; font-size:14px; color:var(--fg-muted); border-bottom:2px solid transparent; white-space:nowrap; margin-bottom:-1px; }
+.tabs a[aria-current] { color:var(--fg); border-color:var(--primary); font-weight:600; }
+.lrow { display:grid; grid-template-columns:96px minmax(0,1fr); gap:12px; padding:12px; }
+@media (min-width:640px) { .lrow { grid-template-columns:128px minmax(0,1fr) auto; align-items:center; } }
+.lrow .ph { border-radius:6px; }
+.lrow .actions { display:flex; gap:6px; grid-column:1 / -1; }
+@media (min-width:640px) { .lrow .actions { grid-column:auto; } }
+.alert { display:flex; gap:10px; padding:10px 12px; border-radius:6px; border:1px solid var(--line); background:var(--surface-muted); font-size:13.5px; line-height:20px; }
+.alert.danger { color:var(--fg); border-color:color-mix(in srgb, var(--danger) 40%, var(--line)); }
+.alert.danger .icon { color:var(--danger); }
+.alert.warning .icon { color:var(--warning); }
+
+/* Admin */
+.admin { display:grid; min-height:calc(100vh - 100px); }
+@media (min-width:1024px) { .admin { grid-template-columns:232px minmax(0,1fr); } }
+.aside { display:none; border-right:1px solid var(--line); background:var(--surface); padding:12px; }
+@media (min-width:1024px) { .aside { display:block; } }
+.aside a { display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:6px; font-size:14px; color:var(--fg-muted); }
+.aside a[aria-current] { background:var(--surface-muted); color:var(--fg); font-weight:600; }
+.aside a .badge { margin-left:auto; padding:0 6px; }
+.aside .group { font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--fg-subtle); padding:12px 10px 4px; }
+.queue { display:grid; gap:16px; padding:16px; }
+@media (min-width:1024px) { .queue { grid-template-columns:320px minmax(0,1fr); padding:20px 24px; } }
+.qitem { display:flex; gap:10px; padding:10px; border-bottom:1px solid var(--line); cursor:pointer; }
+.qitem[aria-current="true"] { background:var(--surface-muted); }
+.qitem .ph { width:64px; flex:none; border-radius:6px; }
+.qitem .ph .icon { width:18px; height:18px; }
+.review-photos { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.review-photos .ph { border-radius:6px; }
+.flag { display:flex; gap:8px; align-items:center; font-size:13.5px; padding:8px 10px; border-radius:6px; background:var(--surface-muted); }
+.flag .icon { color:var(--warning); }
+.kbd { font:500 11px/16px "Geist Mono",ui-monospace,monospace; border:1px solid var(--control); border-bottom-width:2px; border-radius:4px; padding:0 5px; color:var(--fg-muted); }
+.review-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
+
+/* Modal */
+dialog { border:0; border-radius:14px; padding:0; width:min(480px, calc(100% - 32px)); background:var(--surface); color:var(--fg); box-shadow:var(--shadow-pop); }
+dialog::backdrop { background:var(--overlay); }
+dialog header, dialog .body, dialog footer { padding:16px 20px; }
+dialog header { border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
+dialog footer { border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:8px; }
+
+/* Toast */
+.toast { position:fixed; left:50%; transform:translateX(-50%); bottom:76px; z-index:60; background:var(--primary); color:var(--primary-fg); padding:10px 14px; border-radius:8px; font-size:14px; display:none; align-items:center; gap:8px; box-shadow:var(--shadow-pop); }
+.toast.show { display:flex; }
+@media (min-width:1024px) { .toast { left:auto; right:24px; transform:none; bottom:24px; } }
+
+.footer { border-top:1px solid var(--line); background:var(--surface); margin-top:40px; padding:32px 0; font-size:13.5px; }
+.footer .cols { display:grid; gap:24px; grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media (min-width:768px) { .footer .cols { grid-template-columns:2fr 1fr 1fr 1fr; } }
+.footer a { display:block; color:var(--fg-muted); padding:3px 0; }
+.footer a:hover { color:var(--fg); }
+
+h1[tabindex="-1"]:focus { outline:none; }
+.detail > *, .layout > *, .queue > *, .admin > * { min-width:0; }
+.fgroup legend { float:left; width:100%; }
+.fgroup legend + * { clear:both; }
+.fi { display:inline-block; width:1.333em; height:1em; background-size:cover; background-position:50%; border-radius:2px; vertical-align:-0.125em; box-shadow:0 0 0 1px var(--line); }
+.country-btn { gap:6px; font-weight:600; }
+.country-list { display:grid; gap:4px; max-height:320px; overflow:auto; }
+.country-list button { display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 10px; border:0; border-radius:6px; background:none; cursor:pointer; font-size:14px; }
+.country-list button:hover, .country-list button[aria-current="true"] { background:var(--surface-muted); }
+.country-list .n { margin-left:auto; color:var(--fg-subtle); font-size:12.5px; }
+.cur-chip { font-weight:600; letter-spacing:.02em; }
+.notice { display:flex; gap:8px; align-items:flex-start; font-size:13px; line-height:18px; color:var(--fg-muted); background:var(--surface-muted); border-radius:6px; padding:8px 10px; }
+.screen { display:none; }
+.screen.active { display:block; }
+.skeleton { background:var(--surface-muted); border-radius:6px; }
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M3 21l1.6-4.6A9 9 0 1 1 7.7 19.6Z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-1.8-1.8l.8-1-1-2Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path d="m3 16 4 4 4-4M7 20V4M21 8l-4-4-4 4M17 4v16"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 22V4a1 1 0 0 1 1-1h12l-2 4 2 4H5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M9.5 17h5M3 12h18"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 7 6-3 6 3 6-3v13l-6 3-6-3-6 3Z"/><path d="M9 4v13M15 7v13"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 12.6 12.6 21a2.1 2.1 0 0 1-3-3L18 9.6l-1.3-1.3a4 4 0 0 1-5-5Z" transform="rotate(0)"/></symbol>
+  <symbol id="i-phone2" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="11" rx="1"/><path d="M2 19h20"/></symbol>
+  <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M4 11V8a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v3"/><path d="M2 13a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2Z"/><path d="M5 18v2M19 18v2"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-dash" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4Z"/><circle cx="7.5" cy="7.5" r="1"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
+</svg>
+
+<div class="proto" role="region" aria-label="Prototype screen switcher (not part of the product)">
+  <div class="container">
+    <strong>Prototype:</strong>
+    <button type="button" data-screen="home" aria-pressed="true">Home</button>
+    <button type="button" data-screen="search" aria-pressed="false">Search results</button>
+    <button type="button" data-screen="detail" aria-pressed="false">Listing detail</button>
+    <button type="button" data-screen="land" aria-pressed="false">Land listing</button>
+    <button type="button" data-screen="post" aria-pressed="false">Post an ad</button>
+    <button type="button" data-screen="mine" aria-pressed="false">My listings</button>
+    <button type="button" data-screen="admin" aria-pressed="false">Admin review</button>
+    <button type="button" data-screen="global" aria-pressed="false">Global search</button>
+    <button type="button" data-screen="empty" aria-pressed="false">States</button>
+  </div>
+</div>
+
+<header class="header">
+  <div class="container">
+    <a href="#" class="logo" data-go="home" aria-label="Marketplace home"><span class="logo-mark" aria-hidden="true">M</span>Marketplace</a>
+    <button class="btn btn-ghost btn-sm country-btn" type="button" id="countryBtn" aria-haspopup="dialog" aria-label="Country: Sri Lanka. Change country"><span class="fi fi-lk" aria-hidden="true"></span><span id="countryCode">LK</span></button>
+    <form class="search" role="search" onsubmit="go('search');return false;">
+      <label class="sr-only" for="q">Search ads</label>
+      <input id="q" type="search" placeholder="Search cars, land, phones…">
+      <label class="sr-only" for="loc">Location</label>
+      <select id="loc"><option>All Sri Lanka</option><option>Colombo</option><option>Gampaha</option><option>Kandy</option><option>Galle</option></select>
+      <button type="submit" aria-label="Search"><svg class="icon"><use href="#i-search"/></svg></button>
+    </form>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon show-mobile" type="button" aria-label="Search" data-go="search"><svg class="icon"><use href="#i-search"/></svg></button>
+      <a href="#" class="btn btn-primary hide-mobile" data-go="post"><svg class="icon icon-sm"><use href="#i-plus"/></svg>Post ad</a>
+      <a href="#" class="btn btn-ghost btn-icon hide-mobile" aria-label="Saved ads"><svg class="icon"><use href="#i-heart"/></svg></a>
+      <button class="btn btn-ghost btn-icon" type="button" id="themeBtn" aria-label="Switch to dark theme"><svg class="icon"><use href="#i-moon"/></svg></button>
+      <a href="#" class="btn btn-ghost btn-icon" aria-label="Account" data-go="mine"><svg class="icon"><use href="#i-user"/></svg></a>
+    </div>
+  </div>
+  <nav class="catbar" aria-label="Categories">
+    <div class="container">
+      <a href="#" data-go="search">Vehicles</a><a href="#" data-go="land">Property</a><a href="#" data-go="search">Vehicle Parts</a><a href="#" data-go="search">Mobile Phones</a><a href="#" data-go="search">Electronics</a><a href="#" data-go="search">Home &amp; Furniture</a><a href="#" data-go="search">Other Items</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- HOME -->
+<section class="screen active" id="s-home" aria-labelledby="home-h">
+  <div class="container">
+    <div class="hero">
+      <h1 id="home-h">Buy and sell anything in Sri Lanka</h1>
+      <p class="muted" style="margin:6px 0 0">Cars, land, phones and more. Contact sellers directly.</p>
+      <div class="hero-search">
+        <input class="input" type="search" placeholder="Search cars, land, phones…" aria-label="Search ads">
+        <select class="select" aria-label="Location"><option>All Sri Lanka</option><option>Colombo</option></select>
+        <button class="btn btn-primary btn-lg" type="button" data-go="search"><svg class="icon icon-sm"><use href="#i-search"/></svg>Search</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="h2">Browse categories</h2></div>
+      <div class="cats" id="cats"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="h2">Latest ads</h2><a href="#" class="small link" data-go="search">See all</a></div>
+      <ul class="grid g4" id="latest" style="list-style:none;padding:0;margin:0"></ul>
+    </div>
+
+    <div class="section card safety">
+      <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
+      <div><strong>Stay safe:</strong> never pay in advance, and meet sellers in a public place. <a href="#" class="link">Safety tips</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<section class="screen" id="s-search" aria-labelledby="search-h">
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#" data-go="home">Home</a><span aria-hidden="true">›</span><a href="#">Vehicles</a><span aria-hidden="true">›</span><span aria-current="page">Cars</span></nav>
+    <h1 class="h1" id="search-h" style="margin-bottom:16px">Cars for sale in Sri Lanka</h1>
+    <div class="layout">
+      <aside class="filters card" aria-label="Filters" id="filtersDesktop"></aside>
+      <div>
+        <div class="mobile-filterbar">
+          <button class="btn btn-secondary" type="button" id="openFilters" style="flex:1"><svg class="icon icon-sm"><use href="#i-sliders"/></svg>Filters (3)</button>
+          <button class="btn btn-secondary" type="button" style="flex:1"><svg class="icon icon-sm"><use href="#i-sort"/></svg>Newest</button>
+        </div>
+        <div class="toolbar">
+          <span class="count num" aria-live="polite">1,234 ads</span>
+          <label class="sr-only" for="sort">Sort</label>
+          <select id="sort" class="select hide-mobile" style="width:auto;display:none"><option>Newest first</option><option>Price: low to high</option><option>Price: high to low</option></select>
+          <span class="hide-mobile" style="gap:4px">
+            <button class="btn btn-secondary btn-icon" type="button" aria-label="Grid view" aria-pressed="true"><svg class="icon icon-sm"><use href="#i-grid"/></svg></button>
+            <button class="btn btn-ghost btn-icon" type="button" aria-label="List view" aria-pressed="false"><svg class="icon icon-sm"><use href="#i-list"/></svg></button>
+          </span>
+        </div>
+        <div class="chips" aria-label="Active filters">
+          <button class="chip" type="button">Toyota <svg class="icon icon-sm" aria-label="Remove filter Toyota"><use href="#i-x"/></svg></button>
+          <button class="chip" type="button">2015–2020 <svg class="icon icon-sm" aria-label="Remove filter year"><use href="#i-x"/></svg></button>
+          <button class="chip" type="button">Colombo <svg class="icon icon-sm" aria-label="Remove filter Colombo"><use href="#i-x"/></svg></button>
+          <button class="btn btn-ghost btn-sm link" type="button">Clear all</button>
+        </div>
+        <ul class="grid" id="results" style="list-style:none;padding:0;margin:0"></ul>
+        <nav class="pager" aria-label="Pagination"><a href="#" aria-label="Previous page">‹</a><a href="#" aria-current="page">1</a><a href="#">2</a><a href="#">3</a><a href="#" aria-hidden="true" tabindex="-1">…</a><a href="#">52</a><a href="#" aria-label="Next page">›</a></nav>
+      </div>
+    </div>
+  </div>
+  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Filters">
+    <div class="backdrop" data-close></div>
+    <div class="panel">
+      <header><strong>Filters</strong><button class="btn btn-ghost btn-icon" type="button" aria-label="Close filters" data-close><svg class="icon"><use href="#i-x"/></svg></button></header>
+      <div class="body" id="filtersMobile"></div>
+      <footer><button class="btn btn-secondary" type="button">Clear</button><button class="btn btn-primary" style="flex:1" type="button" data-close>Show 1,234 ads</button></footer>
+    </div>
+  </div>
+</section>
+
+<!-- DETAIL (vehicle) -->
+<section class="screen" id="s-detail" aria-labelledby="detail-h">
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#" data-go="home">Home</a><span aria-hidden="true">›</span><a href="#">Vehicles</a><span aria-hidden="true">›</span><a href="#" data-go="search">Cars</a><span aria-hidden="true">›</span><span aria-current="page">Toyota Aqua 2015</span></nav>
+    <div class="detail">
+      <div>
+        <div class="gallery">
+          <div class="main"><div class="ph" id="mainPhoto" role="img" aria-label="Toyota Aqua 2015 G Grade, photo 1 of 6"><svg class="icon"><use href="#i-car"/></svg><span class="photo-count num" id="photoCounter">1 / 6</span></div></div>
+          <div class="thumbs" id="thumbs" aria-label="Photos"></div>
+        </div>
+        <div class="section" style="margin-top:20px">
+          <h1 class="h1" id="detail-h">Toyota Aqua 2015 G Grade</h1>
+          <p class="subtle small" style="margin:4px 0 12px;display:flex;gap:12px;flex-wrap:wrap"><span style="display:flex;gap:4px;align-items:center"><svg class="icon icon-sm"><use href="#i-pin"/></svg>Colombo 05, Colombo</span><span style="display:flex;gap:4px;align-items:center"><svg class="icon icon-sm"><use href="#i-clock"/></svg>Posted 2 days ago</span><span>ID 10482</span></p>
+          <div class="facts"><span class="badge">2015</span><span class="badge num">85,000 km</span><span class="badge">Hybrid</span><span class="badge">Automatic</span><span class="badge num">1,500 cc</span><span class="badge">Used</span></div>
+        </div>
+        <div class="section">
+          <h2 class="h3" style="margin-bottom:4px">Details</h2>
+          <dl class="dl">
+            <div><dt>Make</dt><dd>Toyota</dd></div><div><dt>Model</dt><dd>Aqua</dd></div>
+            <div><dt>Year of manufacture</dt><dd>2015</dd></div><div><dt>Registered</dt><dd>2016</dd></div>
+            <div><dt>Mileage</dt><dd class="num">85,000 km</dd></div><div><dt>Fuel type</dt><dd>Hybrid</dd></div>
+            <div><dt>Transmission</dt><dd>Automatic</dd></div><div><dt>Engine capacity</dt><dd class="num">1,500 cc</dd></div>
+            <div><dt>Body type</dt><dd>Hatchback</dd></div><div><dt>Colour</dt><dd>Pearl white</dd></div>
+          </dl>
+        </div>
+        <div class="section">
+          <h2 class="h3" style="margin-bottom:8px">Description</h2>
+          <p class="muted" style="margin:0;white-space:pre-line">Single owner, full service history at agent. New hybrid battery fitted in 2025. Original paint, no accidents.
+Leasing can be arranged. Genuine buyers only please.</p>
+        </div>
+        <details class="section card panel-pad">
+          <summary style="cursor:pointer;font-weight:600;display:flex;gap:8px;align-items:center"><svg class="icon icon-sm"><use href="#i-shield"/></svg>Safety tips</summary>
+          <ul class="muted small" style="margin:10px 0 0;padding-left:20px"><li>Never pay in advance or share OTP codes.</li><li>Meet in a safe public place and inspect the vehicle.</li><li>Check the registration book and revenue licence before paying.</li></ul>
+        </details>
+      </div>
+      <aside class="side" aria-label="Price and seller">
+        <div class="card panel-pad">
+          <div class="price-xl">Rs 7,850,000</div>
+          <div class="subtle small">Negotiable</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px" id="contact">
+            <button class="btn btn-primary btn-lg btn-block" type="button" id="reveal"><svg class="icon icon-sm"><use href="#i-phone"/></svg>Show phone number</button>
+            <a class="btn btn-secondary btn-lg btn-block" href="#"><svg class="icon icon-sm" style="color:#25D366"><use href="#i-whatsapp"/></svg>WhatsApp</a>
+          </div>
+          <p class="tip"><svg class="icon icon-sm"><use href="#i-info"/></svg>Never pay in advance. Inspect the item before you pay.</p>
+        </div>
+        <div class="card panel-pad">
+          <div class="seller"><div class="avatar" aria-hidden="true">NP</div><div><div style="font-weight:600">Nimal Perera</div><div class="subtle small">Member since 2026</div></div></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span class="badge success"><svg class="icon icon-sm"><use href="#i-check"/></svg>Email verified</span><span class="badge">12 active ads</span></div>
+          <a href="#" class="small link" style="display:inline-block;margin-top:10px">View seller's ads</a>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" type="button" style="flex:1" data-fav aria-pressed="false"><svg class="icon icon-sm"><use href="#i-heart"/></svg>Save</button>
+          <button class="btn btn-secondary" type="button" style="flex:1"><svg class="icon icon-sm"><use href="#i-share"/></svg>Share</button>
+          <button class="btn btn-ghost" type="button" onclick="document.getElementById('reportDlg').showModal()"><svg class="icon icon-sm"><use href="#i-flag"/></svg>Report</button>
+        </div>
+      </aside>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2 class="h2">Similar ads</h2></div>
+      <ul class="grid g4" id="similar" style="list-style:none;padding:0;margin:0"></ul>
+    </div>
+  </div>
+  <div class="mobile-contact" aria-label="Contact seller">
+    <span class="price">Rs 7,850,000</span>
+    <a class="btn btn-secondary" href="#" aria-label="WhatsApp seller"><svg class="icon icon-sm" style="color:#25D366"><use href="#i-whatsapp"/></svg></a>
+    <button class="btn btn-primary" type="button"><svg class="icon icon-sm"><use href="#i-phone"/></svg>Call</button>
+  </div>
+</section>
+
+<!-- LAND detail -->
+<section class="screen" id="s-land" aria-labelledby="land-h">
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#" data-go="home">Home</a><span aria-hidden="true">›</span><a href="#">Property</a><span aria-hidden="true">›</span><span aria-current="page">Land</span></nav>
+    <div class="detail">
+      <div>
+        <div class="gallery"><div class="main"><div class="ph" role="img" aria-label="Land in Kottawa, photo 1 of 4"><svg class="icon"><use href="#i-map"/></svg><span class="photo-count num">1 / 4</span></div></div></div>
+        <div class="section" style="margin-top:20px">
+          <h1 class="h1" id="land-h">50 perches residential land in Kottawa</h1>
+          <p class="subtle small" style="margin:4px 0 12px">Kottawa, Colombo · Posted 5 hours ago · ID 10511</p>
+          <div class="facts"><span class="badge num">50 perches</span><span class="badge">Residential</span><span class="badge">Sinnakkara deed</span><span class="badge">Clear deed</span></div>
+        </div>
+        <div class="section">
+          <h2 class="h3" style="margin-bottom:4px">Details</h2>
+          <dl class="dl"><div><dt>Land size</dt><dd class="num">50 perches</dd></div><div><dt>Land type</dt><dd>Residential</dd></div><div><dt>Deed type</dt><dd>Sinnakkara (freehold)</dd></div><div><dt>Clear deed</dt><dd>Yes</dd></div></dl>
+        </div>
+        <div class="section card panel-pad">
+          <h2 class="h3">Listing cards for Land (ADR-018)</h2>
+          <p class="small muted" style="margin:4px 0 12px">The price per perch is calculated (total ÷ perches). It is never typed by the seller and is shown only for Land.</p>
+          <ul class="grid" id="landCards" style="list-style:none;padding:0;margin:0"></ul>
+        </div>
+      </div>
+      <aside class="side" aria-label="Price and seller">
+        <div class="card panel-pad">
+          <div class="price-xl">Rs 12,500,000</div>
+          <div class="perch" style="font-size:15px;margin-top:2px"><strong class="num">Rs 250,000</strong> per perch · <span class="num">50 perches</span></div>
+          <div class="subtle small" style="margin-top:2px">Negotiable</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+            <button class="btn btn-primary btn-lg btn-block" type="button"><svg class="icon icon-sm"><use href="#i-user"/></svg>Log in to contact seller</button>
+            <p class="small subtle" style="margin:0">This seller shares contact details with logged-in users only.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- POST WIZARD -->
+<section class="screen" id="s-post" aria-labelledby="post-h">
+  <div class="container wizard">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+      <a href="#" class="small link" data-go="mine">Exit (saved as draft)</a>
+      <span class="small subtle" role="status" aria-live="polite" style="display:flex;gap:4px;align-items:center"><svg class="icon icon-sm" style="color:var(--success)"><use href="#i-check"/></svg>Saved</span>
+    </div>
+    <h1 class="h1" id="post-h" style="margin-top:12px">Post an ad</h1>
+    <ol class="steps" id="steps">
+      <li class="done">Category</li><li aria-current="step">Location</li><li>Details</li><li>Price</li><li>Photos</li><li>Contact &amp; review</li>
+    </ol>
+    <p class="sr-only" id="stepAnnounce" aria-live="polite">Step 2 of 6: Location</p>
+
+    <div class="card" style="padding:20px">
+      <div class="wstep" data-step="2">
+        <p class="small subtle" style="margin:0 0 12px">Where is the item? · <span>* required</span></p>
+        <div class="field"><label for="wCountry">Country *</label><select class="select" id="wCountry"><option value="LK" selected>Sri Lanka</option><option value="IN">India</option><option value="GB">United Kingdom</option><option value="US">United States</option></select></div>
+        <div class="row2">
+          <div class="field"><label for="wRegion" id="wRegionLabel">Province *</label><select class="select" id="wRegion"></select></div>
+          <div class="field" id="wSubWrap"><label for="wSub" id="wSubLabel">District *</label><select class="select" id="wSub"></select></div>
+        </div>
+        <div class="field"><label for="wCity" id="wCityLabel">City or town *</label><select class="select" id="wCity"></select><span class="hint"><a href="#" class="link">My town isn't listed</a></span></div>
+        <div class="field"><label for="wLocality" id="wLocalityLabel">Area (optional)</label><input class="input" id="wLocality" maxlength="80" placeholder="e.g. Kirulapone"><span class="hint">Don't enter your house number or street address.</span></div>
+        <div class="notice"><svg class="icon icon-sm"><use href="#i-info"/></svg><span>The country sets the currency and land units for this ad. Try entering a price on the Price step, then come back and change the country.</span></div>
+      </div>
+
+      <div class="wstep" data-step="3" hidden>
+        <p class="small subtle" style="margin:0 0 12px">Category: <strong style="color:var(--fg)">Vehicles › Cars</strong> · <a href="#" class="link">Change</a> · <span>* required</span></p>
+        <fieldset class="field"><legend class="label" style="margin-bottom:6px">Ad type *</legend>
+          <div class="radio-cards"><label><input type="radio" name="t" checked><span>For sale</span></label><label><input type="radio" name="t"><span>For rent</span></label><label><input type="radio" name="t"><span>Wanted</span></label></div>
+        </fieldset>
+        <div class="field"><label for="title">Title *</label><input class="input" id="title" value="Toyota Aqua 2015 G Grade" maxlength="100"><span class="hint num">24 / 100</span></div>
+        <fieldset class="field"><legend class="label" style="margin-bottom:6px">Condition *</legend>
+          <div class="radio-cards"><label><input type="radio" name="c"><span>Brand new</span></label><label><input type="radio" name="c" checked><span>Used</span></label><label><input type="radio" name="c"><span>Reconditioned</span></label></div>
+        </fieldset>
+        <div class="row2">
+          <div class="field"><label for="make">Make *</label><select class="select" id="make"><option>Toyota</option><option>Suzuki</option><option>Honda</option></select></div>
+          <div class="field"><label for="model">Model *</label><select class="select" id="model"><option>Aqua</option><option>Axio</option><option>Other…</option></select></div>
+          <div class="field"><label for="year">Year of manufacture *</label><input class="input num" id="year" inputmode="numeric" value="2015"></div>
+          <div class="field"><label for="mileage">Mileage *</label><div class="prefix"><input class="input num" id="mileage" inputmode="numeric" value="" aria-invalid="true" aria-describedby="mileage-err" placeholder="e.g. 85,000"><span style="border-right:0;border-left:1px solid var(--line)">km</span></div><span class="err" id="mileage-err"><svg class="icon icon-sm"><use href="#i-alert"/></svg>Enter the mileage in km (0 – 1,000,000).</span></div>
+        </div>
+        <div class="field"><label for="desc">Description *</label><textarea class="input" id="desc">Single owner, full service history at agent.</textarea><span class="hint num">46 / 5000 · Plain text only. Don't include phone numbers; use contact settings instead.</span></div>
+      </div>
+
+      <div class="wstep" data-step="4" hidden>
+        <div class="field"><span class="label">Category for this example: Property › Land · <span id="wPriceCountry">Sri Lanka</span></span></div>
+        <div class="row2">
+          <div class="field"><label for="price">Total price *</label><div class="prefix"><span class="cur-chip" id="curChip" title="Currency set by the country">LKR</span><input class="input num" id="price" inputmode="numeric" value="12,500,000"></div></div>
+          <div class="field"><label for="area">Land size *</label><div class="prefix"><input class="input num" id="area" inputmode="decimal" value="50"><select class="select" id="unit" aria-label="Unit" style="width:auto;border-left:1px solid var(--line)"></select></div><span class="hint num" id="areaHint">= 40 perches</span></div>
+        </div>
+        <div class="calc" role="status" aria-live="polite"><svg class="icon icon-sm"><use href="#i-info"/></svg><span>Price per perch (calculated): <strong class="num" id="perchCalc">Rs 312,500</strong></span></div>
+        <fieldset class="field" style="margin-top:16px"><legend class="label" style="margin-bottom:6px">Price type *</legend>
+          <div class="radio-cards" style="grid-template-columns:repeat(2,minmax(0,1fr))"><label><input type="radio" name="pt" checked><span>Fixed</span></label><label><input type="radio" name="pt"><span>Negotiable</span></label></div>
+          <span class="hint">"Free" and "Price on request" aren't available for land.</span>
+        </fieldset>
+        
+      </div>
+
+      <div class="wstep" data-step="5" hidden>
+        <div class="uploader"><svg class="icon" style="margin:0 auto 8px;width:28px;height:28px"><use href="#i-camera"/></svg><p style="margin:0 0 10px">Drag photos here or</p><button class="btn btn-secondary" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>Add photos</button><p class="hint" style="margin:10px 0 0">JPG, PNG or WebP · up to 8 MB each · <span class="num">5 / 8</span> added</p></div>
+        <div class="thumbgrid">
+          <div class="t"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div><span class="cover">Cover</span></div>
+          <div class="t"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div></div>
+          <div class="t"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div></div>
+          <div class="t"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div></div>
+          <div class="t failed"><div class="ph" style="color:var(--danger)"><svg class="icon"><use href="#i-alert"/></svg></div></div>
+        </div>
+        <p class="err" style="margin-top:8px"><svg class="icon icon-sm"><use href="#i-alert"/></svg>IMG_2041.HEIC couldn't be processed. Try a JPG or PNG under 8 MB.</p>
+        <p class="hint">Drag to reorder, or focus a photo and use the Move left / Move right buttons.</p>
+      </div>
+
+      <div class="wstep" data-step="6" hidden>
+        <fieldset class="field"><legend class="label" style="margin-bottom:6px">Who can see your phone number? *</legend>
+          <div class="radio-cards" style="grid-template-columns:repeat(2,minmax(0,1fr))"><label><input type="radio" name="v" checked><span>Logged-in users</span></label><label><input type="radio" name="v"><span>Everyone</span></label></div>
+          <span class="hint">Your number is never shown in the page. Buyers tap "Show phone number" to reveal it.</span>
+        </fieldset>
+        <div class="field"><span class="label">Contact options *</span>
+          <label class="check"><input type="checkbox" checked> Phone call · <span class="num">077 123 4567</span></label>
+          <label class="check"><input type="checkbox" checked> WhatsApp</label>
+        </div>
+        <label class="check"><input type="checkbox"> I agree to the <a href="#" class="link">posting rules</a> and <a href="#" class="link">terms</a> *</label>
+        <div class="alert" style="margin-top:12px"><svg class="icon icon-sm"><use href="#i-info"/></svg><span>All new ads are reviewed before they go live, usually within 24 hours.</span></div>
+      </div>
+
+      <div class="wizard-foot">
+        <button class="btn btn-secondary" type="button" id="wBack"><svg class="icon icon-sm"><use href="#i-chev-l"/></svg>Back</button>
+        <button class="btn btn-primary" type="button" id="wNext">Continue<svg class="icon icon-sm"><use href="#i-chev"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MY LISTINGS -->
+<section class="screen" id="s-mine" aria-labelledby="mine-h">
+  <div class="container" style="max-width:960px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px"><h1 class="h1" id="mine-h">My listings</h1><a href="#" class="btn btn-primary" data-go="post"><svg class="icon icon-sm"><use href="#i-plus"/></svg>Post ad</a></div>
+    <nav class="tabs" aria-label="Listing status"><a href="#" aria-current="page">Live <span class="subtle">4</span></a><a href="#">Under review <span class="subtle">1</span></a><a href="#">Drafts <span class="subtle">2</span></a><a href="#">Not approved <span class="subtle">1</span></a><a href="#">Expired <span class="subtle">3</span></a><a href="#">Sold <span class="subtle">6</span></a></nav>
+    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
+      <li class="card lrow"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong>Toyota Aqua 2015 G Grade</strong><span class="badge success">Live</span></div><div class="price" style="margin-top:2px">Rs 7,850,000</div><div class="small subtle" style="display:flex;gap:12px;margin-top:2px"><span style="display:flex;gap:4px;align-items:center"><svg class="icon icon-sm"><use href="#i-eye"/></svg><span class="num">312</span> views</span><span>Expires in 41 days</span></div></div><div class="actions"><a href="#" class="btn btn-secondary btn-sm">Edit</a><button class="btn btn-secondary btn-sm" type="button" data-toast="Ad marked as sold">Mark sold</button><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="More actions"><svg class="icon icon-sm"><use href="#i-more"/></svg></button></div></li>
+      <li class="card lrow"><div class="ph"><svg class="icon"><use href="#i-map"/></svg></div><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong>Land in Kottawa</strong><span class="badge danger">Not approved</span></div><div class="price" style="margin-top:2px">Rs 12,500,000</div><div class="alert danger" style="margin-top:8px"><svg class="icon icon-sm"><use href="#i-alert"/></svg><span><strong>Reason:</strong> Photos must show the land. Please add at least one photo of the property.</span></div></div><div class="actions"><a href="#" class="btn btn-primary btn-sm">Edit &amp; resubmit</a></div></li>
+      <li class="card lrow"><div class="ph"><svg class="icon"><use href="#i-phone2"/></svg></div><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong>iPhone 13 128GB</strong><span class="badge warning">Under review</span></div><div class="price" style="margin-top:2px">Rs 165,000</div><div class="small subtle">Submitted 2 hours ago</div></div><div class="actions"><a href="#" class="btn btn-secondary btn-sm">Edit</a></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section class="screen" id="s-admin" aria-labelledby="admin-h">
+  <div class="admin">
+    <nav class="aside" aria-label="Admin">
+      <div class="group">Overview</div>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-dash"/></svg>Dashboard</a>
+      <div class="group">Moderation</div>
+      <a href="#" aria-current="page"><svg class="icon icon-sm"><use href="#i-check"/></svg>Review queue<span class="badge num">14</span></a>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-list"/></svg>Listings</a>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-flag"/></svg>Reports<span class="badge num">3</span></a>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-users"/></svg>Users</a>
+      <div class="group">Catalogue</div>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-tag"/></svg>Categories</a>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-sliders"/></svg>Attributes</a>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-pin"/></svg>Locations</a>
+      <div class="group">System</div>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-settings"/></svg>Settings</a>
+      <a href="#"><svg class="icon icon-sm"><use href="#i-shield"/></svg>Audit log</a>
+    </nav>
+    <div>
+      <div style="padding:16px 16px 0" class="container-admin">
+        <h1 class="h1" id="admin-h">Review queue <span class="subtle num" style="font-weight:500">14 pending</span></h1>
+      </div>
+      <div class="queue">
+        <div class="card" style="overflow:hidden" role="listbox" aria-label="Pending listings">
+          <div class="qitem" role="option" aria-current="true" aria-selected="true"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div><div style="min-width:0"><strong class="ltitle" style="-webkit-line-clamp:1">Toyota Aqua 2015 G Grade</strong><div class="small subtle">Cars · 12 min ago</div><span class="badge warning" style="margin-top:4px"><svg class="icon icon-sm"><use href="#i-alert"/></svg>1 flag</span></div></div>
+          <div class="qitem" role="option" aria-selected="false"><div class="ph"><svg class="icon"><use href="#i-map"/></svg></div><div><strong>Land in Kottawa</strong><div class="small subtle">Land · 40 min ago</div></div></div>
+          <div class="qitem" role="option" aria-selected="false"><div class="ph"><svg class="icon"><use href="#i-phone2"/></svg></div><div><strong>iPhone 13 128GB</strong><div class="small subtle">Mobile Phones · 1 h ago</div></div></div>
+          <div class="qitem" role="option" aria-selected="false"><div class="ph"><svg class="icon"><use href="#i-sofa"/></svg></div><div><strong>Teak sofa set</strong><div class="small subtle">Furniture · 2 h ago</div></div></div>
+        </div>
+        <div class="card panel-pad">
+          <div class="review-photos"><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div><div class="ph"><svg class="icon"><use href="#i-car"/></svg></div></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap"><div><h2 class="h2">Toyota Aqua 2015 G Grade</h2><div class="small subtle">Vehicles › Cars · Colombo 05 · Submitted 12 min ago</div></div><div class="price-xl" style="font-size:22px">Rs 7,850,000</div></div>
+          <div class="flag" style="margin-top:12px"><svg class="icon icon-sm"><use href="#i-alert"/></svg>Phone number found in description ("call 077…").</div>
+          <dl class="dl" style="margin-top:8px"><div><dt>Make / Model</dt><dd>Toyota Aqua</dd></div><div><dt>Year</dt><dd>2015</dd></div><div><dt>Mileage</dt><dd class="num">85,000 km</dd></div><div><dt>Fuel</dt><dd>Hybrid</dd></div></dl>
+          <div class="card panel-pad" style="margin-top:12px;background:var(--surface-muted)"><div class="seller"><div class="avatar" aria-hidden="true">NP</div><div><strong>Nimal Perera</strong><div class="small subtle">Joined 3 days ago · 2 listings · 0 rejections · 0 reports · email verified</div></div></div></div>
+          <div class="review-actions">
+            <button class="btn btn-primary" type="button" data-toast="Listing approved and published"><svg class="icon icon-sm"><use href="#i-check"/></svg>Approve <span class="kbd" style="color:inherit;border-color:currentColor">A</span></button>
+            <button class="btn btn-secondary" type="button" onclick="document.getElementById('rejectDlg').showModal()"><svg class="icon icon-sm"><use href="#i-x"/></svg>Reject <span class="kbd">R</span></button>
+            <button class="btn btn-ghost" type="button">Request changes</button>
+            <span class="small subtle" style="margin-left:auto;align-self:center"><span class="kbd">J</span> / <span class="kbd">K</span> next / previous</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GLOBAL SEARCH -->
+<section class="screen" id="s-global" aria-labelledby="global-h">
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#" data-go="home">Home</a><span aria-hidden="true">›</span><span aria-current="page">All countries</span></nav>
+    <h1 class="h1" id="global-h" style="margin-bottom:16px">Search results for "toyota" in all countries</h1>
+    <div class="layout">
+      <aside class="filters card" aria-label="Filters" style="display:block">
+        <div class="fgroup"><div class="flabel">Country</div><select class="select" aria-label="Country"><option>All countries</option><option>Sri Lanka</option><option>India</option><option>United Kingdom</option></select></div>
+        <fieldset class="fgroup"><legend>Price</legend>
+          <label class="small" for="gCur" style="display:block;margin-bottom:6px;font-weight:550">Currency</label>
+          <select class="select" id="gCur" style="margin-bottom:8px"><option value="">Choose a currency</option><option>LKR</option><option>INR</option><option>GBP</option></select>
+          <div class="range"><input class="input num" id="gMin" placeholder="Min" aria-label="Minimum price" disabled aria-describedby="gHint"><span class="subtle">–</span><input class="input num" id="gMax" placeholder="Max" aria-label="Maximum price" disabled aria-describedby="gHint"></div>
+          <p class="hint" id="gHint" style="margin:6px 0 0">Choose a currency to filter or sort by price. Prices in different currencies aren't compared.</p>
+        </fieldset>
+      </aside>
+      <div>
+        <div class="toolbar"><span class="count num">318 ads in 4 countries</span><select class="select" aria-label="Sort" style="width:auto"><option>Newest first</option><option disabled>Price: low to high (choose a currency)</option></select></div>
+        <ul class="grid" id="globalResults" style="list-style:none;padding:0;margin:0"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATES -->
+<section class="screen" id="s-empty" aria-labelledby="states-h">
+  <div class="container" style="max-width:960px">
+    <h1 class="h1" id="states-h" style="margin-top:20px">UI states</h1>
+    <p class="muted">Every data view designs these states (see <em>04-forms-states-accessibility.md</em>).</p>
+    <div class="section"><h2 class="h3" style="margin-bottom:8px">Loading (skeleton)</h2>
+      <ul class="grid" style="list-style:none;padding:0;margin:0" aria-busy="true" aria-label="Loading ads">
+        <li class="card"><div class="skeleton" style="aspect-ratio:4/3;border-radius:10px 10px 0 0"></div><div style="padding:12px;display:grid;gap:8px"><div class="skeleton" style="height:16px;width:60%"></div><div class="skeleton" style="height:12px"></div><div class="skeleton" style="height:12px;width:80%"></div></div></li>
+        <li class="card"><div class="skeleton" style="aspect-ratio:4/3;border-radius:10px 10px 0 0"></div><div style="padding:12px;display:grid;gap:8px"><div class="skeleton" style="height:16px;width:50%"></div><div class="skeleton" style="height:12px"></div><div class="skeleton" style="height:12px;width:70%"></div></div></li>
+        <li class="card"><div class="skeleton" style="aspect-ratio:4/3;border-radius:10px 10px 0 0"></div><div style="padding:12px;display:grid;gap:8px"><div class="skeleton" style="height:16px;width:55%"></div><div class="skeleton" style="height:12px"></div><div class="skeleton" style="height:12px;width:75%"></div></div></li>
+      </ul>
+    </div>
+    <div class="section"><h2 class="h3" style="margin-bottom:8px">Empty: no results</h2>
+      <div class="card" style="padding:32px 20px;text-align:center"><svg class="icon" style="margin:0 auto 10px;width:32px;height:32px;color:var(--fg-subtle)"><use href="#i-search"/></svg><h3 class="h3">No ads match these filters</h3><p class="muted small" style="margin:6px auto 14px;max-width:380px">Try removing a filter or searching a nearby city.</p><button class="btn btn-primary" type="button">Clear filters</button></div>
+    </div>
+    <div class="section"><h2 class="h3" style="margin-bottom:8px">Empty: first use</h2>
+      <div class="card" style="padding:32px 20px;text-align:center"><svg class="icon" style="margin:0 auto 10px;width:32px;height:32px;color:var(--fg-subtle)"><use href="#i-box"/></svg><h3 class="h3">You haven't posted any ads yet</h3><p class="muted small" style="margin:6px auto 14px">It takes about 3 minutes.</p><a class="btn btn-primary" href="#" data-go="post">Post your first ad</a></div>
+    </div>
+    <div class="section"><h2 class="h3" style="margin-bottom:8px">Error and status banners</h2>
+      <div style="display:grid;gap:8px">
+        <div class="alert danger" role="alert"><svg class="icon icon-sm"><use href="#i-alert"/></svg><span>We couldn't save your changes. Check your connection and try again. <button class="btn btn-ghost btn-sm link" type="button">Retry</button></span></div>
+        <div class="alert warning"><svg class="icon icon-sm"><use href="#i-clock"/></svg><span><strong>Under review.</strong> Your ad will go live after a moderator approves it.</span></div>
+        <div class="alert"><svg class="icon icon-sm"><use href="#i-info"/></svg><span>Too many attempts. Try again in 5 minutes.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="cols">
+      <div><a href="#" class="logo" style="padding:0;color:var(--fg)"><span class="logo-mark" aria-hidden="true">M</span>Marketplace</a><p class="subtle small" style="margin:8px 0 0;max-width:280px">Buy and sell directly with people across Sri Lanka.</p><p class="subtle small">A Dev Talk service <span class="badge" style="margin-left:4px">Q-UX-1</span></p></div>
+      <nav aria-label="Categories"><strong>Categories</strong><a href="#">Vehicles</a><a href="#">Property</a><a href="#">Mobile Phones</a><a href="#">Electronics</a></nav>
+      <nav aria-label="Help"><strong>Help</strong><a href="#">Safety tips</a><a href="#">Prohibited items</a><a href="#">FAQ</a><a href="#">Contact</a></nav>
+      <nav aria-label="Legal"><strong>Legal</strong><a href="#">Terms</a><a href="#">Privacy</a></nav>
+    </div>
+  </div>
+</footer>
+
+<nav class="bottom-nav" aria-label="Main">
+  <a href="#" data-go="home" aria-current="page"><svg class="icon"><use href="#i-home"/></svg>Home</a>
+  <a href="#" data-go="search"><svg class="icon"><use href="#i-search"/></svg>Search</a>
+  <a href="#" data-go="post" class="post" aria-label="Post ad"><span class="circle"><svg class="icon"><use href="#i-plus"/></svg></span>Post</a>
+  <a href="#"><svg class="icon"><use href="#i-heart"/></svg>Saved</a>
+  <a href="#" data-go="mine"><svg class="icon"><use href="#i-user"/></svg>Account</a>
+</nav>
+
+<dialog id="rejectDlg" aria-labelledby="rejectTitle">
+  <form method="dialog">
+    <header><strong id="rejectTitle">Reject listing</strong><button class="btn btn-ghost btn-icon" value="cancel" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></header>
+    <div class="body">
+      <fieldset><legend class="label" style="font-weight:550;margin-bottom:6px">Reason (shown to the seller) *</legend>
+        <label class="check"><input type="radio" name="r" checked> Wrong category</label>
+        <label class="check"><input type="radio" name="r"> Poor or missing photos</label>
+        <label class="check"><input type="radio" name="r"> Prohibited item</label>
+        <label class="check"><input type="radio" name="r"> Contact details in description</label>
+        <label class="check"><input type="radio" name="r"> Other</label>
+      </fieldset>
+      <div class="field" style="margin-top:10px;margin-bottom:0"><label for="note">Note to seller</label><textarea class="input" id="note" style="min-height:80px"></textarea></div>
+    </div>
+    <footer><button class="btn btn-secondary" value="cancel">Cancel</button><button class="btn btn-danger" value="ok" data-toast="Listing rejected. The seller has been notified.">Reject listing</button></footer>
+  </form>
+</dialog>
+
+<dialog id="reportDlg" aria-labelledby="reportTitle">
+  <form method="dialog">
+    <header><strong id="reportTitle">Report this ad</strong><button class="btn btn-ghost btn-icon" value="cancel" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></header>
+    <div class="body">
+      <fieldset><legend class="label" style="font-weight:550;margin-bottom:6px">What's wrong? *</legend>
+        <label class="check"><input type="radio" name="rr" checked> Scam or fraud</label>
+        <label class="check"><input type="radio" name="rr"> Prohibited item</label>
+        <label class="check"><input type="radio" name="rr"> Wrong category</label>
+        <label class="check"><input type="radio" name="rr"> Item already sold</label>
+        <label class="check"><input type="radio" name="rr"> Other</label>
+      </fieldset>
+    </div>
+    <footer><button class="btn btn-secondary" value="cancel">Cancel</button><button class="btn btn-primary" value="ok" data-toast="Thanks. Our team will review this ad.">Send report</button></footer>
+  </form>
+</dialog>
+
+<dialog id="countryDlg" aria-labelledby="countryTitle">
+  <form method="dialog">
+    <header><strong id="countryTitle">Choose a country</strong><button class="btn btn-ghost btn-icon" value="cancel" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></header>
+    <div class="body">
+      <label class="sr-only" for="countrySearch">Search countries</label>
+      <input class="input" id="countrySearch" type="search" placeholder="Search countries" style="margin-bottom:8px">
+      <div class="country-list" id="countryList"></div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="countryChangeDlg" aria-labelledby="ccTitle">
+  <form method="dialog">
+    <header><strong id="ccTitle">Change country?</strong></header>
+    <div class="body"><p style="margin:0 0 8px">These will change:</p><ul id="ccList" class="muted" style="margin:0;padding-left:20px"></ul><p class="small subtle" style="margin:10px 0 0">Nothing is converted. Title, description, photos and other details are kept.</p></div>
+    <footer><button class="btn btn-secondary" value="keep" id="ccKeep">Keep</button><button class="btn btn-primary" value="change" id="ccChange">Change</button></footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><svg class="icon icon-sm"><use href="#i-check"/></svg><span></span></div>
+
+<script>
+(function () {
+  var cats = [['car','Vehicles','8,412'],['building','Property','3,105'],['wrench','Vehicle Parts','2,240'],['phone2','Mobile Phones','5,876'],['laptop','Electronics','4,031'],['sofa','Home & Furniture','2,654'],['box','Other Items','3,977'],['grid','All categories','31,783']];
+  var ads = [
+    ['car','Toyota Aqua 2015 G Grade','Rs 7,850,000','Negotiable','2015 · 85,000 km · Hybrid · Auto','Colombo 05 · 2h ago',6],
+    ['phone2','iPhone 13 128GB Midnight','Rs 165,000','','128 GB · Used · Warranty','Kandy · 3h ago',4],
+    ['car','Honda Vezel 2017 Z Package','Rs 11,900,000','','2017 · 62,000 km · Hybrid · Auto','Gampaha · 5h ago',8],
+    ['sofa','Teak sofa set (3+1+1)','Rs 145,000','Negotiable','Sofa · Wood · Used','Moratuwa · 6h ago',5],
+    ['laptop','MacBook Air M2 13" 8GB/256GB','Rs 289,000','','Apple M2 · 8 GB · 13"','Nugegoda · 8h ago',3],
+    ['car','Bajaj RE Three-wheeler 2019','Rs 1,450,000','','2019 · 48,000 km · Petrol','Kurunegala · 9h ago',4],
+    ['building','2BR apartment, Rajagiriya','Rs 95,000 / month','','2 bed · 2 bath · 950 sq ft','Rajagiriya · 1d ago',7],
+    ['wrench','Toyota Axio headlight (genuine)','Rs 38,500','','Lights · Genuine · Used','Panadura · 1d ago',2]
+  ];
+  function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+  function card(a, i, sold) {
+    return '<li class="card lcard"><div class="ph"><svg class="icon" aria-hidden="true"><use href="#i-'+a[0]+'"/></svg>'+
+      (sold?'<span class="badge sold-tag">Sold</span>':'')+
+      '<span class="photo-count num"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-camera"/></svg>'+a[6]+'</span></div>'+
+      '<button class="fav" type="button" aria-pressed="false" aria-label="Save '+esc(a[1])+'"><svg class="icon icon-sm"><use href="#i-heart"/></svg></button>'+
+      '<div class="lcard-body"><div class="price">'+esc(a[2])+(a[3]?'<small>'+esc(a[3])+'</small>':'')+'</div>'+
+      (a[7]?'<div class="perch">'+esc(a[7])+'</div>':'')+
+      '<h3 class="ltitle" style="font-weight:450"><a href="#" data-go="'+(a[0]==='map'?'land':'detail')+'">'+esc(a[1])+'</a></h3>'+
+      '<div class="lmeta">'+esc(a[4])+'</div><div class="lloc">'+esc(a[5])+'</div></div></li>';
+  }
+  document.getElementById('cats').innerHTML = cats.map(function(c){ return '<a href="#" class="card cat" data-go="'+(c[0]==='map'?'land':'search')+'"><svg class="icon" aria-hidden="true"><use href="#i-'+c[0]+'"/></svg><span>'+esc(c[1])+'<span class="count num">'+c[2]+' ads</span></span></a>'; }).join('');
+  document.getElementById('latest').innerHTML = ads.map(function(a,i){ return card(a,i,false); }).join('');
+  var cars = ads.filter(function(a){ return a[0]==='car'; });
+  document.getElementById('results').innerHTML = cars.concat(cars).map(function(a,i){ return card(a,i,i===4); }).join('');
+  document.getElementById('similar').innerHTML = cars.concat([ads[2]]).slice(0,4).map(function(a,i){ return card(a,i,false); }).join('');
+  var land = [
+    ['map','50 perches residential land, Kottawa','Rs 12,500,000','Negotiable','Residential · Sinnakkara deed','Kottawa · 5h ago',4,'Rs 250,000 / perch · 50 perches'],
+    ['map','2 acres coconut land, Kurunegala','Rs 9,600,000','','Agricultural · Coconut','Kurunegala · 1d ago',6,'Rs 30,000 / perch · 2 acres (320 perches)'],
+    ['map','15 perches bare land, Malabe','Rs 6,750,000','','Residential · Clear deed','Malabe · 2d ago',3,'Rs 450,000 / perch · 15 perches']
+  ];
+  document.getElementById('landCards').innerHTML = land.map(function(a,i){ return card(a,i,false); }).join('');
+
+  // Filters (same markup for desktop sidebar and mobile drawer)
+  var filters = '<div class="fgroup" style="display:flex;justify-content:space-between;align-items:center"><strong>Filters</strong><button class="btn btn-ghost btn-sm link" type="button">Clear all</button></div>'+
+    '<div class="fgroup"><div class="flabel">Category</div><div class="small"><a href="#" class="link">Vehicles</a> › <strong>Cars</strong></div></div>'+
+    '<div class="fgroup"><div class="flabel">Location</div><p class="small subtle" style="margin:0 0 8px;display:flex;gap:6px;align-items:center"><span class="fi fi-lk" aria-hidden="true"></span>Sri Lanka · <a href="#" class="link" data-open-country>Change</a></p><div style="display:grid;gap:8px"><select class="select" aria-label="Province"><option>Western Province</option><option>Central Province</option></select><select class="select" aria-label="District"><option>Colombo District</option><option>Gampaha District</option></select><select class="select" aria-label="City or town"><option>All towns</option><option>Nugegoda</option><option>Maharagama</option></select></div></div>'+
+    '<fieldset class="fgroup"><legend>Price</legend><p class="small subtle" style="margin:0 0 8px">Prices in <strong class="cur-chip">LKR</strong> (Sri Lankan Rupee)</p><div class="range"><input class="input num" inputmode="numeric" placeholder="Min" aria-label="Minimum price"><span class="subtle">–</span><input class="input num" inputmode="numeric" placeholder="Max" aria-label="Maximum price"></div></fieldset>'+
+    '<div class="fgroup"><div class="flabel">Make</div><select class="select" aria-label="Make"><option>Toyota</option></select></div>'+
+    '<fieldset class="fgroup"><legend>Year</legend><div class="range"><input class="input num" value="2015" aria-label="Year from"><span class="subtle">–</span><input class="input num" value="2020" aria-label="Year to"></div></fieldset>'+
+    '<fieldset class="fgroup"><legend>Fuel type</legend><label class="check"><input type="checkbox">Petrol</label><label class="check"><input type="checkbox" checked>Hybrid</label><label class="check"><input type="checkbox">Diesel</label><label class="check"><input type="checkbox">Electric</label></fieldset>'+
+    '<fieldset class="fgroup"><legend>Transmission</legend><label class="check"><input type="checkbox">Automatic</label><label class="check"><input type="checkbox">Manual</label></fieldset>'+
+    '<fieldset class="fgroup"><legend>Condition</legend><label class="check"><input type="checkbox">Brand new</label><label class="check"><input type="checkbox">Used</label><label class="check"><input type="checkbox">Reconditioned</label></fieldset>';
+  document.getElementById('filtersDesktop').innerHTML = filters;
+  document.getElementById('filtersMobile').innerHTML = filters.replace(/<div class="fgroup" style="display:flex[^]*?<\/div>/, '');
+  var sortSel = document.getElementById('sort'); if (window.matchMedia('(min-width:1024px)').matches) sortSel.style.display = 'block';
+
+  // Gallery thumbs
+  var thumbs = document.getElementById('thumbs');
+  for (var t = 1; t <= 6; t++) thumbs.insertAdjacentHTML('beforeend', '<button type="button" aria-label="Show photo '+t+' of 6" aria-current="'+(t===1)+'"><div class="ph"><svg class="icon" aria-hidden="true"><use href="#i-car"/></svg></div></button>');
+  thumbs.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var idx = Array.prototype.indexOf.call(thumbs.children, b) + 1;
+    Array.prototype.forEach.call(thumbs.children, function (x) { x.setAttribute('aria-current', String(x === b)); });
+    document.getElementById('photoCounter').textContent = idx + ' / 6';
+    document.getElementById('mainPhoto').setAttribute('aria-label', 'Toyota Aqua 2015 G Grade, photo ' + idx + ' of 6');
+  });
+
+  // Screen switching
+  var screens = ['home','search','detail','land','post','mine','admin','global','empty'];
+  window.go = function (name) {
+    screens.forEach(function (s) { document.getElementById('s-' + s).classList.toggle('active', s === name); });
+    document.querySelectorAll('.proto button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.screen === name)); });
+    document.querySelector('.bottom-nav').style.display = (name === 'post' || name === 'detail' || name === 'land' || name === 'admin' || name === 'global') ? 'none' : '';
+    window.scrollTo(0, 0);
+    var h = document.querySelector('#s-' + name + ' h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  };
+  document.addEventListener('click', function (e) {
+    var p = e.target.closest('.proto button'); if (p) { go(p.dataset.screen); return; }
+    var g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); go(g.dataset.go); return; }
+    var f = e.target.closest('.fav, [data-fav]'); if (f) { var on = f.getAttribute('aria-pressed') !== 'true'; f.setAttribute('aria-pressed', String(on)); toast(on ? 'Saved to your list' : 'Removed from saved'); return; }
+    var tt = e.target.closest('[data-toast]'); if (tt) { toast(tt.dataset.toast); }
+    if (e.target.closest('[data-close]')) document.getElementById('drawer').classList.remove('open');
+  });
+  var initial = (location.hash || '').slice(1); if (screens.indexOf(initial) > -1) go(initial);
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (screens.indexOf(h) > -1) go(h); });
+  document.getElementById('openFilters').addEventListener('click', function () { document.getElementById('drawer').classList.add('open'); document.querySelector('#drawer [data-close].btn-icon').focus(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.getElementById('drawer').classList.remove('open'); });
+
+  // Contact reveal demo
+  document.getElementById('reveal').addEventListener('click', function () {
+    this.outerHTML = '<a class="btn btn-primary btn-lg btn-block num" href="tel:+94771234567"><svg class="icon icon-sm"><use href="#i-phone"/></svg>077 123 4567</a>';
+  });
+
+  // Wizard
+  var step = 2;
+  function showStep() {
+    document.querySelectorAll('.wstep').forEach(function (s) { s.hidden = Number(s.dataset.step) !== step; });
+    var lis = document.querySelectorAll('#steps li');
+    lis.forEach(function (li, i) { li.classList.toggle('done', i + 1 < step); if (i + 1 === step) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
+    var names = ['Category','Location','Details','Price','Photos','Contact & review'];
+    document.getElementById('stepAnnounce').textContent = 'Step ' + step + ' of 6: ' + names[step - 1];
+    document.getElementById('wNext').innerHTML = step === 6 ? 'Submit for review' : 'Continue<svg class="icon icon-sm"><use href="#i-chev"/></svg>';
+  }
+  document.getElementById('wNext').addEventListener('click', function () { if (step < 6) { step++; showStep(); } else { toast('Submitted for review'); go('mine'); step = 2; showStep(); } });
+  document.getElementById('wBack').addEventListener('click', function () { if (step > 2) { step--; showStep(); } });
+
+  // Price per perch calculator (mirrors ADR-018: null-safe, never user-entered)
+  function perPerch() {
+    var price = Number(String(document.getElementById('price').value).replace(/[^0-9]/g, ''));
+    var qty = Number(document.getElementById('area').value);
+    var factor = Number(document.getElementById('unit').value);
+    var perches = qty > 0 ? Math.round(qty * factor * 100) / 100 : 0;
+    document.getElementById('areaHint').textContent = perches > 0 ? '= ' + perches.toLocaleString('en-US') + ' perches' : 'Enter a land size greater than 0';
+    document.getElementById('perchCalc').textContent = (price > 0 && perches > 0) ? 'Rs ' + Math.round(price / perches).toLocaleString('en-US') : '—';
+  }
+  ['price','area','unit'].forEach(function (id) { document.getElementById(id).addEventListener('input', perPerch); });
+  perPerch();
+
+  // ---- Global: countries, locations, currencies, units (demo data) ----
+  var C = {
+    LK: { name:'Sri Lanka', cur:'LKR', curName:'Sri Lankan Rupee', locale:'en-LK', sym:'Rs', levels:2, labels:['Province','District','City or town','Area'],
+          regions:{ 'Western Province':{ 'Colombo District':['Nugegoda','Maharagama','Kottawa','Dehiwala'], 'Gampaha District':['Negombo','Gampaha','Ja-Ela'] }, 'Central Province':{ 'Kandy District':['Kandy','Peradeniya'] } },
+          units:[['perch',25.29285264],['rood',1011.7141056],['acre',4046.8564224],['hectare',10000]], priceUnit:'perch', ads:'31,783' },
+    IN: { name:'India', cur:'INR', curName:'Indian Rupee', locale:'en-IN', sym:'₹', levels:1, labels:['State','','City','Locality'],
+          regions:{ 'Karnataka':['Bengaluru','Mysuru'], 'Maharashtra':['Mumbai','Pune'], 'Tamil Nadu':['Chennai','Coimbatore'] },
+          units:[['sq ft',0.09290304],['sq m',1],['acre',4046.8564224],['cent',40.468564224]], priceUnit:'sq ft', ads:'12,402' },
+    GB: { name:'United Kingdom', cur:'GBP', curName:'Pound Sterling', locale:'en-GB', sym:'£', levels:2, labels:['Country','County or area','Town or city','Area'],
+          regions:{ 'England':{ 'Greater London':['Westminster','Camden','Croydon'], 'Greater Manchester':['Manchester','Salford'] }, 'Scotland':{ 'City of Edinburgh':['Edinburgh'] } },
+          units:[['acre',4046.8564224],['hectare',10000],['sq ft',0.09290304]], priceUnit:'acre', ads:'8,915' },
+    US: { name:'United States', cur:'USD', curName:'US Dollar', locale:'en-US', sym:'$', levels:1, labels:['State','','City','Neighborhood'],
+          regions:{ 'California':['Los Angeles','San Francisco','San Diego'], 'Texas':['Houston','Austin'], 'New York':['New York City','Buffalo'] },
+          units:[['acre',4046.8564224],['sq ft',0.09290304]], priceUnit:'acre', ads:'20,117' }
+  };
+  var current = 'LK';
+  function money(amount, cc) {
+    var c = C[cc];
+    var n = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 }).format(amount);
+    return (c.cur === 'LKR' ? 'Rs ' : c.sym) + n;
+  }
+  function fillSelect(sel, items) { sel.innerHTML = items.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join(''); }
+  function renderLocation() {
+    var c = C[current], rSel = document.getElementById('wRegion'), sSel = document.getElementById('wSub'), cSel = document.getElementById('wCity');
+    document.getElementById('wRegionLabel').textContent = c.labels[0] + ' *';
+    document.getElementById('wCityLabel').textContent = c.labels[2] + ' *';
+    document.getElementById('wLocalityLabel').textContent = c.labels[3] + ' (optional)';
+    fillSelect(rSel, Object.keys(c.regions));
+    function subs() {
+      var r = c.regions[rSel.value];
+      if (c.levels === 2) {
+        document.getElementById('wSubWrap').hidden = false;
+        document.getElementById('wSubLabel').textContent = c.labels[1] + ' *';
+        fillSelect(sSel, Object.keys(r)); fillSelect(cSel, r[sSel.value]);
+      } else { document.getElementById('wSubWrap').hidden = true; fillSelect(cSel, r); }
+    }
+    rSel.onchange = subs; sSel.onchange = function () { fillSelect(cSel, c.regions[rSel.value][sSel.value]); };
+    subs();
+  }
+  function renderPriceStep() {
+    var c = C[current];
+    document.getElementById('curChip').textContent = c.cur;
+    document.getElementById('wPriceCountry').textContent = c.name;
+    var unit = document.getElementById('unit');
+    unit.innerHTML = c.units.map(function (u, i) { return '<option value="' + u[1] + '" data-code="' + u[0] + '"' + (i === 0 ? ' selected' : '') + '>' + u[0] + (u[0] === 'perch' ? 'es' : u[0].indexOf('sq') === 0 ? '' : 's') + '</option>'; }).join('');
+    perPerch();
+  }
+  // Override the land calculator to be unit- and currency-aware
+  perPerch = function () {
+    var c = C[current];
+    var price = Number(String(document.getElementById('price').value).replace(/[^0-9]/g, ''));
+    var qty = Number(document.getElementById('area').value);
+    var opt = document.getElementById('unit').selectedOptions[0];
+    if (!opt) return;
+    var sqm = qty > 0 ? qty * Number(opt.value) : 0;
+    var pu = c.units.filter(function (u) { return u[0] === c.priceUnit; })[0];
+    var inPriceUnit = sqm > 0 ? (opt.dataset.code === c.priceUnit ? qty : sqm / pu[1]) : 0;
+    document.getElementById('areaHint').textContent = sqm > 0 ? '= ' + Math.round(inPriceUnit * 100) / 100 + ' ' + c.priceUnit + (c.priceUnit === 'perch' ? 'es' : c.priceUnit.indexOf('sq') === 0 ? '' : 's') : 'Enter a land size greater than 0';
+    document.getElementById('perchCalc').textContent = (price > 0 && inPriceUnit > 0) ? money(Math.round(price / inPriceUnit), current) + ' per ' + c.priceUnit : '—';
+  };
+  ['price','area','unit'].forEach(function (id) { document.getElementById(id).addEventListener('input', perPerch); document.getElementById(id).addEventListener('change', perPerch); });
+
+  var wCountry = document.getElementById('wCountry'), pending = null;
+  wCountry.addEventListener('change', function () {
+    var next = wCountry.value, cur = C[current], nx = C[next];
+    var priceVal = String(document.getElementById('price').value).replace(/[^0-9]/g, '');
+    var items = [];
+    if (priceVal && cur.cur !== nx.cur) items.push('Currency: ' + cur.cur + ' → ' + nx.cur + '. Your price (' + money(Number(priceVal), current) + ') will be cleared so you can enter it in ' + nx.cur + '.');
+    var unitCode = document.getElementById('unit').selectedOptions[0] ? document.getElementById('unit').selectedOptions[0].dataset.code : null;
+    if (document.getElementById('area').value && unitCode && !nx.units.some(function (u) { return u[0] === unitCode; })) items.push('Land size unit "' + unitCode + '" isn\'t used in ' + nx.name + '. The land size will be cleared.');
+    if (current === 'LK') items.push('Deed type isn\'t available in ' + nx.name + ' and will be removed.');
+    items.push(cur.labels[0] + ', ' + (cur.levels === 2 ? cur.labels[1].toLowerCase() + ', ' : '') + cur.labels[2].toLowerCase() + ' will be reset.');
+    pending = next;
+    document.getElementById('ccTitle').textContent = 'Change country to ' + nx.name + '?';
+    document.getElementById('ccKeep').textContent = 'Keep ' + cur.name;
+    document.getElementById('ccChange').textContent = 'Change to ' + nx.name;
+    document.getElementById('ccList').innerHTML = items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
+    document.getElementById('countryChangeDlg').showModal();
+  });
+  document.getElementById('countryChangeDlg').addEventListener('close', function () {
+    if (this.returnValue === 'change' && pending) {
+      var oldCur = C[current].cur;
+      current = pending;
+      if (C[current].cur !== oldCur) document.getElementById('price').value = '';
+      document.getElementById('area').value = '';
+      renderLocation(); renderPriceStep();
+      toast('Country changed to ' + C[current].name);
+    } else { wCountry.value = current; }
+    pending = null;
+  });
+
+  // Country switcher (header)
+  function renderCountryList(filter) {
+    document.getElementById('countryList').innerHTML = Object.keys(C).filter(function (k) { return !filter || C[k].name.toLowerCase().indexOf(filter) > -1; }).map(function (k) {
+      return '<button type="button" data-cc="' + k + '" aria-current="' + (k === document.getElementById('countryCode').textContent) + '"><span class="fi fi-' + k.toLowerCase() + '" aria-hidden="true"></span>' + esc(C[k].name) + '<span class="n num">' + C[k].ads + ' ads</span></button>';
+    }).join('');
+  }
+  function openCountry() { renderCountryList(''); document.getElementById('countryDlg').showModal(); document.getElementById('countrySearch').focus(); }
+  document.getElementById('countryBtn').addEventListener('click', openCountry);
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-open-country]')) { e.preventDefault(); openCountry(); } });
+  document.getElementById('countrySearch').addEventListener('input', function () { renderCountryList(this.value.toLowerCase()); });
+  document.getElementById('countryList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cc]'); if (!b) return;
+    var k = b.dataset.cc, btn = document.getElementById('countryBtn');
+    btn.querySelector('.fi').className = 'fi fi-' + k.toLowerCase();
+    document.getElementById('countryCode').textContent = k;
+    btn.setAttribute('aria-label', 'Country: ' + C[k].name + '. Change country');
+    document.getElementById('countryDlg').close();
+    toast('Showing ads in ' + C[k].name);
+  });
+
+  // Global search results: mixed countries, flags, original currencies
+  var mixed = [
+    ['car','Toyota Aqua 2015 G Grade', money(7850000,'LK'), 'Negotiable', '2015 · 85,000 km · Hybrid', 'lk', 'Nugegoda, Sri Lanka', 6],
+    ['car','Toyota Innova Crysta 2019', money(1850000,'IN'), '', '2019 · 62,000 km · Diesel', 'in', 'Bengaluru, India', 5],
+    ['car','Toyota Yaris Hybrid 2020', money(12495,'GB'), '', '2020 · 41,000 mi · Hybrid', 'gb', 'Croydon, United Kingdom', 9],
+    ['car','Toyota Corolla 2018 LE', '$14,900 USD', '', '2018 · 58,000 mi · Petrol', 'us', 'Houston, United States', 7]
+  ];
+  document.getElementById('globalResults').innerHTML = mixed.map(function (a) {
+    return '<li class="card lcard"><div class="ph"><svg class="icon" aria-hidden="true"><use href="#i-' + a[0] + '"/></svg><span class="photo-count num"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-camera"/></svg>' + a[7] + '</span></div>' +
+      '<button class="fav" type="button" aria-pressed="false" aria-label="Save ' + esc(a[1]) + '"><svg class="icon icon-sm"><use href="#i-heart"/></svg></button>' +
+      '<div class="lcard-body"><div class="price">' + esc(a[2]) + (a[3] ? '<small>' + esc(a[3]) + '</small>' : '') + '</div>' +
+      '<h3 class="ltitle" style="font-weight:450"><a href="#" data-go="detail">' + esc(a[1]) + '</a></h3><div class="lmeta">' + esc(a[4]) + '</div>' +
+      '<div class="lloc" style="display:flex;gap:6px;align-items:center"><span class="fi fi-' + a[5] + '" aria-hidden="true"></span>' + esc(a[6]) + '</div></div></li>';
+  }).join('');
+  document.getElementById('gCur').addEventListener('change', function () {
+    var on = !!this.value;
+    ['gMin','gMax'].forEach(function (id) { document.getElementById(id).disabled = !on; });
+    document.getElementById('gHint').textContent = on ? 'Showing only ads priced in ' + this.value + '.' : 'Choose a currency to filter or sort by price. Prices in different currencies aren\'t compared.';
+  });
+
+  renderLocation(); renderPriceStep();
+
+  // Toast
+  var tmr;
+  function toast(msg) { var t = document.getElementById('toast'); t.querySelector('span').textContent = msg; t.classList.add('show'); clearTimeout(tmr); tmr = setTimeout(function () { t.classList.remove('show'); }, 3000); }
+  window.toast = toast;
+
+  // Theme toggle
+  var btn = document.getElementById('themeBtn');
+  function syncThemeBtn() { var d = document.documentElement.classList.contains('dark'); btn.setAttribute('aria-label', d ? 'Switch to light theme' : 'Switch to dark theme'); btn.querySelector('use').setAttribute('href', d ? '#i-sun' : '#i-moon'); }
+  btn.addEventListener('click', function () { var d = document.documentElement.classList.toggle('dark'); try { localStorage.setItem('mp-theme', d ? 'dark' : 'light'); } catch (e) {} syncThemeBtn(); });
+  syncThemeBtn();
+})();
+</script>
+</body>
+</html>

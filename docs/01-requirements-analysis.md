@@ -1,0 +1,1 @@
+Read CLAUDE.md and docs/01-requirements-analysis.md. Execute SDLC Phase 1 only. Inspect the existing repository, document business and technical requirements, define MVP scope and acceptance criteria, and identify risks. Do not implement features or modify production configuration. Present the findings for approval.

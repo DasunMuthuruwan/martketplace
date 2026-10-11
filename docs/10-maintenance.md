@@ -1,0 +1,1 @@
+Read CLAUDE.md and docs/10-maintenance.md. Prepare operational procedures for monitoring, backups, restoration, security updates, listing expiry, abuse reports, performance and future releases. Identify manual cPanel tasks and limitations. Do not configure paid services or production automation without approval.

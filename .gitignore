@@ -1,0 +1,27 @@
+# Dependencies
+/vendor
+/node_modules
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+auth.json
+
+# Laravel runtime and build output
+/public/build
+/public/hot
+/public/storage
+/public/uploads
+/storage/*.key
+/storage/pail
+.phpunit.result.cache
+.phpunit.cache
+
+# Local tooling
+/.idea
+/.vscode
+/.qodo
+*.log
+.DS_Store
+Thumbs.db

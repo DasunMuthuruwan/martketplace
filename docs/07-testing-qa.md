@@ -1,0 +1,1 @@
+Read CLAUDE.md and docs/07-testing-qa.md. Review the implemented marketplace and run the available unit, integration, API, frontend build and end-to-end tests. Test negative cases and authorization boundaries. Fix confirmed regressions, report results honestly and do not deploy.

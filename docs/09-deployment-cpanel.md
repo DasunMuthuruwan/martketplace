@@ -1,0 +1,1 @@
+Read CLAUDE.md and docs/09-deployment-cpanel.md. Prepare a cPanel deployment plan for a separate Laravel marketplace with its own database and subdomain. Verify hosting compatibility and document DNS, document root, PHP, dependencies, SSL, environment settings, migration and rollback steps. Do not change live DNS or deploy without explicit approval.
