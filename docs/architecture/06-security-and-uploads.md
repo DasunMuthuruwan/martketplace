@@ -30,6 +30,8 @@
 - Sessions: `database` driver, cookie `dtm_session`, `Secure`, `HttpOnly`, `SameSite=Lax`, **host-only** (`SESSION_DOMAIN=null`). Regenerated on login and privilege change. 120 min lifetime. Staff sessions use a 30-minute idle timeout.
 - Suspend or ban invalidates sessions (DB sessions are deleted by `user_id`).
 
+> **Implemented in T2.1 (2026-10-11):** Fortify registration, login, email verification, password reset and password confirmation with our own views. Login matches emails case-insensitively, always runs a hash check (no timing difference for unknown emails), returns one generic error for wrong email or password, and blocks suspended/banned accounts (showing the reason only after a correct password). Password-reset requests always get the same message (`GenericPasswordResetLinkResponse`), so registered emails can't be discovered. Registration uses a honeypot (`website`, `prohibited`), a time trap (`App\Rules\HumanTiming`: encrypted timestamp, 2 s to 24 h) and Turnstile when configured. The Turnstile token is **required** when enabled (a test caught that an absent field skipped the check), and registration fails closed if Cloudflare is unreachable. Remaining known trade-off: the email-uniqueness error on registration reveals that an address is registered. This is mitigated by the 5/hour/IP registration limit (standard practice; revisit if abused).
+
 ## 3. Rate Limits (Initial Values, Configurable)
 
 | Limiter | Limit |

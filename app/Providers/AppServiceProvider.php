@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Support\RootUrl;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Fortify\Fortify;
+use Illuminate\Validation\Rules\Password;
 use Laravel\Passkeys\Passkeys;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,8 +17,6 @@ class AppServiceProvider extends ServiceProvider
         // Passkeys stay disabled: they are bound to the domain, which will change (ADR-015).
         Passkeys::ignoreRoutes();
 
-        // No auth endpoints until authentication is configured with our own views (T2.1).
-        Fortify::ignoreRoutes();
     }
 
     /**
@@ -27,5 +25,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RootUrl::configure();
+
+        // 10+ characters; in production also refuse passwords found in known breaches (HIBP k-anonymity).
+        Password::defaults(fn () => $this->app->isProduction()
+            ? Password::min(10)->max(255)->uncompromised()
+            : Password::min(10)->max(255));
     }
 }

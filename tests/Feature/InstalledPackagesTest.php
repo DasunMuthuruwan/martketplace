@@ -41,13 +41,16 @@ class InstalledPackagesTest extends TestCase
         $this->assertTrue(class_exists($class) || trait_exists($class), "{$class} is missing from vendor/");
     }
 
-    public function test_fortify_routes_are_not_registered_before_authentication_is_configured(): void
+    public function test_only_the_enabled_fortify_features_expose_routes(): void
     {
-        foreach (['login', 'register', 'password.request', 'password.reset', 'two-factor.login', 'verification.notice'] as $name) {
-            $this->assertFalse(Route::has($name), "Fortify route [{$name}] must not be live before T2.1");
+        foreach (['login', 'register', 'password.request', 'password.reset', 'verification.notice', 'password.confirm'] as $name) {
+            $this->assertTrue(Route::has($name), "Fortify route [{$name}] should be enabled (T2.1)");
         }
 
-        $this->post('/register', ['email' => 'someone@example.com'])->assertNotFound();
+        // Two-factor arrives in T2.2, profile and password updates in T2.3.
+        foreach (['two-factor.login', 'two-factor.enable', 'user-profile-information.update', 'user-password.update'] as $name) {
+            $this->assertFalse(Route::has($name), "Fortify route [{$name}] must not be live yet");
+        }
     }
 
     public function test_passkey_routes_are_never_registered(): void

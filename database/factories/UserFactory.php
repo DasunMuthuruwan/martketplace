@@ -42,4 +42,15 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /** Suspended indefinitely, or until the given time. */
+    public function suspended(?\DateTimeInterface $until = null, string $reason = 'Policy violation'): static
+    {
+        return $this->state(['status' => 'suspended', 'suspended_until' => $until, 'status_reason' => $reason]);
+    }
+
+    public function banned(string $reason = 'Repeated scams'): static
+    {
+        return $this->state(['status' => 'banned', 'status_reason' => $reason]);
+    }
 }

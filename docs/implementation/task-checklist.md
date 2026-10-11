@@ -26,7 +26,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [!] T1.5 Money, units, AreaConverter, UnitPrice — gated by G-5, G-6
 - [!] T1.6 CountryContext — gated by G-2
 ### M2 Accounts and roles
-- [ ] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot
+- [~] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot — done on `feature/T2.1-auth`, **awaiting owner review**
 - [ ] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm
 - [ ] T2.3 Account settings backend
 ### M3 Catalogue

@@ -26,12 +26,21 @@ return [
     // Content-Security-Policy additions. Hosts are configuration, never code.
     'csp' => [
         'report_only' => (bool) env('CSP_REPORT_ONLY', false),
-        'script' => [],
+        // Turnstile needs its script and iframe host, only when configured.
+        'script' => array_filter([env('TURNSTILE_SITE_KEY') ? 'https://challenges.cloudflare.com' : null]),
         'style' => [],
         'img' => array_filter([env('LISTINGS_URL')]),
         'font' => [],
         'connect' => [],
-        'frame' => [],
+        'frame' => array_filter([env('TURNSTILE_SITE_KEY') ? 'https://challenges.cloudflare.com' : null]),
+    ],
+
+    // Cloudflare Turnstile bot protection (ADR-010). Disabled when keys are empty.
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret_key' => env('TURNSTILE_SECRET_KEY'),
+        'verify_url' => 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        'timeout' => 5,
     ],
 
     'listings' => [
