@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Date | 2026-10-11 |
-| Status | **Final package list approved 2026-10-11.** Nothing has been installed in the project yet (packages are added at scaffolding, Phase 5). |
+| Status | **Final package list approved and installed (T0.5, 2026-10-11):** livewire/livewire 4.4.7, laravel/fortify 1.41.0, spatie/laravel-permission 8.3.0, spatie/laravel-translatable 6.14.1, intervention/image 4.3.5, propaganistas/laravel-phone 6.1.0 (with giggsey/libphonenumber-for-php-lite 9.0.41). `composer audit` clean. Transitive licences are permissive (MIT, BSD-2/3, Apache-2.0). nette/schema and nette/utils are triple-licensed BSD-3/GPL-2/GPL-3 and used under BSD-3 (pre-existing Laravel dependency). Fortify and passkey routes are disabled in `AppServiceProvider` (passkeys permanently per ADR-015; Fortify until T2.1). |
 | Sources | Packagist metadata (`repo.packagist.org/p2/*.json`, fetched 2026-10-11), laravel.com/docs/13.x (releases, database, fortify), php.net/supported-versions |
 | Rule (owner) | Add only packages with a clear benefit. Verify Laravel 13 compatibility, maintenance and licence. Document alternatives. |
 
