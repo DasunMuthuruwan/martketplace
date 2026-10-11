@@ -28,7 +28,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ### M2 Accounts and roles
 - [x] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot (merged eb97d18)
 - [x] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm (merged 80daad3; staff idle/absolute session timeouts still open)
-- [~] T2.3 Account settings backend — done on `feature/T2.3-account-settings`, **awaiting owner review**
+- [x] T2.3 Account settings backend (merged 0fbd474)
 ### M3 Catalogue
 - [!] T3.1 Categories + seed — gated by G-13
 - [ ] T3.2 Attributes, options, AttributeSchema
