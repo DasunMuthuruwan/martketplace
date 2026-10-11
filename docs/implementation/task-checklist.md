@@ -4,16 +4,16 @@ Status keys: `[ ]` not started · `[~]` in progress · `[x]` done (tests green, 
 Details for each task: [implementation-plan.md](implementation-plan.md). Update this file after every task.
 
 ## Gate 0 — Before Code
-- [ ] G0.1 Owner approves the implementation plan
+- [x] G0.1 Owner approves the implementation plan (2026-10-11)
 - [ ] G0.2 Host PHP 8.3/8.4 availability + DB version confirmed
 - [ ] G0.3 Composer decision (global update or marketplace-only phar)
-- [ ] G0.4 Local `marketplace` database approved
-- [ ] G0.5 Initial commit + branch workflow approved
+- [x] G0.4 Local `marketplace` database approved (2026-10-11)
+- [x] G0.5 Initial commit + branch workflow approved (2026-10-11)
 - [ ] G0.6 Defaults confirmed (G-1–G-13, Q-UX-1–6) — can be gradual
 
 ## Phase 5 — Backend
 ### M0 Foundation
-- [ ] T0.1 Initial docs commit, `.gitignore`, branch workflow
+- [x] T0.1 Initial docs commit, `.gitignore`, branch workflow (commit a38ecda)
 - [ ] T0.2 Scaffold Laravel 13 (PHP 8.4), env inventory, `config/marketplace.php`
 - [ ] T0.3 Pint, Larastan, PHPUnit, GitHub Actions CI (SQLite + MySQL 8)
 - [ ] T0.4 Security/portability baseline + guard tests
