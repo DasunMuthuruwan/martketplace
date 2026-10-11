@@ -93,6 +93,12 @@ return [
         'import_path' => env('GEONAMES_PATH', storage_path('app/geonames')),
     ],
 
+    // Staff session limits (docs/architecture/12-authentication-and-2fa.md §6).
+    'staff_session' => [
+        'idle_minutes' => (int) env('STAFF_SESSION_IDLE_MINUTES', 30),
+        'absolute_minutes' => (int) env('STAFF_SESSION_ABSOLUTE_MINUTES', 480),
+    ],
+
     // Retention periods in days (docs/architecture/09-data-retention.md).
     // Initial plan approved (CD-07); subject to privacy/legal review before production.
     'retention' => [

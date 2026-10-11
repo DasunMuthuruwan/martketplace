@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnforceStaffSessionLimits;
 use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsureStaffTwoFactor;
 use App\Http\Middleware\SecurityHeaders;
@@ -25,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Suspended/banned users are signed out on their next request (AUTH-09).
         $middleware->appendToGroup('web', EnsureAccountActive::class);
+        // Staff: 30-minute idle timeout, 8-hour absolute lifetime, no "remember me" (auth doc §6).
+        $middleware->appendToGroup('web', EnforceStaffSessionLimits::class);
         $middleware->alias(['staff.2fa' => EnsureStaffTwoFactor::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

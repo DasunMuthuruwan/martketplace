@@ -4,6 +4,7 @@ return [
     'last_owner' => 'This is the only Owner. Appoint another Owner first.',
     'unverified_target' => 'Only accounts with a verified email can become staff.',
     'two_factor_required' => 'Set up two-factor authentication to use the admin area.',
+    'session_expired' => 'For security, staff sessions end after a period of inactivity or a few hours. Please log in again.',
 
     'two_factor' => [
         'title' => 'Two-factor authentication',
