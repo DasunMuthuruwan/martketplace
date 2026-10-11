@@ -36,6 +36,7 @@ class HardcodedValueScanner
         'sqs.us-east-1.amazonaws.com',
         'challenges.cloudflare.com',
         'wa.me',
+        'download.geonames.org',
     ];
 
     /** Directories scanned, relative to the project root. */

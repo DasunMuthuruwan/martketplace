@@ -21,7 +21,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ### M1 Geo and money
 - [x] T1.1 Currencies, countries, country_currencies (merged 43ca29f)
 - [x] T1.2 Regions, cities, localities, location requests + LocationChain rule (merged 2a76ed3)
-- [ ] T1.3 GeoNames import commands
+- [~] T1.3 GeoNames import commands — done on `feature/T1.3-geonames-import`, **awaiting owner review**
 - [!] T1.4 Sri Lanka curated data — gated by G-1, G-3 and owner review C1
 - [!] T1.5 Money, units, AreaConverter, UnitPrice — gated by G-5, G-6
 - [!] T1.6 CountryContext — gated by G-2

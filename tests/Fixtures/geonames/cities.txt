@@ -1,0 +1,13 @@
+1248991	Colombo	Colombo		6.93194	79.84778	P	PPLC	LK		36	11			648034		0	Asia/Colombo	2026-10-01
+1235846	Maharagama	Maharagama		6.84800	79.92600	P	PPL	LK		36	11			195355		0	Asia/Colombo	2026-10-01
+1232999	Nugegoda	Nugegoda		6.86470	79.89970	P	PPL	LK		36	11			0		0	Asia/Colombo	2026-10-01
+1241622	Kandy	Kandy		7.29060	80.63360	P	PPLA	LK		29	21			125400		0	Asia/Colombo	2026-10-01
+1100001	Old Fort Town	Old Fort Town		6.90000	79.85000	P	PPLH	LK		36	11			5000		0	Asia/Colombo	2026-10-01
+1100002	Kirulapone	Kirulapone		6.87900	79.87700	P	PPLX	LK		36	11			0		0	Asia/Colombo	2026-10-01
+1100003	Lost Town	Lost Town		7.10000	80.10000	P	PPL	LK		36	99			3000		0	Asia/Colombo	2026-10-01
+1100004	Mountain Peak	Mountain Peak		7.20000	80.70000	T	MT	LK		29	21			0		0	Asia/Colombo	2026-10-01
+1100005	Bēruwala			6.47880	79.98280	P	PPL	LK		36	12			0		0	Asia/Colombo	2026-10-01
+1100007	Kottawa	Kottawa		6.84120	79.96530	P	PPL	LK		36	11			32000		0	Asia/Colombo	2026-10-01
+1100008	Kottawa	Kottawa		6.85000	79.97000	P	PPL	LK		36	11			1200		0	Asia/Colombo	2026-10-01
+5368361	Los Angeles	Los Angeles		34.05223	-118.24368	P	PPLA2	US		CA	037			3898747		0	America/Los_Angeles	2026-10-01
+4699066	Houston	Houston		29.76328	-95.36327	P	PPLA2	US		TX	201			2304580		0	America/Chicago	2026-10-01

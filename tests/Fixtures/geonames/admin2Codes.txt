@@ -1,0 +1,5 @@
+LK.36.11	Colombo District	Colombo District	1248990
+LK.36.12	Gampaha District	Gampaha District	1246294
+LK.29.21	Kandy District	Kandy District	1241621
+LK.99.01	Orphan District	Orphan District	9999901
+US.CA.037	Los Angeles County	Los Angeles County	5368381

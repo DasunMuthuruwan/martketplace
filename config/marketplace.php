@@ -80,6 +80,8 @@ return [
     'geo' => [
         // Shown on the site as required by the GeoNames CC BY 4.0 licence.
         'attribution' => 'Location data © GeoNames (geonames.org), CC BY 4.0',
+        // Folder with downloaded GeoNames dumps for geo:import-regions / geo:import-cities (never committed).
+        'import_path' => env('GEONAMES_PATH', storage_path('app/geonames')),
     ],
 
     // Retention periods in days (docs/architecture/09-data-retention.md).

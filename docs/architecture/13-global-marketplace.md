@@ -158,6 +158,20 @@ countries ─< regions (level 1: state / province / nation)
 4. Export reviewed data as an idempotent SQL/seed file → deploy (works without SSH).
 5. **Updates:** quarterly diff against the latest GeoNames files on staging. Renames update names only (IDs never change). Removed places are **deactivated, never deleted** when referenced by listings.
 
+**Implemented (T1.3) — commands and runbook** (developer machine or staging; download files from https://download.geonames.org/export/dump/ into `GEONAMES_PATH`, default `storage/app/geonames`, never committed):
+
+```bash
+php artisan geo:import-countries [--sync]                  # committed snapshot; new countries inactive; --sync updates name/ISO3/GeoNames ID only
+# set the country's region_levels (G-3) before importing regions
+php artisan geo:import-regions LK [--deactivate-missing]    # admin1 (+ admin2 when region_levels = 2)
+php artisan geo:import-cities LK --file=LK.txt [--min-population=N] [--deactivate-missing]
+php artisan geo:import-cities US --file=cities1000.txt
+```
+
+Rules: matched by GeoNames ID; IDs and slugs never change; renames update names only; curated cities keep name and region (population and coordinates refresh); excluded feature codes `PPLH, PPLQ, PPLW, PPLCH, PPLX` and places below `--min-population` are *filtered* (never deactivated); only places absent from the file are deactivated, and only with `--deactivate-missing`; nothing is deleted. Each run prints created / updated / unchanged / deactivated / skipped / filtered counts with notes.
+
+**Real-data trial (2026-10-11, test database only):** LK regions 34 (9 + 25), GB 189 (4 + 185), US 51. LK full dump → 17,470 places created, 274 skipped (blank/unknown district code), 112 filtered, ~14 s. US `cities1000` → 16,655 created, 688 filtered, ~14 s. This confirms that Sri Lanka needs a curated subset (T1.4).
+
 **Evidence of curation need (Sri Lanka):** Nugegoda and Kottawa are missing from `cities1000`. In the full dump there are two "Kottawa" entries, and Malabe (Colombo District) is assigned to North Western Province. So a curated Sri Lanka town list (~400–700 towns) is proposed, reviewed by the owner.
 
 ### 4.4 Countries with Incomplete Data

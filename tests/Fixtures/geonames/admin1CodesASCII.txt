@@ -1,0 +1,5 @@
+# admin1 fixture (GeoNames format: code, name, asciiname, geonameid)
+LK.36	Western Province	Western Province	1223421
+LK.29	Central Province	Central Province	1232860
+US.CA	California	California	5332921
+US.TX	Texas	Texas	4736286
