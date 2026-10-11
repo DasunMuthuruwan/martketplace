@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Services\Attributes;
+
+use App\Models\Attribute;
+use App\Models\AttributeOption;
+use App\Models\Category;
+use App\Models\CategoryAttribute;
+use App\Services\Catalogue\CatalogueCache;
+use App\Support\CountryScope;
+
+/**
+ * Builds the attribute schema of a leaf category for one country (architecture §5, routes doc
+ * §3.1): the parent's attributes plus the leaf's own (the leaf's link wins), without inactive or
+ * out-of-scope attributes and options. The same schema produces the form definition and the
+ * validation rules (CategorySchema), so they cannot drift apart. Cached per category + country.
+ */
+class AttributeSchema
+{
+    public function for(Category $category, string $iso2): CategorySchema
+    {
+        $iso2 = strtoupper($iso2);
+
+        return new CategorySchema(
+            CatalogueCache::remember("attribute-schema:{$category->id}:{$iso2}", fn () => $this->build($category, $iso2)),
+        );
+    }
+
+    /**
+     * @return list<array<string, mixed>> field definitions (plain arrays: safe to cache)
+     */
+    private function build(Category $category, string $iso2): array
+    {
+        /** @var array<int, array{attribute: Attribute, link: CategoryAttribute, inherited: bool}> $entries */
+        $entries = [];
+        foreach ([$category->parent, $category] as $owner) {
+            if ($owner === null) {
+                continue;
+            }
+            foreach ($owner->attributeDefinitions()->with('dependsOn')->get() as $attribute) {
+                /** @var CategoryAttribute $link */
+                $link = $attribute->getRelation('pivot');
+                $entries[$attribute->id] = ['attribute' => $attribute, 'link' => $link, 'inherited' => ! $owner->is($category)];
+            }
+        }
+
+        $entries = array_filter($entries, fn (array $entry) => $entry['attribute']->is_active
+            && CountryScope::includes($entry['link']->scope_countries, $iso2));
+
+        // Form order: sort_order, then inherited (parent) fields before the leaf's own, then id.
+        $sortKey = fn (array $entry) => [$entry['link']->sort_order, $entry['inherited'] ? 0 : 1, $entry['attribute']->id];
+        usort($entries, fn (array $a, array $b) => $sortKey($a) <=> $sortKey($b));
+
+        $optionsByAttribute = $this->availableOptions(array_map(fn (array $entry) => $entry['attribute'], $entries), $iso2);
+        $presentKeys = array_map(fn (array $entry) => $entry['attribute']->key, $entries);
+
+        $fields = [];
+        foreach ($entries as $entry) {
+            $attribute = $entry['attribute'];
+            $dependsOn = $attribute->dependsOn?->key;
+
+            // A dependent select is only usable together with the select it depends on.
+            if ($dependsOn !== null && ! in_array($dependsOn, $presentKeys, true)) {
+                continue;
+            }
+
+            $fields[] = [
+                'key' => $attribute->key,
+                'type' => $attribute->type->value,
+                'label' => $attribute->getTranslations('label'),
+                'help' => $attribute->getTranslations('help_text'),
+                'unit' => $attribute->unit,
+                'rules' => $attribute->rules ?? [],
+                'required' => $entry['link']->is_required,
+                'required_for_conditions' => $entry['link']->required_for_conditions,
+                'filterable' => $entry['link']->is_filterable,
+                'show_on_card' => $entry['link']->show_on_card,
+                'group' => $entry['link']->group,
+                'allows_other' => $attribute->allows_other,
+                'depends_on' => $dependsOn,
+                'options' => $attribute->type->hasOptions() ? ($optionsByAttribute[$attribute->id] ?? []) : [],
+            ];
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Active, in-scope options; a dependent option also needs its parent option to be available.
+     *
+     * @param  list<Attribute>  $attributes
+     * @return array<int, list<array{value: string, label: array<string, string>, parent: string|null}>>
+     */
+    private function availableOptions(array $attributes, string $iso2): array
+    {
+        $ids = array_map(fn (Attribute $attribute) => $attribute->id, array_filter($attributes, fn (Attribute $a) => $a->type->hasOptions()));
+        if ($ids === []) {
+            return [];
+        }
+
+        $options = AttributeOption::whereIn('attribute_id', $ids)
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->filter(fn (AttributeOption $option) => $option->isInScopeFor($iso2))
+            ->keyBy('id');
+
+        $result = [];
+        foreach ($options as $option) {
+            $parent = null;
+            if ($option->parent_option_id !== null) {
+                $parentOption = $options->get($option->parent_option_id);
+                if ($parentOption === null) {
+                    continue; // parent inactive or out of scope
+                }
+                $parent = $parentOption->value;
+            }
+
+            $result[$option->attribute_id][] = [
+                'value' => $option->value,
+                'label' => $option->getTranslations('label'),
+                'parent' => $parent,
+            ];
+        }
+
+        return $result;
+    }
+}

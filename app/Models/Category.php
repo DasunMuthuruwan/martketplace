@@ -7,12 +7,14 @@ use App\Enums\ListingType;
 use App\Enums\PriceMode;
 use App\Enums\PriceType;
 use App\Exceptions\InvalidCategoryTree;
-use App\Services\Catalogue\CategoryTree;
+use App\Services\Catalogue\CatalogueCache;
+use App\Support\CountryScope;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
@@ -34,6 +36,7 @@ use Spatie\Translatable\HasTranslations;
  * @property PriceMode $price_mode
  * @property bool $allow_free
  * @property list<string>|null $allowed_price_types
+ * @property int|null $unit_price_attribute_id attribute used for the calculated price per unit (Land → land_size)
  * @property bool $show_condition
  * @property int $max_images
  * @property CategoryModeration $moderation
@@ -51,7 +54,7 @@ class Category extends Model
     /** @var list<string> */
     protected $fillable = [
         'parent_id', 'name', 'slug', 'description', 'icon', 'sort_order', 'is_active', 'scope_countries',
-        'allowed_types', 'price_mode', 'allow_free', 'allowed_price_types', 'show_condition', 'max_images',
+        'allowed_types', 'price_mode', 'allow_free', 'allowed_price_types', 'unit_price_attribute_id', 'show_condition', 'max_images',
         'moderation', 'meta_title', 'meta_description',
     ];
 
@@ -77,6 +80,7 @@ class Category extends Model
             'price_mode' => PriceMode::class,
             'allow_free' => 'boolean',
             'allowed_price_types' => 'array',
+            'unit_price_attribute_id' => 'integer',
             'show_condition' => 'boolean',
             'max_images' => 'integer',
             'moderation' => CategoryModeration::class,
@@ -102,7 +106,7 @@ class Category extends Model
         static::saved(function (Category $category): void {
             // A slug in use again is no longer a redirect.
             SlugRedirect::where('type', self::REDIRECT_TYPE)->where('old_slug', $category->slug)->delete();
-            CategoryTree::flush();
+            CatalogueCache::flush();
         });
 
         static::deleting(function (Category $category): void {
@@ -113,7 +117,7 @@ class Category extends Model
 
         static::deleted(function (Category $category): void {
             SlugRedirect::where('type', self::REDIRECT_TYPE)->where('target_id', $category->id)->delete();
-            CategoryTree::flush();
+            CatalogueCache::flush();
         });
     }
 
@@ -127,6 +131,16 @@ class Category extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Attributes attached directly to this category (a leaf also inherits its parent's: see AttributeSchema).
+     *
+     * @return BelongsToMany<Attribute, $this, CategoryAttribute>
+     */
+    public function attributeDefinitions(): BelongsToMany
+    {
+        return $this->belongsToMany(Attribute::class, 'category_attribute')->using(CategoryAttribute::class)->withPivot(CategoryAttribute::COLUMNS);
     }
 
     /** @param  Builder<Category>  $query */
@@ -164,7 +178,7 @@ class Category extends Model
 
     public function isInScopeFor(string $iso2): bool
     {
-        return $this->scope_countries === null || in_array(strtoupper($iso2), $this->scope_countries, true);
+        return CountryScope::includes($this->scope_countries, $iso2);
     }
 
     /** Active and in scope, together with its parent. */
@@ -226,7 +240,7 @@ class Category extends Model
             $this->slug = $this->uniqueSlug(Str::slug((string) $this->getTranslation('name', 'en', true)));
         }
 
-        $this->scope_countries = $this->normaliseCountries($this->scope_countries);
+        $this->scope_countries = CountryScope::normalise($this->scope_countries);
         $this->allowed_types = $this->normaliseEnumList('allowed_types', $this->allowed_types ?? [], ListingType::class);
         if ($this->allowed_types === []) {
             throw InvalidCategoryTree::noListingTypes();
@@ -249,22 +263,6 @@ class Category extends Model
         if ($this->exists && $this->children()->exists()) {
             throw InvalidCategoryTree::parentHasChildren();
         }
-    }
-
-    /**
-     * @param  list<string>|null  $countries
-     * @return list<string>|null
-     */
-    private function normaliseCountries(?array $countries): ?array
-    {
-        if ($countries === null) {
-            return null;
-        }
-
-        $codes = array_values(array_unique(array_map(fn ($code) => strtoupper(trim((string) $code)), $countries)));
-        sort($codes);
-
-        return $codes === [] ? null : $codes;
     }
 
     /**

@@ -243,6 +243,8 @@ Unique `(attribute_id, parent_option_id, value)`. Index `(attribute_id, is_activ
 
 Effective attributes for a subcategory = parent's attributes + its own. The child's pivot overrides the parent's when both attach the same attribute.
 
+> **Implementation note (T3.2):** two columns were added beyond §2.4–§2.6: `attributes.allows_other` (a select offers "Other" + free text, input `attributes[<key>__other]`; `other` is a reserved option value) and `category_attribute.required_for_conditions` (JSON list of item conditions, e.g. mileage required only for `used`/`reconditioned`). `categories.unit_price_attribute_id` now exists (FK, `ON DELETE SET NULL`). Area attributes entered with a unit (`land_size`, `input_value`/`input_unit_id`) are **not** in T3.2: they come with the measurement units in **T1.5**, which extends `AttributeSchema`. `AttributeSchema` (`App\Services\Attributes`) merges parent + leaf links, drops inactive/out-of-scope attributes and options (a dependent option also needs its parent option), drops a dependent select whose parent select is missing, and returns a `CategorySchema` with `rules()` (unknown keys rejected, dependent selects checked against the chosen parent), `form()` and `validationAttributes()`. Cached per category + country in one catalogue cache generation, renewed by any category, attribute, option or link change. The "deactivate, never delete once used" check (CAT-06) needs listing values and arrives with T4.1/T4.2.
+
 ### 2.7 `listings`
 
 | Column | Type | Notes |

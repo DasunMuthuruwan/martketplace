@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Services\Catalogue\CategoryTree;
+use App\Services\Catalogue\CatalogueCache;
 use Illuminate\Database\Seeder;
 
 /**
@@ -27,7 +27,7 @@ class CategorySeeder extends Seeder
         }
 
         // DatabaseSeeder mutes model events, so flush the cached trees explicitly.
-        CategoryTree::flush();
+        CatalogueCache::flush();
     }
 
     /**
