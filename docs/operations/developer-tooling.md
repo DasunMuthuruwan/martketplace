@@ -120,3 +120,19 @@ Most work needs **no token**. Add one only if you hit GitHub rate limits or use 
 **Never** commit `auth.json`, paste tokens into project files or `.env`, or share `composer diagnose -vvv` output publicly without checking it first.
 
 **Status:** Documented for the owner to run. No change was made.
+
+## 3. Local XAMPP MariaDB Health (Found 2026-10-11)
+
+While creating the approved local `marketplace` database on XAMPP's MariaDB 10.4.32 (`C:\php8.2\mysql`, port 3306):
+
+| Finding | Evidence | Impact |
+|---|---|---|
+| `GRANT` failed: `ERROR 1030: Got error 176 "Read page with wrong checksum" from storage engine Aria` | System privilege tables (`mysql.db`, `mysql.global_priv`, …) use the Aria engine. One has a corrupted page. | New users can't be granted privileges. Other privilege changes may fail. |
+| InnoDB log/data mismatch at startup: "Are you sure you are using the right ib_logfiles…", pages with log sequence numbers "in the future", 34 "Your database may be corrupt" errors today, plus similar entries from earlier dates | `C:\php8.2\mysql\data\mysql_error.log` | **Pre-existing.** Typical after `ib_logfile*` were deleted/replaced to get XAMPP MySQL starting. Risk to data in **all** databases on this server (including other local projects). |
+
+**State left by the attempt:** an empty database `marketplace` and users `marketplace@localhost` / `marketplace@127.0.0.1` **without any privileges** were created before the error. Nothing else was changed. The marketplace `.env` still uses SQLite.
+
+**Recommendations (owner decides, nothing done):**
+1. **Back up `C:\php8.2\mysql\data` now** (stop MySQL, copy the whole folder elsewhere), and export important databases with `mysqldump`/phpMyAdmin.
+2. Don't use this server for the marketplace. Options: a separate portable MariaDB 10.11 LTS / MySQL 8.4 LTS on another port (e.g. 3307), or SQLite locally with MySQL 8 in CI.
+3. Repairing XAMPP (e.g. `mysqlcheck --repair mysql`, InnoDB recovery) is a separate task for the owner's local environment. Do it only after the backup.
