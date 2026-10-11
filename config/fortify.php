@@ -167,7 +167,8 @@ return [
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication(['confirm' => true, 'confirmPassword' => true]),
-        // T2.3: Features::updateProfileInformation(), Features::updatePasswords()
+        Features::updateProfileInformation(),
+        Features::updatePasswords(),
         // Passkeys stay disabled (ADR-015).
     ],
 

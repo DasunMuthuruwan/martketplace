@@ -31,9 +31,13 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        // ISO codes are stored upper-case; SQLite compares case-sensitively.
+        $input['phone_country'] = strtoupper(trim((string) ($input['phone_country'] ?? '')));
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'string', 'email:rfc', 'max:191', Rule::unique(User::class)->withoutTrashed()],
+            // Includes soft-deleted accounts: their address stays reserved until anonymised (restore window).
+            'email' => ['required', 'string', 'email:rfc', 'max:191', Rule::unique(User::class)],
             'password' => $this->passwordRules(),
             'country_id' => ['required', 'integer', Rule::exists(Country::class, 'id')->where('is_active', true)],
             'phone_country' => ['nullable', 'required_with:phone', 'string', 'size:2', Rule::exists(Country::class, 'iso2')],
@@ -49,7 +53,7 @@ class CreateNewUser implements CreatesNewUsers
             Turnstile::RESPONSE_FIELD.'.required' => __('security.turnstile_failed'),
         ])->validate();
 
-        $phoneCountry = isset($input['phone_country']) ? strtoupper((string) $input['phone_country']) : null;
+        $phoneCountry = $input['phone_country'] !== '' ? $input['phone_country'] : null;
         $phone = filled($input['phone'] ?? null)
             ? (new PhoneNumber((string) $input['phone'], $phoneCountry))->formatE164()
             : null;

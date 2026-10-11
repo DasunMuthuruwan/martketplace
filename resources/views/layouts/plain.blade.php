@@ -24,7 +24,7 @@
     <main>
         <h1>@yield('title')</h1>
         @if (session('status'))
-            <p class="status" role="status">{{ session('status') }}</p>
+            <p class="status" role="status">{{ trans()->has('account.status.'.session('status')) ? __('account.status.'.session('status')) : session('status') }}</p>
         @endif
         @yield('content')
     </main>

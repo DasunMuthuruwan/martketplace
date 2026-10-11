@@ -34,19 +34,15 @@
             </select>
             @error('country_id')<p class="error" id="country-error">{{ $message }}</p>@enderror
 
-            <label for="phone_country">{{ __('auth.ui.phone_country') }}</label>
-            <select id="phone_country" name="phone_country" autocomplete="tel-country-code">
-                <option value=""></option>
-                @foreach ($phoneCountries as $country)
-                    <option value="{{ $country->iso2 }}" @selected(old('phone_country') === $country->iso2)>{{ $country->name }} (+{{ $country->phone_country_code }})</option>
-                @endforeach
-            </select>
-            @error('phone_country')<p class="error">{{ $message }}</p>@enderror
-
-            <label for="phone">{{ __('auth.ui.phone') }}</label>
-            <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" maxlength="30" autocomplete="tel-national" inputmode="tel" aria-describedby="phone-hint @error('phone') phone-error @enderror">
-            <p class="hint" id="phone-hint">{{ __('auth.ui.phone_hint') }}</p>
-            @error('phone')<p class="error" id="phone-error">{{ $message }}</p>@enderror
+            @include('partials.phone-field', [
+                'name' => 'phone',
+                'countryName' => 'phone_country',
+                'label' => __('auth.ui.phone'),
+                'countryLabel' => __('auth.ui.phone_country'),
+                'hint' => __('auth.ui.phone_hint'),
+                'value' => old('phone'),
+                'countryValue' => old('phone_country'),
+            ])
 
             <label><input type="checkbox" name="terms" value="1" @checked(old('terms'))> {{ __('auth.ui.terms') }}</label>
             @error('terms')<p class="error">{{ $message }}</p>@enderror

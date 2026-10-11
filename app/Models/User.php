@@ -29,6 +29,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $email_verified_at
  * @property string|null $phone E.164
  * @property string|null $phone_country ISO 3166-1 alpha-2 of the phone number
+ * @property Carbon|null $phone_verified_at reserved for SMS OTP (AUTH-05)
+ * @property string|null $whatsapp_phone E.164; null means the same as $phone
  * @property int|null $country_id
  * @property ContactVisibility $contact_visibility
  * @property UserStatus $status

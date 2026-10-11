@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\CountryFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -85,6 +86,17 @@ class Country extends Model
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * Countries offered in phone-number pickers: every country with a calling code, active or not,
+     * because a seller's phone may be registered abroad.
+     *
+     * @return Collection<int, Country>
+     */
+    public static function phonePickerOptions(): Collection
+    {
+        return self::whereNotNull('phone_country_code')->get()->sortBy('name')->values();
     }
 
     /**

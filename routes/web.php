@@ -1,11 +1,22 @@
 <?php
 
 use App\Authorization\Permissions;
+use App\Http\Controllers\Account\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Account settings. Profile and security stay reachable before email verification (e.g. to fix a
+// mistyped address); contact settings need a verified email.
+Route::middleware('auth')->prefix('account/settings')->name('account.settings.')->controller(SettingsController::class)->group(function () {
+    Route::get('/profile', 'profile')->name('profile');
+    Route::get('/security', 'security')->name('security');
+    Route::get('/contact', 'contact')->middleware('verified')->name('contact');
+    Route::put('/contact', 'updateContact')->middleware('verified')->name('contact.update');
+});
+Route::delete('/account', [SettingsController::class, 'destroy'])->middleware('auth')->name('account.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Two-factor setup (Fortify endpoints do the work; this page shows status, QR and recovery codes).

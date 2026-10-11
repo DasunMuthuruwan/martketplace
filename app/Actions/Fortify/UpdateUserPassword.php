@@ -3,11 +3,15 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Support\UserSessions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
 
+/**
+ * Password change (AUTH-08). Needs the current password; other devices are signed out afterwards.
+ */
 class UpdateUserPassword implements UpdatesUserPasswords
 {
     use PasswordValidationRules;
@@ -31,5 +35,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
         $user->forceFill([
             'password' => Hash::make($input['password']),
         ])->save();
+
+        UserSessions::endOthers($user, request()->hasSession() ? request()->session()->getId() : null);
     }
 }

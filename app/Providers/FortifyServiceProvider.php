@@ -96,7 +96,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn () => view('auth.login'));
         Fortify::registerView(fn () => view('auth.register', [
             'countries' => Country::active()->get()->sortBy('name')->values(),
-            'phoneCountries' => Country::whereNotNull('phone_country_code')->get()->sortBy('name')->values(),
+            'phoneCountries' => Country::phonePickerOptions(),
         ] + $botProtection()));
         Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password'));
         Fortify::resetPasswordView(fn (Request $request) => view('auth.reset-password', ['request' => $request]));

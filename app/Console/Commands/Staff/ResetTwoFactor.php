@@ -4,8 +4,8 @@ namespace App\Console\Commands\Staff;
 
 use App\Models\User;
 use App\Notifications\TwoFactorResetNotification;
+use App\Support\UserSessions;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -45,8 +45,7 @@ class ResetTwoFactor extends Command
             'two_factor_confirmed_at' => null,
         ])->save();
 
-        // End the user's other sessions (database session driver).
-        DB::table('sessions')->where('user_id', $user->id)->delete();
+        UserSessions::endAll($user);
 
         Log::warning('Two-factor authentication reset from the command line', ['user_id' => $user->id]);
         $user->notify(new TwoFactorResetNotification);

@@ -127,6 +127,15 @@ class RegistrationTest extends TestCase
         $this->post('/register', $this->payload(['email' => 'NIMAL@EXAMPLE.COM']))->assertSessionHasErrors('email');
     }
 
+    public function test_email_of_a_deleted_account_stays_reserved(): void
+    {
+        // Regression: validation used to ignore soft-deleted rows, so the unique index threw a 500.
+        User::factory()->create(['email' => 'nimal@example.com'])->delete();
+
+        $this->post('/register', $this->payload())->assertSessionHasErrors('email');
+        $this->assertSame(1, User::withTrashed()->count());
+    }
+
     public function test_honeypot_field_blocks_bots(): void
     {
         $this->post('/register', $this->payload(['website' => 'https://spam.example']))->assertSessionHasErrors('website');
