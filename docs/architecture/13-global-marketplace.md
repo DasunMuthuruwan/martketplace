@@ -294,6 +294,8 @@ InnoDB FULLTEXT tokenises on spaces and punctuation. This works for English, Sin
 
 ## 12. Owner Decisions Needed (Global)
 
+> **Decided 2026-10-11:** the owner accepted every recommendation below as the decision ("use the defaults"). G-1 to G-13 are therefore settled as recommended. Owner actions that remain are part of those recommendations: legal review before activating each country (G-10), moderation-language coverage per country (G-12), and review of the curated location lists (T1.4, review C1).
+
 | # | Decision | Recommendation |
 |---|---|---|
 | G-1 | Which countries are **active at launch**? | Build for all; **activate Sri Lanka first**, then add countries one at a time after data curation, legal check and moderation capacity (G-10, G-12). Or name the launch set. |

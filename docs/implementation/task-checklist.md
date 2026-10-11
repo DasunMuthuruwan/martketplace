@@ -22,16 +22,16 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T1.1 Currencies, countries, country_currencies (merged 43ca29f)
 - [x] T1.2 Regions, cities, localities, location requests + LocationChain rule (merged 2a76ed3)
 - [x] T1.3 GeoNames import commands (merged 52fe7c4)
-- [!] T1.4 Sri Lanka curated data — gated by G-1, G-3 and owner review C1
-- [!] T1.5 Money, units, AreaConverter, UnitPrice — gated by G-5, G-6
-- [!] T1.6 CountryContext — gated by G-2
+- [ ] T1.4 Sri Lanka curated data — G-1/G-3 defaults accepted; owner review C1 of the curated lists still required
+- [ ] T1.5 Money, units, AreaConverter, UnitPrice (G-5, G-6 defaults accepted)
+- [ ] T1.6 CountryContext (G-2 default accepted)
 ### M2 Accounts and roles
 - [x] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot (merged eb97d18)
 - [x] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm (merged 80daad3)
 - [x] T2.3 Account settings backend (merged 0fbd474)
-- [~] T2.4 Staff session limits (follow-up to T2.2: 30-min idle, 8-h absolute, no remember-me for staff) — done on `feature/T2.4-staff-session-timeouts`, **awaiting owner review**
+- [x] T2.4 Staff session limits (follow-up to T2.2: 30-min idle, 8-h absolute, no remember-me for staff) (merged 5b5614a)
 ### M3 Catalogue
-- [!] T3.1 Categories + seed — gated by G-13
+- [~] T3.1 Categories + seed (G-13 default accepted) — in progress on `feature/T3.1-categories`
 - [ ] T3.2 Attributes, options, AttributeSchema
 - [ ] T3.3 Attribute/option seed data (owner review C2)
 ### M4 Listings core
@@ -42,8 +42,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [ ] T4.5 Contact reveal
 - [ ] T4.6 Favourites and reports
 ### M5 Search and SEO
-- [!] T5.1 ListingSearch (MySQL) — gated by G-7
-- [!] T5.2 Public routes — gated by G-8
+- [ ] T5.1 ListingSearch (MySQL) (G-7 default accepted)
+- [ ] T5.2 Public routes (G-8 default accepted)
 - [ ] T5.3 SEO, JSON-LD, sitemaps
 - [ ] T5.4 Performance check (50k listings, 4 countries)
 ### M6 Admin backend
@@ -57,7 +57,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [ ] T7.2 Retention pruning
 
 ## Phase 6 — Frontend
-- [!] F1.1 Tokens, fonts, icons, dark mode — gated by Q-UX-2, Q-UX-5, G-11
+- [!] F1.1 Tokens, fonts, icons, dark mode — gated by Q-UX-2, Q-UX-5 (G-11 accepted)
 - [ ] F1.2 Core components
 - [!] F1.3 Layouts + style guide — gated by Q-UX-1, Q-UX-3
 - [ ] F2.1 Home / country home
