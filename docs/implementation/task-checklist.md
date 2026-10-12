@@ -38,8 +38,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T4.1 Listings tables, indexes, public scope (merged 27f3a0a, e0437aa)
 - [x] T4.2 Draft actions (location, details, price, units) (merged 7d2e9be)
 - [x] T4.3 Image pipeline (merged 9abeae9; `local.serve` disabled)
-- [~] T4.4 Lifecycle and moderation actions — T4.4a submit + moderation merged (4574d7b); **T4.4b edits, renew, sold, delete, expiry, suspend done on `feature/T4.4b-lifecycle`, awaiting owner review**
-- [ ] T4.5 Contact reveal
+- [x] T4.4 Lifecycle and moderation actions (T4.4a merged 4574d7b, T4.4b merged ac8a02b; country/category fixed after submission approved)
+- [~] T4.5 Contact reveal
 - [ ] T4.6 Favourites and reports
 ### M5 Search and SEO
 - [ ] T5.1 ListingSearch (MySQL) (G-7 default accepted)
