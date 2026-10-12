@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * A processed listing photo (database design §2.9). Only re-encoded variants are stored
@@ -38,6 +39,32 @@ class ListingImage extends Model
             'bytes' => 'integer',
             'sort_order' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Files go with the row. (Rows removed by a database cascade are handled by the retention job.)
+        static::deleted(function (ListingImage $image): void {
+            Storage::disk($image->disk)->delete(array_map(fn (string $variant) => $image->path($variant), $image->variantNames()));
+        });
+    }
+
+    /** Path of a variant on the disk, e.g. 2026/10/42/{basename}-lg.webp. */
+    public function path(string $variant): string
+    {
+        return "{$this->directory}/{$this->basename}-{$variant}.{$this->format}";
+    }
+
+    /** Public URL from the disk configuration, never stored (P2, P6). */
+    public function url(string $variant = 'lg'): string
+    {
+        return Storage::disk($this->disk)->url($this->path($variant));
+    }
+
+    /** @return list<string> */
+    public function variantNames(): array
+    {
+        return array_keys((array) config('marketplace.images.variants'));
     }
 
     /** @return BelongsTo<Listing, $this> */

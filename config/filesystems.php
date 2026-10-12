@@ -33,7 +33,8 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // No signed "serve" route: private files are never served directly (T4.3 decision).
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -46,6 +47,42 @@ return [
             'throw' => false,
             'report' => false,
         ],
+
+        // Listing photos (security doc §4). Only re-encoded variants are stored here. The driver,
+        // root and public URL come from env so storage can move without code changes (P6):
+        //   local   → storage/app/public/listings, served via the public/storage symlink;
+        //   uploads → public/uploads/listings, for hosts without symlinks (script execution blocked
+        //             by an .htaccess that App\Support\ListingsDisk writes);
+        //   s3      → S3-compatible object storage (AWS_* settings).
+        'listings' => match (env('LISTINGS_DISK_DRIVER', 'local')) {
+            's3' => [
+                'driver' => 's3',
+                'key' => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+                'region' => env('AWS_DEFAULT_REGION'),
+                'bucket' => env('AWS_BUCKET'),
+                'url' => env('LISTINGS_URL') ?: env('AWS_URL'),
+                'endpoint' => env('AWS_ENDPOINT'),
+                'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+                'root' => env('LISTINGS_ROOT') ?: 'listings',
+                'visibility' => 'public',
+                'throw' => true,
+            ],
+            'uploads' => [
+                'driver' => 'local',
+                'root' => env('LISTINGS_ROOT') ?: public_path('uploads/listings'),
+                'url' => env('LISTINGS_URL') ?: rtrim(env('APP_URL', 'http://localhost'), '/').'/uploads/listings',
+                'visibility' => 'public',
+                'throw' => true,
+            ],
+            default => [
+                'driver' => 'local',
+                'root' => env('LISTINGS_ROOT') ?: storage_path('app/public/listings'),
+                'url' => env('LISTINGS_URL') ?: rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/listings',
+                'visibility' => 'public',
+                'throw' => true,
+            ],
+        },
 
         's3' => [
             'driver' => 's3',
