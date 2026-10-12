@@ -36,7 +36,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T3.3 Attribute/option seed data (merged b3ede9a; C2 approved 2026-10-11)
 ### M4 Listings core
 - [x] T4.1 Listings tables, indexes, public scope (merged 27f3a0a, e0437aa)
-- [~] T4.2 Draft actions (location, details, price, units)
+- [~] T4.2 Draft actions (location, details, price, units) — done on `feature/T4.2-draft-actions`, **awaiting owner review**
 - [ ] T4.3 Image pipeline (also decide the skeleton's `storage.local` serve/upload routes from `config/filesystems.php` → `local.serve`: signed-URL only, unused by our design; disable unless needed)
 - [ ] T4.4 Lifecycle and moderation actions
 - [ ] T4.5 Contact reveal

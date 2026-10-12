@@ -24,14 +24,14 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property int $user_id
  * @property int $category_id
- * @property ListingType $type
+ * @property ListingType|null $type null until the details step (drafts)
  * @property ListingStatus $status
- * @property string $title
- * @property string $slug
- * @property string $description
+ * @property string|null $title
+ * @property string|null $slug
+ * @property string|null $description
  * @property string|null $price decimal string in $currency (never converted)
  * @property string $currency ISO 4217
- * @property PriceType $price_type
+ * @property PriceType|null $price_type null until the price step (drafts)
  * @property RentPeriod|null $rent_period
  * @property ItemCondition|null $condition
  * @property int $country_id
@@ -104,7 +104,7 @@ class Listing extends Model
         // The slug follows the title; old URLs still resolve because routing uses the id (routes doc §1).
         static::saving(function (Listing $listing): void {
             if ($listing->isDirty('title') || blank($listing->getAttribute('slug'))) {
-                $listing->slug = Str::limit(Str::slug($listing->title), self::SLUG_MAX_LENGTH, '') ?: 'listing';
+                $listing->slug = Str::limit(Str::slug((string) $listing->title), self::SLUG_MAX_LENGTH, '') ?: 'listing';
             }
         });
     }
