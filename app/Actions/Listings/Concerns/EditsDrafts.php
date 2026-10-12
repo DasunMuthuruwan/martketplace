@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Gate;
 trait EditsDrafts
 {
     /**
-     * Owner only (ListingPolicy::update) and only while the listing is a draft.
+     * Owner only (ListingPolicy::update) and only while the listing is a draft, or rejected
+     * (the seller fixes it and submits again, architecture §4.2).
      *
      * @throws AuthorizationException
      * @throws ListingNotEditable
@@ -21,7 +22,7 @@ trait EditsDrafts
     {
         Gate::forUser($user)->authorize('update', $listing);
 
-        if ($listing->status !== ListingStatus::Draft) {
+        if (! in_array($listing->status, [ListingStatus::Draft, ListingStatus::Rejected], true)) {
             throw new ListingNotEditable($listing->status);
         }
     }

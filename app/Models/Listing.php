@@ -46,6 +46,9 @@ use Illuminate\Support\Str;
  * @property int|null $cover_image_id
  * @property int $view_count
  * @property string|null $moderation_note
+ * @property int|null $moderated_by
+ * @property Carbon|null $moderated_at
+ * @property Carbon|null $submitted_at
  * @property Carbon|null $published_at
  * @property Carbon|null $expires_at
  * @property bool $flagged
