@@ -37,8 +37,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ### M4 Listings core
 - [x] T4.1 Listings tables, indexes, public scope (merged 27f3a0a, e0437aa)
 - [x] T4.2 Draft actions (location, details, price, units) (merged 7d2e9be)
-- [~] T4.3 Image pipeline — done on `feature/T4.3-image-pipeline`, **awaiting owner review** (`local.serve` disabled)
-- [ ] T4.4 Lifecycle and moderation actions
+- [x] T4.3 Image pipeline (merged 9abeae9; `local.serve` disabled)
+- [~] T4.4 Lifecycle and moderation actions
 - [ ] T4.5 Contact reveal
 - [ ] T4.6 Favourites and reports
 ### M5 Search and SEO
