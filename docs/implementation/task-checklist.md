@@ -39,8 +39,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T4.2 Draft actions (location, details, price, units) (merged 7d2e9be)
 - [x] T4.3 Image pipeline (merged 9abeae9; `local.serve` disabled)
 - [x] T4.4 Lifecycle and moderation actions (T4.4a merged 4574d7b, T4.4b merged ac8a02b; country/category fixed after submission approved)
-- [~] T4.5 Contact reveal — done on `feature/T4.5-contact-reveal`, **awaiting owner review**
-- [ ] T4.6 Favourites and reports
+- [x] T4.5 Contact reveal (merged f78bb63)
+- [~] T4.6 Favourites and reports
 ### M5 Search and SEO
 - [ ] T5.1 ListingSearch (MySQL) (G-7 default accepted)
 - [ ] T5.2 Public routes (G-8 default accepted)
