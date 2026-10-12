@@ -55,6 +55,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('slug_redirects');
-        Schema::dropIfExists('categories');
+        // Self-referencing parent_id (RESTRICT): SQLite deletes rows on DROP and would refuse.
+        Schema::withoutForeignKeyConstraints(fn () => Schema::dropIfExists('categories'));
     }
 };

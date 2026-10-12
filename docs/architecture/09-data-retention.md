@@ -36,7 +36,7 @@
 3. Within 30 days: the user can ask support to restore the account (manual, staff with `users.delete`).
 4. After 30 days: anonymised and purged as above. Staff audit records keep the anonymised user id only.
 
-> **Implementation status (T2.3):** steps 1 and 2 are implemented (`AppActionsAccountDeleteAccount`): password check, soft delete, staff roles removed (a restored account does not regain staff powers), all database sessions ended and the remember token cycled, confirmation email, and a last-Owner guard. The email stays reserved while the row is soft-deleted (registration and email changes reject it). Hiding listings comes with the public scope (T4.1), removing favourites with T4.6, and anonymisation/purge with the retention job (M7).
+> **Implementation status (T2.3):** steps 1 and 2 are implemented (`App\Actions\Account\DeleteAccount`): password check, soft delete, staff roles removed (a restored account does not regain staff powers), all database sessions ended and the remember token cycled, confirmation email, and a last-Owner guard. The email stays reserved while the row is soft-deleted (registration and email changes reject it). Hiding listings comes with the public scope (T4.1), removing favourites with T4.6, and anonymisation/purge with the retention job (M7).
 
 ## 3. Legal Hold
 

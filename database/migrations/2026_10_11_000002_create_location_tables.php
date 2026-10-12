@@ -91,6 +91,7 @@ return new class extends Migration
         Schema::dropIfExists('location_requests');
         Schema::dropIfExists('localities');
         Schema::dropIfExists('cities');
-        Schema::dropIfExists('regions');
+        // Self-referencing parent_id (RESTRICT): SQLite deletes rows on DROP and would refuse.
+        Schema::withoutForeignKeyConstraints(fn () => Schema::dropIfExists('regions'));
     }
 };
