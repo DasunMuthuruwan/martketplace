@@ -225,6 +225,7 @@ Countries (activate, labels, currency, locale, units, requirements) · Regions (
 | URL state | All filters in the URL (`?region=western-province&city=nugegoda&currency=LKR&min_price=…`). Shareable and bookmarkable. |
 | Indexable landing pages | Country home, country + category, country + region (+ city) + category: see the routes doc. Other combinations get `noindex,follow` + canonical. |
 | Defaults | Visitor country: remembered choice (cookie) → Cloudflare `CF-IPCountry` header **if** the site is later proxied by Cloudflare (free) → site default country setting. No paid geo-IP service. [OPEN G-2] |
+> **Implementation status (T1.6):** `AppServicesGeoCountryContext` (request-scoped) resolves the visitor country in this order: `{cc}` route segment (middleware alias `country` = `ResolveCountry`: active country required, 404 otherwise; any upper-case code 301-redirects to the lower-case canonical URL, query kept; shared with views as `$currentCountry`) → remembered choice (cookie `dtm_country`, 1 year, host-only, HttpOnly, SameSite Lax, encrypted) → `CF-IPCountry` only when `GEO_USE_CF_IPCOUNTRY=true` **and** the request comes through a proxy in `TRUSTED_PROXIES` (otherwise the header could be forged) → `MARKETPLACE_DEFAULT_COUNTRY`. Only active countries are returned; null means the home page shows the country chooser (T5.2). `POST /country` (`country.choose`) remembers a choice and redirects to `/{cc}`.
 
 ## 7. Listing Creation Flow (Country-Aware)
 

@@ -24,7 +24,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T1.3 GeoNames import commands (merged 52fe7c4)
 - [ ] T1.4 Sri Lanka curated data — G-1/G-3 defaults accepted; owner review C1 of the curated lists still required
 - [x] T1.5 Money, units, AreaConverter, UnitPrice + area attributes in AttributeSchema (merged a1dc964)
-- [~] T1.6 CountryContext (G-2 default accepted) — in progress on `feature/T1.6-country-context`
+- [~] T1.6 CountryContext — done on `feature/T1.6-country-context`, **awaiting owner review**
 ### M2 Accounts and roles
 - [x] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot (merged eb97d18)
 - [x] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm (merged 80daad3)

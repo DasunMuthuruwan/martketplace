@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnforceStaffSessionLimits;
 use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsureStaffTwoFactor;
+use App\Http\Middleware\ResolveCountry;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\TrustConfiguredHosts;
 use App\Http\Middleware\TrustConfiguredProxies;
@@ -28,7 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', EnsureAccountActive::class);
         // Staff: 30-minute idle timeout, 8-hour absolute lifetime, no "remember me" (auth doc §6).
         $middleware->appendToGroup('web', EnforceStaffSessionLimits::class);
-        $middleware->alias(['staff.2fa' => EnsureStaffTwoFactor::class]);
+        $middleware->alias(['staff.2fa' => EnsureStaffTwoFactor::class, 'country' => ResolveCountry::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

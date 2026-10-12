@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Geo\CountryContext;
 use App\Support\RootUrl;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -20,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
         // Passkeys stay disabled: they are bound to the domain, which will change (ADR-015).
         Passkeys::ignoreRoutes();
 
+        // One visitor country per request (reset between requests, also under Octane-style workers).
+        $this->app->scoped(CountryContext::class);
     }
 
     /**

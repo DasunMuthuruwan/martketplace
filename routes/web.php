@@ -3,6 +3,7 @@
 use App\Authorization\Permissions;
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\EngagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,9 @@ Route::middleware('auth')->prefix('account/settings')->name('account.settings.')
     Route::put('/contact', 'updateContact')->middleware('verified')->name('contact.update');
 });
 Route::delete('/account', [SettingsController::class, 'destroy'])->middleware('auth')->name('account.destroy');
+
+// Visitor country choice (G-2): remembered in a cookie.
+Route::post('/country', [CountryController::class, 'choose'])->name('country.choose');
 
 // Seller contact reveal (MSG-04): JSON, CSRF-protected, rate-limited; numbers never in the page HTML.
 Route::post('/listings/{listing}/contact', ContactRevealController::class)

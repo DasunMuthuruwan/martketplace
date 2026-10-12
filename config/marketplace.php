@@ -91,6 +91,11 @@ return [
         'attribution' => 'Location data © GeoNames (geonames.org), CC BY 4.0',
         // Folder with downloaded GeoNames dumps for geo:import-regions / geo:import-cities (never committed).
         'import_path' => env('GEONAMES_PATH', storage_path('app/geonames')),
+        // Visitor country (G-2): remembered choice → CF-IPCountry (only from a trusted proxy and
+        // only when enabled, i.e. when the site sits behind Cloudflare) → default_country.
+        'country_cookie' => 'dtm_country',
+        'country_cookie_days' => 365,
+        'use_cf_ip_country' => (bool) env('GEO_USE_CF_IPCOUNTRY', false),
     ],
 
     // Seller contact (MSG-04–07, security doc §3: contact-reveal limits).
