@@ -38,7 +38,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T4.1 Listings tables, indexes, public scope (merged 27f3a0a, e0437aa)
 - [x] T4.2 Draft actions (location, details, price, units) (merged 7d2e9be)
 - [x] T4.3 Image pipeline (merged 9abeae9; `local.serve` disabled)
-- [~] T4.4 Lifecycle and moderation actions — split: **T4.4a submit + moderation done on `feature/T4.4a-submit-moderation`, awaiting owner review**; T4.4b edits (material → re-review, price feed), renew, sold, delete, expire + reminders next
+- [~] T4.4 Lifecycle and moderation actions — split: T4.4a submit + moderation merged (4574d7b); **T4.4b in progress on `feature/T4.4b-lifecycle`**: edits (material → re-review, price feed), renew, sold, delete, expire + reminders next
 - [ ] T4.5 Contact reveal
 - [ ] T4.6 Favourites and reports
 ### M5 Search and SEO
