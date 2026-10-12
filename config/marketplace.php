@@ -93,6 +93,17 @@ return [
         'import_path' => env('GEONAMES_PATH', storage_path('app/geonames')),
     ],
 
+    // Seller contact (MSG-04–07, security doc §3: contact-reveal limits).
+    'contact' => [
+        // Site-wide switches (MSG-07); an Admin setting later (M6).
+        'call_enabled' => (bool) env('CONTACT_CALL_ENABLED', true),
+        'whatsapp_enabled' => (bool) env('CONTACT_WHATSAPP_ENABLED', true),
+        'reveals_per_hour_user' => 30,
+        'reveals_per_hour_guest' => 10,
+        // Guests must pass Turnstile after this many reveals per hour (when Turnstile is configured).
+        'guest_challenge_after' => 5,
+    ],
+
     // Area units (global design §5). Countries without their own units offer these unit codes.
     'area' => [
         'fallback_units' => ['sqm', 'hectare'],

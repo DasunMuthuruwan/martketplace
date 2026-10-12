@@ -2,6 +2,7 @@
 
 use App\Authorization\Permissions;
 use App\Http\Controllers\Account\SettingsController;
+use App\Http\Controllers\ContactRevealController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,6 +18,12 @@ Route::middleware('auth')->prefix('account/settings')->name('account.settings.')
     Route::put('/contact', 'updateContact')->middleware('verified')->name('contact.update');
 });
 Route::delete('/account', [SettingsController::class, 'destroy'])->middleware('auth')->name('account.destroy');
+
+// Seller contact reveal (MSG-04): JSON, CSRF-protected, rate-limited; numbers never in the page HTML.
+Route::post('/listings/{listing}/contact', ContactRevealController::class)
+    ->whereNumber('listing')
+    ->middleware('throttle:contact-reveal')
+    ->name('listings.contact');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Two-factor setup (Fortify endpoints do the work; this page shows status, QR and recovery codes).

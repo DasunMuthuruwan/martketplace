@@ -3,12 +3,13 @@
 namespace App\Services\Contact;
 
 use App\Enums\ContactVisibility;
+use App\Models\ContactReveal;
 use App\Models\Listing;
 
 /**
- * Which contact channels of a listing are visible to anyone at all (MSG-01–03): the account's
- * visibility must not be hidden, the listing toggle must be on and a number must exist. The full
- * per-viewer resolution (guest vs logged in, reveal endpoint) is ContactResolver in T4.5.
+ * Which contact channels of a listing are visible to anyone at all (MSG-01–03, MSG-07): the
+ * channel is enabled site-wide, the account's visibility is not hidden, the listing toggle is on
+ * and a number exists. Per-viewer rules (guest vs logged in) are in ContactResolver.
  */
 class ContactChannels
 {
@@ -21,11 +22,11 @@ class ContactChannels
         }
 
         $channels = [];
-        if ($listing->show_call && $seller->phone !== null) {
-            $channels[] = 'call';
+        if (config('marketplace.contact.call_enabled') && $listing->show_call && $seller->phone !== null) {
+            $channels[] = ContactReveal::CALL;
         }
-        if ($listing->show_whatsapp && ($seller->whatsapp_phone ?? $seller->phone) !== null) {
-            $channels[] = 'whatsapp';
+        if (config('marketplace.contact.whatsapp_enabled') && $listing->show_whatsapp && $this->whatsappNumber($listing) !== null) {
+            $channels[] = ContactReveal::WHATSAPP;
         }
 
         return $channels;
@@ -35,5 +36,11 @@ class ContactChannels
     public function hasVisibleChannel(Listing $listing): bool
     {
         return $this->visible($listing) !== [];
+    }
+
+    /** E.164; the separate WhatsApp number when set, otherwise the phone. */
+    public function whatsappNumber(Listing $listing): ?string
+    {
+        return $listing->user->whatsapp_phone ?? $listing->user->phone;
     }
 }

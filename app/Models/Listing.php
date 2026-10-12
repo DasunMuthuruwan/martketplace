@@ -134,6 +134,15 @@ class Listing extends Model
                     ->orWhereHas('parent', fn (Builder $q) => $q->where('is_active', true))));
     }
 
+    /**
+     * Canonical URL `/ad/{slug}-{id}` (LST-11, CD-12), always from APP_URL. The page itself is
+     * built in T5.2; old slugs redirect there because the id decides.
+     */
+    public function publicUrl(): string
+    {
+        return url('/ad/'.($this->slug ?: 'listing').'-'.$this->id);
+    }
+
     public function isPublic(): bool
     {
         return static::query()->public()->whereKey($this->getKey())->exists();

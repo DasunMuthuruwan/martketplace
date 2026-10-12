@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Support\RootUrl;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Passkeys\Passkeys;
@@ -30,5 +33,10 @@ class AppServiceProvider extends ServiceProvider
         Password::defaults(fn () => $this->app->isProduction()
             ? Password::min(10)->max(255)->uncompromised()
             : Password::min(10)->max(255));
+
+        // Contact reveals (security doc §3): per account when logged in, per IP for guests.
+        RateLimiter::for('contact-reveal', fn (Request $request) => $request->user()
+            ? Limit::perHour((int) config('marketplace.contact.reveals_per_hour_user'))->by('reveal:user:'.$request->user()->id)
+            : Limit::perHour((int) config('marketplace.contact.reveals_per_hour_guest'))->by('reveal:ip:'.$request->ip()));
     }
 }

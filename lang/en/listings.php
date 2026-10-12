@@ -21,6 +21,7 @@ return [
     'contact_required' => 'Keep at least one way for buyers to contact you.',
     'cannot_sell' => 'Only live ads can be marked as sold.',
     'cannot_renew' => 'This ad cannot be renewed now.',
+    'whatsapp_message' => 'Hi, I am interested in your ad ":title" :url',
     'renew_too_early' => 'You can renew this ad in the last :days days before it expires.',
     'area_required' => 'Enter the :label before the price.',
 
