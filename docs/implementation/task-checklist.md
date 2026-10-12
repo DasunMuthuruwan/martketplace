@@ -24,7 +24,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T1.3 GeoNames import commands (merged 52fe7c4)
 - [ ] T1.4 Sri Lanka curated data — G-1/G-3 defaults accepted; owner review C1 of the curated lists still required
 - [x] T1.5 Money, units, AreaConverter, UnitPrice + area attributes in AttributeSchema (merged a1dc964)
-- [~] T1.6 CountryContext — done on `feature/T1.6-country-context`, **awaiting owner review**
+- [x] T1.6 CountryContext (merged d307a13)
 ### M2 Accounts and roles
 - [x] T2.1 Users extension, Fortify auth, rate limits, Turnstile + honeypot (merged eb97d18)
 - [x] T2.2 Roles/permissions, policies, guards, staff 2FA, password confirm (merged 80daad3)
@@ -42,7 +42,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T4.5 Contact reveal (merged f78bb63)
 - [x] T4.6 Favourites and reports (merged 7c9286a) — M4 complete
 ### M5 Search and SEO
-- [ ] T5.1 ListingSearch (MySQL) (G-7 default accepted)
+- [~] T5.1 ListingSearch (MySQL) (G-7 default accepted) — in progress on `feature/T5.1-listing-search`
 - [ ] T5.2 Public routes (G-8 default accepted)
 - [ ] T5.3 SEO, JSON-LD, sitemaps
 - [ ] T5.4 Performance check (50k listings, 4 countries)
