@@ -23,5 +23,11 @@ return [
         'changes_line' => 'Your ad ":title" needs a few changes before it can go live.',
         'reason' => 'Moderator note: :reason',
         'resubmit' => 'Edit the ad in your account and submit it again.',
+        'suspended_subject' => 'Your ad was taken down',
+        'suspended_line' => 'Your ad ":title" was taken down by our team. Reason: :reason',
+        'expiring_subject' => 'Your ad expires soon',
+        'expiring_line' => 'Your ad ":title" expires on :date. Renew it from your account to keep it online.',
+        'expired_subject' => 'Your ad has expired',
+        'expired_line' => 'Your ad ":title" has expired and is no longer visible. You can renew it from your account.',
     ],
 ];

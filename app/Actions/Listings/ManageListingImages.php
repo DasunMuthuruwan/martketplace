@@ -25,17 +25,33 @@ class ManageListingImages
     /** @throws ValidationException */
     public function add(User $user, Listing $listing, UploadedFile $file): ListingImage
     {
-        $this->authorizeDraft($user, $listing);
+        $this->authorizeEdit($user, $listing);
 
-        return $this->processor->store($user, $listing, $file);
+        $image = $this->processor->store($user, $listing, $file);
+        try {
+            $this->afterMaterialChange($listing->fresh());
+        } catch (ValidationException $e) {
+            $image->delete(); // the ad's text is now refused: do not keep the new photo either
+            throw $e;
+        }
+
+        return $image;
     }
 
+    /** @throws ValidationException */
     public function remove(User $user, Listing $listing, int $imageId): void
     {
-        $this->authorizeDraft($user, $listing);
+        $this->authorizeEdit($user, $listing);
         $image = $this->ownedImage($listing, $imageId);
 
+        // LST-02: a submitted ad keeps at least one photo.
+        if (self::isSubmitted($listing) && $listing->images()->count() <= 1) {
+            throw ValidationException::withMessages([ListingImageProcessor::FIELD => __('listings.last_photo')]);
+        }
+
         DB::transaction(function () use ($listing, $image): void {
+            // Screen first: the file deletion below cannot be rolled back.
+            $this->afterMaterialChange($listing);
             $wasCover = $listing->cover_image_id === $image->id;
             if ($wasCover) {
                 $listing->forceFill(['cover_image_id' => null])->save();
@@ -54,7 +70,7 @@ class ManageListingImages
      */
     public function reorder(User $user, Listing $listing, array $orderedIds): void
     {
-        $this->authorizeDraft($user, $listing);
+        $this->authorizeEdit($user, $listing);
 
         $ids = array_map('intval', $orderedIds);
         $current = $listing->images()->pluck('id')->all();
@@ -71,7 +87,7 @@ class ManageListingImages
 
     public function setCover(User $user, Listing $listing, int $imageId): void
     {
-        $this->authorizeDraft($user, $listing);
+        $this->authorizeEdit($user, $listing);
 
         $listing->forceFill(['cover_image_id' => $this->ownedImage($listing, $imageId)->id])->save();
     }

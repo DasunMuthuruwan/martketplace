@@ -16,6 +16,12 @@ return [
     'price_too_large' => 'The price is too large.',
     'rent_period_required' => 'Choose the rent period.',
     'details_first' => 'Add the ad details before the price.',
+    'submitted_country_category' => 'The country and category of a submitted ad cannot be changed. Post a new ad instead.',
+    'last_photo' => 'A published ad needs at least one photo. Add another photo first.',
+    'contact_required' => 'Keep at least one way for buyers to contact you.',
+    'cannot_sell' => 'Only live ads can be marked as sold.',
+    'cannot_renew' => 'This ad cannot be renewed now.',
+    'renew_too_early' => 'You can renew this ad in the last :days days before it expires.',
     'area_required' => 'Enter the :label before the price.',
 
     'country_change' => [

@@ -10,6 +10,7 @@ use App\Enums\RentPeriod;
 use App\Models\Attribute;
 use App\Models\Listing;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use App\Support\Decimal;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,7 @@ class SaveListingPrice
      */
     public function handle(User $user, Listing $listing, array $input): Listing
     {
-        $this->authorizeDraft($user, $listing);
+        $this->authorizeEdit($user, $listing);
 
         if ($listing->type === null) {
             throw ValidationException::withMessages(['price' => __('listings.details_first')]);
@@ -76,11 +77,19 @@ class SaveListingPrice
         $this->requireArea($listing);
 
         $price = filled($validated['price'] ?? null) ? Decimal::parse($validated['price']) : null;
+        $before = ['price' => $listing->price, 'price_type' => $listing->price_type?->value, 'rent_period' => $listing->rent_period?->value];
         $listing->forceFill([
             'price_type' => PriceType::from($validated['price_type']),
             'price' => $price,
             'rent_period' => $validated['rent_period'] ?? null,
         ])->save();
+
+        // Q-MOD-1: a price change on a submitted ad applies at once and appears in the moderators'
+        // "recent changes" feed (audit action listing.price_changed).
+        if (self::isSubmitted($listing) && $listing->wasChanged(['price', 'price_type', 'rent_period'])) {
+            $after = ['price' => $listing->price, 'price_type' => $listing->price_type?->value, 'rent_period' => $listing->rent_period?->value];
+            app(AuditLogger::class)->record($user, 'listing.price_changed', $listing, null, ['before' => $before, 'after' => $after]);
+        }
 
         return $listing->fresh();
     }

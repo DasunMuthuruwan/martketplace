@@ -23,6 +23,9 @@ use Illuminate\Validation\ValidationException;
  * currency (GLB-04). On an existing draft:
  * - a new country needs confirmation when values would be cleared (GLB-11), never converted;
  * - a new category clears the details entered for the old one.
+ * Once submitted (waiting for review or live), the country and category are fixed: changing them
+ * would clear the price or details of a published ad. The seller posts a new ad instead. Other
+ * location changes are material edits (LST-06).
  */
 class SaveListingLocation
 {
@@ -45,7 +48,7 @@ class SaveListingLocation
         if ($listing === null) {
             Gate::forUser($user)->authorize('create', Listing::class);
         } else {
-            $this->authorizeDraft($user, $listing);
+            $this->authorizeEdit($user, $listing);
         }
 
         $validated = Validator::make($input, [
@@ -62,6 +65,12 @@ class SaveListingLocation
 
         $country = Country::findOrFail((int) $validated['country_id']); // active: checked by LocationChain
         $category = $this->leafCategory((int) $validated['category_id'], $country);
+
+        if ($listing !== null && self::isSubmitted($listing)
+            && ($listing->country_id !== $country->id || $listing->category_id !== $category->id)) {
+            // Both would clear details or the price of a submitted ad (see the class comment).
+            throw ValidationException::withMessages(['category_id' => __('listings.submitted_country_category')]);
+        }
 
         if ($listing === null) {
             $this->checkDailyLimit($user);
@@ -95,6 +104,10 @@ class SaveListingLocation
                 'locality_id' => $validated['locality_id'] ?? null,
                 'locality_text' => filled($validated['locality_text'] ?? null) ? trim((string) $validated['locality_text']) : null,
             ])->save();
+
+            if ($listing->wasChanged(['region_id', 'subregion_id', 'city_id', 'locality_id', 'locality_text'])) {
+                $this->afterMaterialChange($listing);
+            }
 
             return $listing->fresh();
         });

@@ -155,7 +155,7 @@ class DraftActionsTest extends TestCase
             $this->addToAssertionCount(1);
         }
 
-        $listing->forceFill(['status' => ListingStatus::PendingReview])->save();
+        $listing->forceFill(['status' => ListingStatus::Sold])->save(); // sold ads are not edited
         $this->expectException(ListingNotEditable::class);
         $this->details($listing, []);
     }

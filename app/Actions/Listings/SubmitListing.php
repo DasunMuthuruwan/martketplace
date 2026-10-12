@@ -15,6 +15,7 @@ use App\Services\Attributes\AttributeSchema;
 use App\Services\Contact\ContactChannels;
 use App\Services\Listings\ListingPublisher;
 use App\Services\Moderation\ListingScreener;
+use App\Services\Moderation\ModerationRules;
 use App\Services\Security\Turnstile;
 use App\Validation\LocationChain;
 use Illuminate\Support\Facades\DB;
@@ -33,17 +34,12 @@ class SubmitListing
 {
     use EditsDrafts;
 
-    public const MODE_ALL = 'all';
-
-    public const MODE_NEW_USERS = 'new_users';
-
-    public const MODE_NONE = 'none';
-
     public function __construct(
         private readonly AttributeSchema $schemas,
         private readonly ContactChannels $contact,
         private readonly ListingScreener $screener,
         private readonly ListingPublisher $publisher,
+        private readonly ModerationRules $rules,
     ) {}
 
     /**
@@ -76,7 +72,7 @@ class SubmitListing
 
             $listing->forceFill(['flagged' => $screening->isFlagged(), 'submitted_at' => now()]);
 
-            if ($this->needsReview($user, $listing, $screening->isFlagged())) {
+            if ($this->rules->requiresReview($user, $listing, $screening->isFlagged())) {
                 $listing->forceFill(['status' => ListingStatus::PendingReview, 'moderation_note' => null])->save();
             } else {
                 $this->publisher->publish($listing);
@@ -168,16 +164,5 @@ class SubmitListing
         if ($live >= $limit) {
             throw ValidationException::withMessages(['status' => __('moderation.active_limit', ['limit' => $limit])]);
         }
-    }
-
-    /** CD-06 / LST-05: mode all (launch), new_users (until one ad has been approved) or none. */
-    private function needsReview(User $user, Listing $listing, bool $flagged): bool
-    {
-        return match (config('marketplace.moderation_mode')) {
-            self::MODE_NONE => $flagged,
-            self::MODE_NEW_USERS => $flagged || ! Listing::withTrashed()->where('user_id', $user->id)
-                ->whereKeyNot($listing->id)->whereNotNull('published_at')->exists(),
-            default => true,
-        };
     }
 }

@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 // Housekeeping (security doc §4). Runs from `schedule:run` at whatever interval the host allows.
 Schedule::command('marketplace:prune-images')->daily()->withoutOverlapping();
+Schedule::command('marketplace:expire-listings')->hourly()->withoutOverlapping();

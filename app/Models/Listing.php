@@ -51,6 +51,9 @@ use Illuminate\Support\Str;
  * @property Carbon|null $submitted_at
  * @property Carbon|null $published_at
  * @property Carbon|null $expires_at
+ * @property Carbon|null $expiry_reminder_sent_at
+ * @property Carbon|null $sold_at
+ * @property Carbon|null $renewed_at
  * @property bool $flagged
  * @property bool $legal_hold
  */
@@ -95,6 +98,7 @@ class Listing extends Model
             'submitted_at' => 'datetime',
             'published_at' => 'datetime',
             'expires_at' => 'datetime',
+            'expiry_reminder_sent_at' => 'datetime',
             'sold_at' => 'datetime',
             'renewed_at' => 'datetime',
             'flagged' => 'boolean',

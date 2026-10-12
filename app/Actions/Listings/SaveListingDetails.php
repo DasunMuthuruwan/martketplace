@@ -44,7 +44,7 @@ class SaveListingDetails
      */
     public function handle(User $user, Listing $listing, array $input): Listing
     {
-        $this->authorizeDraft($user, $listing);
+        $this->authorizeEdit($user, $listing);
 
         $category = $listing->category;
         $schema = $this->schemas->for($category, $listing->country->iso2);
@@ -79,6 +79,7 @@ class SaveListingDetails
             $listing->save();
 
             $this->writer->write($listing, $schema, $validated[CategorySchema::INPUT] ?? []);
+            $this->afterMaterialChange($listing);
         });
 
         return $listing->fresh();

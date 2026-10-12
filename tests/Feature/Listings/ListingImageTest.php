@@ -263,7 +263,7 @@ class ListingImageTest extends TestCase
             $this->addToAssertionCount(1);
         }
 
-        $this->listing->forceFill(['status' => ListingStatus::Active])->save();
+        $this->listing->forceFill(['status' => ListingStatus::Sold])->save(); // sold ads are not edited
         $this->expectException(ListingNotEditable::class);
         $this->add($this->image());
     }
