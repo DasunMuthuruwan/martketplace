@@ -143,6 +143,7 @@ Errors: 401 `{"message":"login_required"}` when visibility is `registered`; 403 
 { "reportable_type": "listing", "reportable_id": 1234, "reason": "scam", "details": "Asked for advance payment" }
 ```
 → 201 `{ "id": 88, "status": "open" }`. Duplicate open report → 409.
+> **Implementation status (T4.6):** `POST /listings/{listing}/favourite` (`auth`) → `ToggleFavourite`: saving needs a public listing (404 otherwise), removing always works; returns `{favourited, count}`. `POST /reports` (`auth`, `verified`, `throttle:report` = 10/day) → `SubmitReport`: `reportable_type` is `listing` or `user` (short stable names, never class names), the target must be a public listing that is not the reporter's own or another (not deleted) account; reasons per MOD-02, details required for `other`, plain text ≤ 1,000; Turnstile when configured (fails open); one open report per reporter + target, checked under a lock (409). `ResolveReport` (staff with `reports.resolve`, not about themselves or their own ads) closes a report as `actioned` or `dismissed` with an optional note and an audit entry; the action on the target itself (suspend, ban) stays separate. Account deletion now removes the user's favourites at once (retention §2).
 
 ## 5. Admin Area (`/admin`, `auth`, `verified`, `active`, `staff`)
 

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -125,6 +126,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function listings(): HasMany
     {
         return $this->hasMany(Listing::class);
+    }
+
+    /**
+     * Saved listings (SRCH-08), newest first.
+     *
+     * @return BelongsToMany<Listing, $this>
+     */
+    public function favourites(): BelongsToMany
+    {
+        return $this->belongsToMany(Listing::class, 'favourites')->withPivot('created_at')->orderByPivot('created_at', 'desc');
     }
 
     /** Highest staff role, or null for buyers/sellers. */

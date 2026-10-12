@@ -3,6 +3,7 @@
 use App\Authorization\Permissions;
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
+use App\Http\Controllers\EngagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,6 +25,15 @@ Route::post('/listings/{listing}/contact', ContactRevealController::class)
     ->whereNumber('listing')
     ->middleware('throttle:contact-reveal')
     ->name('listings.contact');
+
+// Favourites and reports (routes doc §4.3, §4.4).
+Route::post('/listings/{listing}/favourite', [EngagementController::class, 'favourite'])
+    ->whereNumber('listing')
+    ->middleware('auth')
+    ->name('listings.favourite');
+Route::post('/reports', [EngagementController::class, 'report'])
+    ->middleware(['auth', 'verified', 'throttle:report'])
+    ->name('reports.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Two-factor setup (Fortify endpoints do the work; this page shows status, QR and recovery codes).

@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
  * Self-service account deletion (AUTH-08), step 1 of the retention plan (docs/architecture/09 §2):
  * soft delete, staff roles removed, signed out everywhere, confirmation email. Anonymisation after
  * the restore window is done by the retention job (M7). Listings are hidden by the public scope
- * (owner deleted, T4.1) and favourites are removed when they exist (T4.6).
+ * (owner deleted, T4.1); favourites are removed at once.
  */
 class DeleteAccount
 {
@@ -46,6 +46,7 @@ class DeleteAccount
 
             // A restored account (support request) must not silently regain staff powers.
             $user->syncRoles([]);
+            $user->favourites()->detach(); // retention §2: favourites removed at once
             $user->delete();
         });
 
