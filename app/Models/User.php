@@ -9,9 +9,11 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -104,6 +106,25 @@ class User extends Authenticatable implements MustVerifyEmail
             UserStatus::Suspended => $this->suspended_until !== null && $this->suspended_until->isPast(),
             UserStatus::Banned => false,
         };
+    }
+
+    /**
+     * Accounts that may act: the query form of isActive() (a suspension with a past end date has expired).
+     *
+     * @param  Builder<User>  $query
+     */
+    public function scopeActiveAccounts(Builder $query): void
+    {
+        $query->where(fn (Builder $q) => $q->where('status', UserStatus::Active->value)
+            ->orWhere(fn (Builder $q) => $q->where('status', UserStatus::Suspended->value)
+                ->whereNotNull('suspended_until')
+                ->where('suspended_until', '<=', now())));
+    }
+
+    /** @return HasMany<Listing, $this> */
+    public function listings(): HasMany
+    {
+        return $this->hasMany(Listing::class);
     }
 
     /** Highest staff role, or null for buyers/sellers. */

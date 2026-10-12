@@ -27,6 +27,16 @@ class InvalidCategoryTree extends DomainException
         return new self('Move or delete the subcategories first.');
     }
 
+    public static function hasListings(): self
+    {
+        return new self('This category has listings. Deactivate it instead of deleting it.');
+    }
+
+    public static function parentHasListings(): self
+    {
+        return new self('Listings are posted to subcategories: a category with listings cannot get subcategories.');
+    }
+
     public static function invalidValue(string $field, string $value): self
     {
         return new self("Unknown value [{$value}] for [{$field}].");

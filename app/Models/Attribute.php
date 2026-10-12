@@ -71,6 +71,11 @@ class Attribute extends Model
             }
         });
         static::saved(fn () => CatalogueCache::flush());
+        static::deleting(function (Attribute $attribute): void {
+            if (ListingAttributeValue::where('attribute_id', $attribute->id)->exists()) {
+                throw new InvalidArgumentException("Attribute [{$attribute->key}] is used by listings. Deactivate it instead (CAT-06).");
+            }
+        });
         static::deleted(fn () => CatalogueCache::flush());
     }
 

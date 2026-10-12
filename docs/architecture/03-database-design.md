@@ -295,6 +295,8 @@ Effective attributes for a subcategory = parent's attributes + its own. The chil
 
 Indexes: `(listing_id)`, `(attribute_id, value_option_id, listing_id)`, `(attribute_id, value_number, listing_id)`, `(attribute_id, value_bool, listing_id)`.
 
+> **Implementation note (T4.1):** `listings`, `listing_attribute_values` and `listing_images` exist with the §4 / global §9 indexes (FULLTEXT `(title, description)` on MySQL/MariaDB only; SQLite tests skip it). Deviations: the three EAV indexes have explicit short names (`lav_attribute_*_listing_index`; generated names exceed the 64-character MySQL limit, now guarded by `IdentifierLengthTest`); `value_number` is `DECIMAL(18,4)` (not 15,2) so normalised m² keeps the 4 decimals `AreaConverter` produces; `listing_images` gets indexes `(listing_id, sort_order)`, `(listing_id, created_at)` (orphan cleanup) and `sha256`, and `basename` is unique. **Public scope** (`Listing::public()`): status `active`, `expires_at > now()` (query time), not soft-deleted, owner may act (`User::activeAccounts()`: active, or a suspension that has ended; deleted owners excluded), country active, **and category plus its parent active** (added: ads in a switched-off category should not stay visible). Integrity: a category with listings (even soft-deleted ones) cannot be deleted or get subcategories; attributes and options used by listing values cannot be deleted (CAT-06), with `RESTRICT` foreign keys as backstop. The slug follows the title; status, moderation and counters are not mass-assignable.
+
 ### 2.9 `listing_images`
 
 | Column | Type | Notes |

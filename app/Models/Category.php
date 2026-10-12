@@ -113,6 +113,9 @@ class Category extends Model
             if ($category->children()->exists()) {
                 throw InvalidCategoryTree::hasChildren();
             }
+            if ($category->listings()->withTrashed()->exists()) {
+                throw InvalidCategoryTree::hasListings();
+            }
         });
 
         static::deleted(function (Category $category): void {
@@ -131,6 +134,12 @@ class Category extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order')->orderBy('id');
+    }
+
+    /** @return HasMany<Listing, $this> */
+    public function listings(): HasMany
+    {
+        return $this->hasMany(Listing::class);
     }
 
     /**
@@ -259,6 +268,10 @@ class Category extends Model
         $parent = self::find($this->parent_id);
         if ($parent === null || $parent->parent_id !== null) {
             throw InvalidCategoryTree::tooDeep();
+        }
+        // Listings live on leaves: a category that has listings cannot get subcategories.
+        if ($parent->listings()->withTrashed()->exists()) {
+            throw InvalidCategoryTree::parentHasListings();
         }
         if ($this->exists && $this->children()->exists()) {
             throw InvalidCategoryTree::parentHasChildren();

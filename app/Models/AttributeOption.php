@@ -67,6 +67,11 @@ class AttributeOption extends Model
             $option->guardParent();
         });
         static::saved(fn () => CatalogueCache::flush());
+        static::deleting(function (AttributeOption $option): void {
+            if (ListingAttributeValue::where('value_option_id', $option->id)->exists()) {
+                throw new InvalidArgumentException("Option [{$option->value}] is used by listings. Deactivate it instead (CAT-06).");
+            }
+        });
         static::deleted(fn () => CatalogueCache::flush());
     }
 
