@@ -13,7 +13,8 @@ class CurrencyFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => strtoupper(fake()->unique()->lexify('???')),
+            // Q[B-Z]?: no real ISO 4217 code (only QAR starts with Q), so no clash with seeded currencies.
+            'code' => fake()->unique()->regexify('Q[B-Z][A-Z]'),
             'numeric_code' => (string) fake()->numberBetween(100, 999),
             'name' => ['en' => fake()->words(2, true)],
             'minor_units' => 2,

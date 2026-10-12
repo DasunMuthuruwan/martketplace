@@ -19,8 +19,8 @@ class CountryFactory extends Factory
         $name = fake()->unique()->country();
 
         return [
-            'iso2' => strtoupper(fake()->unique()->lexify('??')),
-            'iso3' => strtoupper(fake()->unique()->lexify('???')),
+            'iso2' => fake()->unique()->randomElement(self::testIso2Codes()),
+            'iso3' => fake()->unique()->regexify('Q[M-Z][A-Z]'),
             'name' => ['en' => $name],
             'slug' => Str::slug($name).'-'.Str::lower(Str::random(4)),
             'default_currency' => Currency::factory(),
@@ -32,6 +32,25 @@ class CountryFactory extends Factory
             'require_city' => true,
             'is_active' => true,
         ];
+    }
+
+    /**
+     * ISO 3166 user-assigned codes (QM–QZ, XA–XZ), which no real country uses, so factory
+     * countries never clash with explicitly created or seeded ones. XK is left out: GeoNames
+     * uses it for Kosovo.
+     *
+     * @return list<string>
+     */
+    private static function testIso2Codes(): array
+    {
+        $codes = array_map(fn (string $letter) => 'Q'.$letter, range('M', 'Z'));
+        foreach (range('A', 'Z') as $letter) {
+            if ($letter !== 'K') {
+                $codes[] = 'X'.$letter;
+            }
+        }
+
+        return $codes;
     }
 
     public function configure(): static
