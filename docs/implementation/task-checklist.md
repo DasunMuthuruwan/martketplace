@@ -47,7 +47,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T5.3 SEO, JSON-LD, sitemaps (merged 3937cc8)
 - [x] T5.4 Performance check (merged a1c2b44; results in `docs/operations/performance.md`; re-run on the host before launch) — M5 complete
 ### M6 Admin backend
-- [ ] T6.1 Moderation + reports
+- [~] T6.1 Moderation + reports — done on `feature/T6.1-moderation-admin`, **awaiting owner review**
 - [ ] T6.2 Users + staff
 - [ ] T6.3 Catalogue admin
 - [ ] T6.4 Locations admin

@@ -174,6 +174,8 @@ Errors: 401 `{"message":"login_required"}` when visibility is `registered`; 403 
 
 Each component checks its permission in `mount()` **and** inside every action (`approve(id)`, `reject(id, reason)`, `suspend(id, reason)`, …). Actions write `audit_logs`.
 
+> **Implementation status (T6.1, plain views until F5.1):** Livewire full-page components in `App\Livewire\Admin` with the `layouts.admin` layout: `/admin/moderation` (`admin.moderation`, `ModerationQueue`), `/admin/moderation/changes` (`admin.changes`, `RecentChanges`), `/admin/reports` (`admin.reports`, `ReportsQueue`). Livewire runs its **CSP-safe build** (`config/livewire.php` → `csp_safe`), so the strict CSP stays without `'unsafe-eval'`. Every component checks its permission on mount and before each action (`RequiresPermission`), in addition to the route middleware and the domain actions' own checks; the selected item id is `#[Locked]`. Moderation queue: pending ads, flagged first then oldest; filters flagged-only and country; review pane with photos, details, the screener's reasons (re-run on display) and a seller summary (member since, verified, published / rejected ads, open reports); approve, reject or ask for changes with reason templates (`lang/en/admin.php`) plus own words, through `ModerateListing`. Recent changes: `listing.price_changed` audit entries. Reports: open first (oldest first), filters by status and type, dismiss / mark actioned (`reports.resolve`) and "take the ad down and close" (`listings.suspend`, one transaction; a reason is required). Account actions (suspend, ban) arrive with the users screen in T6.2.
+
 ## 6. Notifications Contract (Email Templates)
 
 | Notification | Variables |

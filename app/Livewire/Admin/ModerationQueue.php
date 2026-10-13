@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Livewire\Admin;
+
+use App\Actions\Listings\ModerateListing;
+use App\Authorization\Permissions;
+use App\Enums\ListingStatus;
+use App\Enums\ReportStatus;
+use App\Livewire\Admin\Concerns\RequiresPermission;
+use App\Models\Country;
+use App\Models\Listing;
+use App\Models\Report;
+use App\Services\Listings\ListingPresenter;
+use App\Services\Moderation\ListingScreener;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+/**
+ * Moderation queue (MOD-01, CD-06): ads waiting for review, oldest first (flagged first when
+ * filtered), a review pane with photos, details, the screener's reasons and a seller summary,
+ * and approve / reject (reason templates or own text) / request changes. Decisions go through
+ * ModerateListing (permission, not own ad, row lock, audit, seller email).
+ */
+#[Layout('layouts.admin')]
+#[Title('Moderation')]
+class ModerationQueue extends Component
+{
+    use RequiresPermission, WithPagination;
+
+    public const PER_PAGE = 20;
+
+    #[Url]
+    public bool $flaggedOnly = false;
+
+    #[Url]
+    public string $country = '';
+
+    /** Set only by select(); the browser cannot change it. */
+    #[Locked]
+    public ?int $selectedId = null;
+
+    public string $template = '';
+
+    public string $note = '';
+
+    public function mount(): void
+    {
+        $this->requirePermission(Permissions::LISTINGS_MODERATE);
+    }
+
+    public function updating(string $name): void
+    {
+        if (in_array($name, ['flaggedOnly', 'country'], true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function select(int $id): void
+    {
+        $this->requirePermission(Permissions::LISTINGS_MODERATE);
+        abort_unless(Listing::whereKey($id)->where('status', ListingStatus::PendingReview->value)->exists(), 404);
+
+        $this->selectedId = $id;
+        $this->reset('template', 'note');
+        $this->resetErrorBag();
+    }
+
+    public function approve(ModerateListing $moderate): void
+    {
+        $this->decide(fn (Listing $listing) => $moderate->approve(Auth::user(), $listing), 'admin.moderation.approved');
+    }
+
+    public function reject(ModerateListing $moderate): void
+    {
+        $this->decide(fn (Listing $listing) => $moderate->reject(Auth::user(), $listing, $this->reason()), 'admin.moderation.rejected');
+    }
+
+    public function requestChanges(ModerateListing $moderate): void
+    {
+        $this->decide(fn (Listing $listing) => $moderate->requestChanges(Auth::user(), $listing, $this->reason()), 'admin.moderation.changes_requested');
+    }
+
+    public function render(ListingScreener $screener, ListingPresenter $present): View
+    {
+        $selected = $this->selectedId === null ? null
+            : Listing::with(['user', 'category.parent', 'country', 'currencyModel', 'images', 'city', 'region', 'subregion'])->find($this->selectedId);
+
+        return view('livewire.admin.moderation-queue', [
+            'queue' => Listing::where('status', ListingStatus::PendingReview->value)
+                ->with(['user', 'category', 'country'])
+                ->when($this->flaggedOnly, fn ($q) => $q->where('flagged', true))
+                ->when($this->country !== '', fn ($q) => $q->whereHas('country', fn ($q) => $q->where('iso2', strtoupper($this->country))))
+                ->orderByDesc('flagged')->orderBy('submitted_at')->orderBy('id')
+                ->paginate(self::PER_PAGE),
+            'countries' => Country::active()->get()->sortBy('name'),
+            'selected' => $selected,
+            'reasons' => $selected === null ? [] : $screener->screen($selected)->flags,
+            'seller' => $selected === null ? null : $this->sellerSummary($selected),
+            'present' => $present,
+            'templates' => (array) __('admin.moderation.templates'),
+        ]);
+    }
+
+    /** @param  callable(Listing): Listing  $decision */
+    private function decide(callable $decision, string $message): void
+    {
+        $this->requirePermission(Permissions::LISTINGS_MODERATE);
+        $listing = $this->selectedId === null ? null : Listing::find($this->selectedId);
+        abort_if($listing === null, 404);
+
+        try {
+            $decision($listing);
+        } catch (ValidationException $e) {
+            // Show the action's message (e.g. "already decided") on the pane.
+            $this->setErrorBag($e->validator->errors());
+
+            return;
+        }
+
+        session()->flash('status', __($message, ['title' => $listing->title]));
+        $this->reset('selectedId', 'template', 'note');
+    }
+
+    /** The chosen template, then the moderator's own words. */
+    private function reason(): string
+    {
+        $templates = (array) __('admin.moderation.templates');
+        $text = trim(($templates[$this->template] ?? '').' '.trim($this->note));
+
+        return $text;
+    }
+
+    /** @return array<string, mixed> */
+    private function sellerSummary(Listing $listing): array
+    {
+        $seller = $listing->user;
+        $listings = Listing::withTrashed()->where('user_id', $seller->id);
+
+        return [
+            'name' => $seller->name,
+            'since' => $seller->created_at,
+            'verified' => $seller->hasVerifiedEmail(),
+            'status' => $seller->status->value,
+            'published' => (clone $listings)->whereNotNull('published_at')->count(),
+            'rejected' => (clone $listings)->where('status', ListingStatus::Rejected->value)->count(),
+            'open_reports' => Report::where('status', ReportStatus::Open->value)
+                ->where(fn ($q) => $q->where(fn ($q) => $q->where('reportable_type', 'user')->where('reportable_id', $seller->id))
+                    ->orWhere(fn ($q) => $q->where('reportable_type', 'listing')->whereIn('reportable_id', Listing::withTrashed()->where('user_id', $seller->id)->select('id'))))
+                ->count(),
+        ];
+    }
+}

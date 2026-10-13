@@ -10,6 +10,9 @@ use App\Http\Controllers\ListingController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
+use App\Livewire\Admin\ModerationQueue;
+use App\Livewire\Admin\RecentChanges;
+use App\Livewire\Admin\ReportsQueue;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -53,6 +56,10 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
     ->name('admin.')
     ->group(function () {
         Route::view('/', 'admin.placeholder')->name('dashboard');
+        // Each screen also checks its permission inside the component (mount and every action).
+        Route::livewire('/moderation', ModerationQueue::class)->middleware('can:'.Permissions::LISTINGS_MODERATE)->name('moderation');
+        Route::livewire('/moderation/changes', RecentChanges::class)->middleware('can:'.Permissions::LISTINGS_MODERATE)->name('changes');
+        Route::livewire('/reports', ReportsQueue::class)->middleware('can:'.Permissions::REPORTS_VIEW)->name('reports');
     });
 
 // ---- Public pages (routes doc §1, ADR-023). Plain views until Phase 6. ---------------------------

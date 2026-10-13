@@ -55,13 +55,14 @@ class StaffSessionLimitsTest extends TestCase
     {
         $this->actingAs($this->staff(StaffRole::Owner))->get('/admin')->assertOk();
 
-        // Active every 20 minutes for 8 hours.
-        foreach (range(1, 24) as $step) {
+        // Active every 20 minutes up to 7 h 40 min. (Not exactly 8 h: the real seconds the test
+        // takes are added to the travelled time, which made an exact-boundary check flaky.)
+        foreach (range(1, 23) as $step) {
             $this->travel(20)->minutes();
             $this->get('/admin')->assertOk();
         }
 
-        $this->travel(20)->minutes();
+        $this->travel(21)->minutes(); // 8 h 01 min after sign-in
         $this->get('/admin')->assertRedirect('/login');
         $this->assertGuest();
     }
