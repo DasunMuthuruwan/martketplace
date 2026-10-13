@@ -206,20 +206,26 @@ class ListingSearchTest extends TestCase
         $this->value($honda2019, $make, ['value_option_id' => $option('honda')]);
         $this->value($honda2019, $year, ['value_number' => '2019']);
 
-        $this->assertSame([$toyota2015->id], $this->search(['category' => 'cars', 'attr' => ['make' => 'toyota']]));
-        $this->assertEqualsCanonicalizing([$toyota2015->id, $honda2019->id], $this->search(['category' => 'cars', 'attr' => ['make' => ['toyota', 'honda']]]), 'OR within one attribute');
-        $this->assertSame([$honda2019->id], $this->search(['category' => 'cars', 'attr' => ['year' => ['min' => '2017']]]));
-        $this->assertSame([$toyota2015->id], $this->search(['category' => 'cars', 'attr' => ['make' => 'toyota', 'year' => ['max' => '2016'], 'parking' => '1']]), 'AND across attributes');
-        $this->assertSame([], $this->search(['category' => 'cars', 'attr' => ['make' => 'ford']]));
-        $this->assertSame([$toyota2015->id], $this->search(['category' => 'vehicles', 'attr' => ['make' => 'toyota']]), 'Parent category uses its own attributes');
+        $this->assertSame([$toyota2015->id], $this->search(['category' => 'cars', 'a' => ['make' => 'toyota']]));
+        $this->assertEqualsCanonicalizing([$toyota2015->id, $honda2019->id], $this->search(['category' => 'cars', 'a' => ['make' => ['toyota', 'honda']]]), 'OR within one attribute');
+        $this->assertSame([$honda2019->id], $this->search(['category' => 'cars', 'a' => ['year' => ['min' => '2017']]]));
+        $this->assertSame([$toyota2015->id], $this->search(['category' => 'cars', 'a' => ['make' => 'toyota', 'year' => ['max' => '2016'], 'parking' => '1']]), 'AND across attributes');
+        $this->assertSame([], $this->search(['category' => 'cars', 'a' => ['make' => 'ford']]));
+        $this->assertSame([$toyota2015->id], $this->search(['category' => 'vehicles', 'a' => ['make' => 'toyota']]), 'Parent category uses its own attributes');
 
-        $this->assertSame('attr.trim', $this->rejected(['category' => 'cars', 'attr' => ['trim' => 'GL']]), 'Not filterable');
-        $this->assertSame('attr.make', $this->rejected(['category' => 'cars', 'attr' => ['make' => 'tesla']]));
-        $this->assertSame('attr.year', $this->rejected(['category' => 'cars', 'attr' => ['year' => '2015']]), 'Ranges need min/max');
-        $this->assertSame('attr.year', $this->rejected(['category' => 'cars', 'attr' => ['year' => ['min' => 'old']]]));
-        $this->assertSame('attr', $this->rejected(['attr' => ['make' => 'toyota']]), 'Needs a category');
-        $this->assertSame('attr', $this->rejected(['category' => 'cars', 'attr' => array_fill_keys(range('a', 'k'), 'x')]), 'At most 10 filters');
-        $this->assertSame('attr', $this->rejected(['category' => 'cars', 'attr' => ['make' => 'toyota']], global: true), 'Needs a country');
+        $this->assertEqualsCanonicalizing([$toyota2015->id, $honda2019->id], $this->search(['category' => 'cars', 'a' => ['make' => 'toyota,honda']]), 'Comma-separated values');
+
+        // Ignored, never passed to SQL (routes doc §1.1): unknown, not filterable, no category or country.
+        $both = [$toyota2015->id, $honda2019->id];
+        $this->assertEqualsCanonicalizing($both, $this->search(['category' => 'cars', 'a' => ['trim' => 'GL', 'nope' => 'x']]));
+        $this->assertEqualsCanonicalizing($both, $this->search(['a' => ['make' => 'toyota']]));
+        $this->assertCount(2, $this->search(['category' => 'cars', 'a' => ['make' => 'toyota']], global: true));
+
+        // Invalid values of a filterable attribute are rejected under their query key.
+        $this->assertSame('a.make', $this->rejected(['category' => 'cars', 'a' => ['make' => 'tesla']]));
+        $this->assertSame('a.year', $this->rejected(['category' => 'cars', 'a' => ['year' => '2015']]), 'Ranges need min/max');
+        $this->assertSame('a.year', $this->rejected(['category' => 'cars', 'a' => ['year' => ['min' => 'old']]]));
+        $this->assertSame('a', $this->rejected(['category' => 'cars', 'a' => array_fill_keys(range('a', 'k'), 'x')]), 'At most 10 filters');
     }
 
     public function test_dependent_select_filter_is_limited_to_the_chosen_parent(): void
@@ -236,9 +242,9 @@ class ListingSearchTest extends TestCase
         $this->value($truck, $make, ['value_option_id' => $hinoRanger->parent_option_id]);
         $this->value($truck, $model, ['value_option_id' => $hinoRanger->id]);
 
-        $this->assertEqualsCanonicalizing([$pickup->id, $truck->id], $this->search(['category' => 'cars', 'attr' => ['model' => 'ranger']]), 'Without a make: every "Ranger"');
+        $this->assertEqualsCanonicalizing([$pickup->id, $truck->id], $this->search(['category' => 'cars', 'a' => ['model' => 'ranger']]), 'Without a make: every "Ranger"');
         // With a make chosen, the model filter only matches that make's option, even on its own.
-        $criteria = app(SearchCriteriaFactory::class)->fromInput(['category' => 'cars', 'attr' => ['make' => 'ford', 'model' => 'ranger']], $this->lk);
+        $criteria = app(SearchCriteriaFactory::class)->fromInput(['category' => 'cars', 'a' => ['make' => 'ford', 'model' => 'ranger']], $this->lk);
         $this->assertSame([$fordRanger->id], $criteria->attributeFilters[1]->optionIds);
         $this->assertSame([$pickup->id], app(ListingSearch::class)->search($criteria)->getCollection()->pluck('id')->all());
     }
@@ -257,10 +263,10 @@ class ListingSearchTest extends TestCase
         $big = $this->ad([], category: $land);
         $this->value($big, $size, ['value_number' => '4046.8564', 'input_value' => '1', 'input_unit_id' => $acre->id]); // 1 acre = 160 perches
 
-        $this->assertSame([$big->id], $this->search(['category' => 'land', 'attr' => ['land_size' => ['min' => '100', 'unit' => 'perch']]]));
-        $this->assertSame([$small->id], $this->search(['category' => 'land', 'attr' => ['land_size' => ['max' => '0.5', 'unit' => 'acre']]]));
-        $this->assertSame([$small->id], $this->search(['category' => 'land', 'attr' => ['land_size' => ['max' => '50']]]), 'Default unit (perch)');
-        $this->assertSame('attr.land_size', $this->rejected(['category' => 'land', 'attr' => ['land_size' => ['min' => '1', 'unit' => 'sqft']]]), 'Unit not offered in LK');
+        $this->assertSame([$big->id], $this->search(['category' => 'land', 'a' => ['land_size' => ['min' => '100', 'unit' => 'perch']]]));
+        $this->assertSame([$small->id], $this->search(['category' => 'land', 'a' => ['land_size' => ['max' => '0.5', 'unit' => 'acre']]]));
+        $this->assertSame([$small->id], $this->search(['category' => 'land', 'a' => ['land_size' => ['max' => '50']]]), 'Default unit (perch)');
+        $this->assertSame('a.land_size', $this->rejected(['category' => 'land', 'a' => ['land_size' => ['min' => '1', 'unit' => 'sqft']]]), 'Unit not offered in LK');
     }
 
     // ---- Paging -------------------------------------------------------------------------------

@@ -5,11 +5,13 @@ use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\EngagementController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ListingController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SellerController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Account settings. Profile and security stay reachable before email verification (e.g. to fix a
 // mistyped address); contact settings need a verified email.
@@ -51,3 +53,24 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
     ->group(function () {
         Route::view('/', 'admin.placeholder')->name('dashboard');
     });
+
+// ---- Public pages (routes doc §1, ADR-023). Plain views until Phase 6. ---------------------------
+// `{cc}` = two letters (an active country, checked by the `country` middleware; upper case 301s).
+// `in` is reserved: it separates the category part from the location part.
+Route::get('/countries', [CountryController::class, 'index'])->name('countries');
+Route::get('/ad/{slugId}', [ListingController::class, 'show'])->where('slugId', '[A-Za-z0-9-]*-[0-9]+')->name('listing.show');
+Route::get('/seller/{idSlug}', [SellerController::class, 'show'])->where('idSlug', '[0-9]+(-[A-Za-z0-9-]*)?')->name('seller.show');
+Route::get('/ads', [SearchController::class, 'global'])->middleware('throttle:search')->name('ads.global');
+
+Route::prefix('{cc}')->where(['cc' => '[A-Za-z]{2}'])->middleware('country')->group(function () {
+    $slug = '(?!in$)[a-z0-9-]+';
+
+    Route::get('/', [HomeController::class, 'country'])->name('country.home');
+    Route::middleware('throttle:search')->controller(SearchController::class)->group(function () use ($slug) {
+        Route::get('/ads', 'country')->name('ads.country');
+        Route::get('/ads/in/{region}/{city?}', 'country')->where(['region' => '[a-z0-9-]+', 'city' => '[a-z0-9-]+'])->name('ads.location');
+        Route::get('/ads/{category}/in/{region}/{city?}', 'country')->where(['category' => $slug, 'region' => '[a-z0-9-]+', 'city' => '[a-z0-9-]+'])->name('ads.category.location');
+        Route::get('/ads/{category}/{subcategory}/in/{region}/{city?}', 'country')->where(['category' => $slug, 'subcategory' => $slug, 'region' => '[a-z0-9-]+', 'city' => '[a-z0-9-]+'])->name('ads.subcategory.location');
+        Route::get('/ads/{category}/{subcategory?}', 'country')->where(['category' => $slug, 'subcategory' => $slug])->name('ads.category');
+    });
+});

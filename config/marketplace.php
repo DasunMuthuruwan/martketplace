@@ -47,6 +47,8 @@ return [
         'expiry_days' => (int) env('MARKETPLACE_LISTING_EXPIRY_DAYS', 60),
         'expiry_reminder_days' => 3,
         'renew_window_days' => 7,
+        // A sold ad keeps a public "sold" page (noindex) this long, then answers 410 (retention §1).
+        'sold_page_days' => 30,
         'max_active_per_user' => (int) env('MARKETPLACE_MAX_ACTIVE_LISTINGS', 50),
         'max_new_per_day' => (int) env('MARKETPLACE_MAX_NEW_LISTINGS_PER_DAY', 10),
         'per_page' => 24,

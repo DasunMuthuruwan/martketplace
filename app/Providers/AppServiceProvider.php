@@ -47,6 +47,9 @@ class AppServiceProvider extends ServiceProvider
             ? Limit::perHour((int) config('marketplace.contact.reveals_per_hour_user'))->by('reveal:user:'.$request->user()->id)
             : Limit::perHour((int) config('marketplace.contact.reveals_per_hour_guest'))->by('reveal:ip:'.$request->ip()));
 
+        // Search pages: 120 per minute per IP (security doc §3).
+        RateLimiter::for('search', fn (Request $request) => Limit::perMinute(120)->by('search:'.$request->ip()));
+
         // Reports: 10 per day per account (security doc §3).
         RateLimiter::for('report', fn (Request $request) => Limit::perDay(10)->by('report:'.($request->user()?->id ?: $request->ip())));
     }

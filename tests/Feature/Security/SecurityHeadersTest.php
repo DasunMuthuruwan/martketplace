@@ -2,10 +2,14 @@
 
 namespace Tests\Feature\Security;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SecurityHeadersTest extends TestCase
 {
+    // `/` reads the countries table (home redirect or country chooser).
+    use RefreshDatabase;
+
     public function test_baseline_security_headers_are_sent(): void
     {
         $response = $this->get('/');

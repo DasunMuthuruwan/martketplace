@@ -136,12 +136,12 @@ class Listing extends Model
     }
 
     /**
-     * Canonical URL `/ad/{slug}-{id}` (LST-11, CD-12), always from APP_URL. The page itself is
-     * built in T5.2; old slugs redirect there because the id decides.
+     * Canonical URL `/ad/{slug}-{id}` (LST-11, CD-12), always from APP_URL. Old slugs redirect
+     * here because the id decides.
      */
     public function publicUrl(): string
     {
-        return url('/ad/'.($this->slug ?: 'listing').'-'.$this->id);
+        return route('listing.show', ['slugId' => ($this->slug ?: 'listing').'-'.$this->id]);
     }
 
     public function isPublic(): bool

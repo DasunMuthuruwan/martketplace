@@ -30,6 +30,15 @@ Middleware shorthand: `auth` = logged in, `verified` = email verified, `active` 
 
 **Canonical rules:** a canonical URL is built from `APP_URL` + the path. Filters other than category/region/city are `noindex,follow` with a canonical to the nearest landing page. Listing pages: `<title>` = "{title} – {city}, {country} | {APP_NAME}". JSON-LD `Offer.priceCurrency` = listing currency, `PostalAddress` with `addressLocality`, `addressRegion`, `addressCountry` (iso2). Never a street address.
 
+
+> **Implementation status (T5.2, plain views until Phase 6):** all routes in the table above except `/page/{slug}` (pages arrive with page management in M6) and the sitemap/robots files (T5.3). Controllers: `HomeController` (`/` → 302 to the visitor's country from `CountryContext`, otherwise the country chooser + latest ads from every country; `/{cc}` country home), `CountryController@index` (ad counts cached 15 min), `SearchController` (all `ads.*` routes), `ListingController@show`, `SellerController@show`. Rules as built:
+> - `{cc}` is exactly two letters, so it never captures `/admin`, `/login` etc.; inactive or unknown countries are 404 and upper case 301s (T1.6 middleware). The `in` segment is reserved by the route patterns.
+> - Category path: a leaf given alone (`/lk/ads/cars`) and a renamed slug answer 301 to the canonical `/{parent}/{leaf}` path (query kept); a subcategory under the wrong parent, an unknown slug or a category not offered in the country is 404. A location in the path (`/in/{region}/{city}`, region of level 1 or 2) replaces any location in the query; an unknown region or a city outside it is 404.
+> - Query filters follow §1.1 (`a[key]`, comma-separated values; unknown or non-filterable keys ignored). An invalid query value (e.g. `min_price=abc`, `page=500`) answers 302 to the same page without it, never an error page. `/ads?country=xx` 301s to `/xx/ads`. `throttle:search` = 120/min per IP.
+> - `/ad/{slug}-{id}`: public → 200 (contact buttons from `ContactResolver::buttons()`, never a number in the HTML; the reveal requests are wired in F2.3); different slug → 301; sold within `listings.sold_page_days` (30) → 200 "sold" page, `noindex`; expired, sold longer ago or deleted → 410; draft, pending, rejected, suspended, owner not active, inactive country or category → 404.
+> - `/seller/{id}-{slug}`: active accounts only (404 otherwise), slug mismatch 301, public ads only, never the email or phone.
+> - Robots: `noindex,nofollow` everywhere until `SEO_INDEXING=true`; then landing pages without a query are `index,follow` and filtered pages `noindex,follow` (canonical and structured data: T5.3).
+> - Found by the tests: Laravel passes route parameters to controller methods by position, so `/lk/ads/in/western` handed the region to the category argument; `SearchController` now reads route parameters by name.
 ### 1.1 Search Query Contract
 
 | Param | Example | Rule |

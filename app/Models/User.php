@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -120,6 +121,17 @@ class User extends Authenticatable implements MustVerifyEmail
             ->orWhere(fn (Builder $q) => $q->where('status', UserStatus::Suspended->value)
                 ->whereNotNull('suspended_until')
                 ->where('suspended_until', '<=', now())));
+    }
+
+    /** Public seller page `/seller/{id}-{slug}` (routes doc §1); the slug follows the name. */
+    public function sellerUrl(): string
+    {
+        return route('seller.show', ['idSlug' => $this->id.'-'.$this->sellerSlug()]);
+    }
+
+    public function sellerSlug(): string
+    {
+        return Str::slug($this->name) ?: 'seller';
     }
 
     /** @return HasMany<Listing, $this> */

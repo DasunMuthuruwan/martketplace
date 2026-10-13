@@ -24,18 +24,23 @@ use Illuminate\Validation\ValidationException;
 /**
  * Turns query-string filters into SearchCriteria (URL state, global design §6):
  *   q, category, region, subregion, city, locality (slugs), type, condition, currency, min_price,
- *   max_price, sort, page, attr[key] (option value or list, or [min, max] and for areas [unit]).
+ *   max_price, sort, page, a[key] (option value, list or comma-separated values; [min, max] and for
+ *   areas [unit]; 1 for booleans).
  * Rules: location and attribute filters need a country (global search covers keywords and
  * categories, G-7); attribute filters are limited to the category's filterable attributes (at
  * most MAX_ATTRIBUTE_FILTERS); prices are compared in one currency only, the country's, or in
  * global search the one the visitor picked; without it, price filters and sort are ignored and
- * flagged. Unknown or invalid values raise a ValidationException.
+ * flagged. Unknown or non-filterable attribute keys are ignored; other invalid values raise a
+ * ValidationException keyed by the query parameter (callers drop it or answer 404).
  */
 class SearchCriteriaFactory
 {
     public const MAX_ATTRIBUTE_FILTERS = 10;
 
     public const KEYWORD_MAX = 100;
+
+    /** Query key of attribute filters (routes doc §1.1). */
+    public const ATTRIBUTE_INPUT = 'a';
 
     public function __construct(
         private readonly AttributeSchema $schemas,
@@ -64,7 +69,7 @@ class SearchCriteriaFactory
             'max_price' => ['nullable', 'numeric', 'min:0'],
             'sort' => ['nullable', Rule::in($sorts)],
             'page' => ['nullable', 'integer', 'min:1', 'max:'.(int) config('marketplace.listings.max_page')],
-            'attr' => ['nullable', 'array', 'max:'.self::MAX_ATTRIBUTE_FILTERS],
+            self::ATTRIBUTE_INPUT => ['nullable', 'array', 'max:'.self::MAX_ATTRIBUTE_FILTERS],
         ])->validate();
 
         $category = $this->category($v['category'] ?? null, $country);
@@ -89,7 +94,7 @@ class SearchCriteriaFactory
             currency: $currency,
             minPrice: $minPrice,
             maxPrice: $maxPrice,
-            attributeFilters: $this->attributes((array) ($v['attr'] ?? []), $category, $country),
+            attributeFilters: $this->attributes((array) ($v[self::ATTRIBUTE_INPUT] ?? []), $category, $country),
             sort: $sort,
             page: (int) ($v['page'] ?? 1),
             priceIgnored: $priceIgnored,
@@ -218,11 +223,9 @@ class SearchCriteriaFactory
     private function attributes(array $input, ?Category $category, ?Country $country): array
     {
         $input = array_filter($input, fn ($value) => $value !== null && $value !== '' && $value !== []);
-        if ($input === []) {
+        // Without a category and country there is no schema: attribute filters are ignored (routes doc §1.1).
+        if ($input === [] || $category === null || $country === null) {
             return [];
-        }
-        if ($category === null || $country === null) {
-            $this->fail('attr');
         }
 
         $schema = $this->schemas->for($category, $country->iso2);
@@ -232,8 +235,8 @@ class SearchCriteriaFactory
         $filters = [];
         foreach ($input as $key => $value) {
             $field = isset($filterable[$key]) ? $schema->field((string) $key) : null;
-            if ($field === null || ! isset($ids[$key])) {
-                $this->fail("attr.{$key}");
+            if ($field === null || ! isset($ids[$key]) || $field['type'] === AttributeType::Text->value) {
+                continue; // unknown, not filterable here, or free text: ignored, never passed to SQL
             }
             $filters[] = $this->attributeFilter((int) $ids[$key], $field, $value, $input);
         }
@@ -247,12 +250,14 @@ class SearchCriteriaFactory
      */
     private function attributeFilter(int $attributeId, array $field, mixed $value, array $all): AttributeFilter
     {
-        $key = 'attr.'.$field['key'];
+        $key = self::ATTRIBUTE_INPUT.'.'.$field['key'];
 
         switch (AttributeType::from($field['type'])) {
             case AttributeType::Select:
             case AttributeType::MultiSelect:
-                $values = array_values(array_unique(array_map('strval', (array) $value)));
+                // Several values: a list or comma-separated (`a[make]=toyota,honda`).
+                $values = is_array($value) ? array_map('strval', $value) : explode(',', (string) $value);
+                $values = array_values(array_unique(array_filter(array_map('trim', $values), fn (string $v) => $v !== '')));
                 $allowed = array_column($field['options'], 'value');
                 if ($values === [] || array_diff($values, $allowed) !== []) {
                     $this->fail($key);
@@ -260,7 +265,7 @@ class SearchCriteriaFactory
                 $query = AttributeOption::where('attribute_id', $attributeId)->whereIn('value', $values);
                 // Dependent select (Model under Make): with one parent value chosen, only its options.
                 $parentValue = $field['depends_on'] !== null ? ($all[$field['depends_on']] ?? null) : null;
-                if (is_string($parentValue)) {
+                if (is_string($parentValue) && $parentValue !== '' && ! str_contains($parentValue, ',')) {
                     $query->whereHas('parentOption', fn ($q) => $q->where('value', $parentValue));
                 }
 
@@ -291,7 +296,7 @@ class SearchCriteriaFactory
                 return new AttributeFilter($attributeId, min: $min, max: $max);
 
             default:
-                $this->fail($key); // text attributes are not filterable
+                $this->fail($key);
         }
     }
 

@@ -3,11 +3,15 @@
 namespace Tests\Feature\Security;
 
 use App\Http\Middleware\TrustConfiguredHosts;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Tests\TestCase;
 
 class TrustedHostsTest extends TestCase
 {
+    // `/` reads the countries table (home redirect or country chooser).
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         SymfonyRequest::setTrustedHosts([]);
