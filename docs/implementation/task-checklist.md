@@ -49,7 +49,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ### M6 Admin backend
 - [x] T6.1 Moderation + reports (merged d96e8c3)
 - [x] T6.2 Users + staff (merged 81e30eb)
-- [~] T6.3 Catalogue admin — in progress on `feature/T6.3-catalogue-admin`
+- [~] T6.3 Catalogue admin — awaiting review on `feature/T6.3-catalogue-admin`
 - [ ] T6.4 Locations admin
 - [ ] T6.5 Settings, pages, blocklist, audit, dashboard
 ### M7 Background and retention
