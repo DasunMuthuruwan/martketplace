@@ -7,6 +7,7 @@ use App\Enums\ListingStatus;
 use App\Enums\ListingType;
 use App\Enums\PriceType;
 use App\Enums\RentPeriod;
+use App\Enums\UserStatus;
 use Database\Factories\ListingFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -128,11 +129,24 @@ class Listing extends Model
     {
         $query->where('listings.status', ListingStatus::Active->value)
             ->where('listings.expires_at', '>', now())
-            ->whereHas('user', fn (Builder $q) => $q->activeAccounts())
-            ->whereHas('country', fn (Builder $q) => $q->where('is_active', true))
-            ->whereHas('category', fn (Builder $q) => $q->where('is_active', true)
-                ->where(fn (Builder $q) => $q->whereNull('parent_id')
-                    ->orWhereHas('parent', fn (Builder $q) => $q->where('is_active', true))));
+            // Owner may act: no deleted, suspended or banned account. Written as NOT EXISTS (a
+            // per-row primary-key lookup) because an EXISTS on users became a join that drove the
+            // query from the users table and lost the newest-first index order (T5.4).
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('users')
+                ->whereColumn('users.id', 'listings.user_id')
+                ->where(fn ($q) => $q->whereNotNull('users.deleted_at')
+                    ->orWhere('users.status', UserStatus::Banned->value)
+                    ->orWhere(fn ($q) => $q->where('users.status', UserStatus::Suspended->value)
+                        ->where(fn ($q) => $q->whereNull('users.suspended_until')->orWhere('users.suspended_until', '>', now())))))
+            ->whereHas('country', fn (Builder $q) => $q->where('is_active', true));
+
+        // Switched-off categories as a (cached, usually empty) exclusion list rather than a join:
+        // a join on categories made MariaDB sort every ad of a country to show the newest 24
+        // (measured in T5.4, docs/operations/performance.md).
+        $hidden = Category::hiddenIds();
+        if ($hidden !== []) {
+            $query->whereNotIn('listings.category_id', $hidden);
+        }
     }
 
     /**

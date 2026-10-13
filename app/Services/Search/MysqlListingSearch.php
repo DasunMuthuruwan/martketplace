@@ -5,6 +5,7 @@ namespace App\Services\Search;
 use App\Models\Listing;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -21,15 +22,55 @@ class MysqlListingSearch implements ListingSearch
 
     public function search(SearchCriteria $criteria): LengthAwarePaginator
     {
-        $query = Listing::query()->public()
-            ->with(['category', 'country', 'currencyModel', 'coverImage', 'region', 'subregion', 'city']);
+        $query = $this->query($criteria);
+        $perPage = (int) config('marketplace.listings.per_page');
+
+        $items = (clone $query)
+            ->with(['category', 'country', 'currencyModel', 'coverImage', 'region', 'subregion', 'city'])
+            ->forPage($criteria->page, $perPage)
+            ->get(['listings.*']);
+
+        return (new Paginator($items, $this->total($query), $perPage, $criteria->page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]))->withQueryString();
+    }
+
+    /**
+     * Number of results, counted up to one more than can be browsed (max_page × per_page): beyond
+     * that the exact figure is never shown ("2,400+") and counting it cost most of the query time
+     * for broad searches (T5.4).
+     *
+     * @param  Builder<Listing>  $query
+     */
+    public function total(Builder $query): int
+    {
+        $cap = self::countCap();
+        $limited = (clone $query)->toBase()->reorder()->select('listings.id')->limit($cap);
+
+        return (int) DB::query()->fromSub($limited, 'capped')->count();
+    }
+
+    /** One more than the deepest result that can be browsed. */
+    public static function countCap(): int
+    {
+        return (int) config('marketplace.listings.max_page') * (int) config('marketplace.listings.per_page') + 1;
+    }
+
+    /**
+     * The exact query the search runs (also used by `marketplace:perf-report` to EXPLAIN it).
+     *
+     * @return Builder<Listing>
+     */
+    public function query(SearchCriteria $criteria): Builder
+    {
+        $query = Listing::query()->public();
 
         $this->keyword($query, $criteria->keyword);
         $this->filters($query, $criteria);
         $this->sort($query, $criteria);
 
-        return $query->paginate((int) config('marketplace.listings.per_page'), ['listings.*'], 'page', $criteria->page)
-            ->withQueryString();
+        return $query;
     }
 
     /** @param  Builder<Listing>  $query */

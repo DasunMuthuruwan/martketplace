@@ -11,6 +11,7 @@ use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Search\ListingSearch;
+use App\Services\Search\MysqlListingSearch;
 use App\Services\Search\SearchCriteria;
 use App\Services\Search\SearchCriteriaFactory;
 use App\Services\Seo\PageSeo;
@@ -102,6 +103,7 @@ class SearchController extends Controller
             'filters' => $category !== null && $country !== null ? $this->filterFields($category, $country) : [],
             'present' => $this->present,
             'seo' => $this->seo($request, $criteria, $results->total()),
+            'countCap' => MysqlListingSearch::countCap(),
         ]);
     }
 

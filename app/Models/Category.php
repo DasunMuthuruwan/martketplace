@@ -230,6 +230,21 @@ class Category extends Model
         return array_values(array_filter(PriceType::cases(), fn (PriceType $type) => $this->allowsPriceType($type)));
     }
 
+    /**
+     * Categories whose ads are hidden: switched off, or under a switched-off parent. Cached in the
+     * catalogue cache generation, which every category change renews.
+     *
+     * @return list<int>
+     */
+    public static function hiddenIds(): array
+    {
+        return CatalogueCache::remember('hidden-category-ids', function (): array {
+            $off = self::where('is_active', false)->pluck('id');
+
+            return self::whereIn('id', $off)->orWhereIn('parent_id', $off)->orderBy('id')->pluck('id')->map(fn ($id) => (int) $id)->all();
+        });
+    }
+
     /** Current category for a slug, following renamed-slug redirects. */
     public static function findBySlugOrRedirect(string $slug): ?self
     {

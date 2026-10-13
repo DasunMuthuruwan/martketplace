@@ -89,7 +89,8 @@
         <p class="status" role="status">{{ __('public.price_needs_currency') }}</p>
     @endif
 
-    <p class="muted">{{ trans_choice('public.ads_count', $results->total(), ['count' => number_format($results->total())]) }}</p>
+    @php($capped = $results->total() >= $countCap)
+    <p class="muted">{{ trans_choice('public.ads_count', $results->total(), ['count' => number_format($capped ? $results->total() - 1 : $results->total()).($capped ? '+' : '')]) }}</p>
 
     @if ($results->isEmpty())
         <p>{{ __('public.no_results') }}</p>

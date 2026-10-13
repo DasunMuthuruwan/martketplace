@@ -271,6 +271,18 @@ class ListingSearchTest extends TestCase
 
     // ---- Paging -------------------------------------------------------------------------------
 
+    public function test_the_total_is_counted_only_up_to_the_deepest_browsable_result(): void
+    {
+        config(['marketplace.listings.per_page' => 2, 'marketplace.listings.max_page' => 2]); // cap = 5
+        Listing::factory()->count(7)->inCountry($this->lk)->inCategory($this->cars)->create();
+
+        $page = app(ListingSearch::class)->search(app(SearchCriteriaFactory::class)->fromInput([], $this->lk));
+
+        $this->assertSame(5, $page->total());
+        $this->assertCount(2, $page->items());
+        $this->get('/lk/ads')->assertSee('4+ ads');
+    }
+
     public function test_pages_of_24_with_a_cap(): void
     {
         Listing::factory()->count(25)->inCountry($this->lk)->inCategory($this->cars)->create();

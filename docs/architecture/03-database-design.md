@@ -359,6 +359,7 @@ Indexes: `(listing_id)`, `(attribute_id, value_option_id, listing_id)`, `(attrib
 | Reports queue | `reports (status, created_at)` |
 
 **Validation plan (Phase 5/7):** seed 50k listings with realistic attributes, then `EXPLAIN` every search pattern. If attribute filters on the biggest categories (cars) exceed the latency target, add **generated hot columns** (e.g. `year`, `mileage`, `make_option_id`) on `listings` for the top 3–4 filters. This is an additive change.
+> **Validated (T5.4, 2026-10-13):** see [performance check](../operations/performance.md). With 50,000 listings and 20,000 users every planned query uses its index; no index was added. The public scope was rewritten (category exclusion list, owner check as NOT EXISTS) and the result count capped at 2,401, because MariaDB otherwise lost the newest-first index order. Very common keywords are the slowest case (p95 ≈ 300 ms). Re-run on the target host before launch.
 
 ## 5. Portability Rules for the Schema
 
