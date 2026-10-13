@@ -5,6 +5,7 @@ namespace App\Actions\Fortify;
 use App\Enums\ContactVisibility;
 use App\Models\Country;
 use App\Models\User;
+use App\Services\Security\BannedIdentities;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -50,6 +51,14 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $phone = $phoneCountry !== null
             ? (new PhoneNumber((string) $input['phone'], $phoneCountry))->formatE164()
             : null;
+
+        // A new email or phone may not be one blocked after a ban (retention §1).
+        $newEmail = $emailChanged ? (string) $input['email'] : null;
+        $newPhone = $phone !== $user->phone ? $phone : null;
+        if (app(BannedIdentities::class)->isBanned($newEmail, $newPhone)) {
+            throw ValidationException::withMessages([$newEmail !== null ? 'email' : 'phone' => __('auth.cannot_register')])
+                ->errorBag('updateProfileInformation');
+        }
 
         $user->forceFill([
             'name' => trim((string) $input['name']),

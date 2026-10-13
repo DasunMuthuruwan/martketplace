@@ -6,6 +6,7 @@ use App\Models\Country;
 use App\Models\User;
 use App\Rules\HumanTiming;
 use App\Rules\PassesTurnstile;
+use App\Services\Security\BannedIdentities;
 use App\Services\Security\Turnstile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -57,6 +58,11 @@ class CreateNewUser implements CreatesNewUsers
         $phone = filled($input['phone'] ?? null)
             ? (new PhoneNumber((string) $input['phone'], $phoneCountry))->formatE164()
             : null;
+
+        // Banned email or phone (retention §1). The message does not say why.
+        if (app(BannedIdentities::class)->isBanned((string) $input['email'], $phone)) {
+            throw ValidationException::withMessages(['email' => __('auth.cannot_register')]);
+        }
 
         return User::create([
             'name' => trim((string) $input['name']),

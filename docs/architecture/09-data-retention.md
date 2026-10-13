@@ -28,6 +28,7 @@
 | **Failed jobs** | Failed | **30 days** | |
 | **Application logs** | Daily file | **14 days** rotation | May contain IPs |
 | **Backups** | Daily | Daily ×7, weekly ×4, monthly ×3, so **up to about 90 days**. Deleted data can persist in backups until they rotate out. This is disclosed in the Privacy Policy. Backups are not restored selectively to revive deleted personal data. | Disaster recovery |
+> **Implementation status (T6.2):** the re-registration block for banned accounts is built: `banned_identities` keeps only HMAC hashes of the email and phone, checked on registration and on profile email or phone changes, removed when the ban is lifted, and pruned after 730 days by `model:prune`. Anonymising banned accounts after 30 days belongs to the retention job (M7).
 
 ## 2. Account Deletion Behaviour (User-Facing)
 

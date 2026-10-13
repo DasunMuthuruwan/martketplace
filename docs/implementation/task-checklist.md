@@ -48,7 +48,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T5.4 Performance check (merged a1c2b44; results in `docs/operations/performance.md`; re-run on the host before launch) — M5 complete
 ### M6 Admin backend
 - [x] T6.1 Moderation + reports (merged d96e8c3)
-- [~] T6.2 Users + staff — in progress on `feature/T6.2-users-staff-admin`
+- [~] T6.2 Users + staff — done on `feature/T6.2-users-staff-admin`, **awaiting owner review**
 - [ ] T6.3 Catalogue admin
 - [ ] T6.4 Locations admin
 - [ ] T6.5 Settings, pages, blocklist, audit, dashboard

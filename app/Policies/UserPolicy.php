@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Authorization\Permissions;
 use App\Authorization\StaffHierarchy;
+use App\Enums\UserStatus;
 use App\Models\User;
 
 /**
@@ -37,6 +38,20 @@ class UserPolicy
         return $actor->can(Permissions::USERS_BAN)
             && $this->hierarchy->canActOn($actor, $target)
             && ! $this->hierarchy->isLastOwner($target);
+    }
+
+    /** Lifting a suspension needs users.suspend; lifting a ban needs users.ban. */
+    public function reinstate(User $actor, User $target): bool
+    {
+        $permission = $target->status === UserStatus::Banned ? Permissions::USERS_BAN : Permissions::USERS_SUSPEND;
+
+        return $actor->can($permission) && $this->hierarchy->canActOn($actor, $target);
+    }
+
+    /** ADM-04 "verify": mark an email as verified by hand (e.g. a support request). */
+    public function verifyEmail(User $actor, User $target): bool
+    {
+        return $actor->can(Permissions::USERS_SUSPEND) && $this->hierarchy->canActOn($actor, $target);
     }
 
     public function delete(User $actor, User $target): bool

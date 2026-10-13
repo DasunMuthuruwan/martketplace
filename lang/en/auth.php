@@ -4,6 +4,7 @@
 return [
     'inactive' => 'This account cannot sign in. :reason',
     'contact_support' => 'Please contact support.',
+    'cannot_register' => 'This email address or phone number cannot be used. Please contact support.',
 
     'ui' => [
         'login_title' => 'Log in',

@@ -2,11 +2,9 @@
 
 namespace App\Console\Commands\Staff;
 
+use App\Actions\Staff\ResetStaffTwoFactor;
 use App\Models\User;
-use App\Notifications\TwoFactorResetNotification;
-use App\Support\UserSessions;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Break-glass 2FA reset for a sole Owner who lost both phone and recovery codes
@@ -19,7 +17,7 @@ class ResetTwoFactor extends Command
 
     protected $description = 'Remove two-factor authentication from an account (break-glass) and email the user';
 
-    public function handle(): int
+    public function handle(ResetStaffTwoFactor $reset): int
     {
         $user = User::where('email', mb_strtolower(trim((string) $this->argument('email'))))->first();
 
@@ -39,16 +37,7 @@ class ResetTwoFactor extends Command
             return self::FAILURE;
         }
 
-        $user->forceFill([
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
-            'two_factor_confirmed_at' => null,
-        ])->save();
-
-        UserSessions::endAll($user);
-
-        Log::warning('Two-factor authentication reset from the command line', ['user_id' => $user->id]);
-        $user->notify(new TwoFactorResetNotification);
+        $reset->handle(null, $user);
 
         $this->info("Two-factor authentication removed for {$user->email}. The user has been emailed.");
 

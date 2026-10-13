@@ -17,4 +17,22 @@ trait RequiresPermission
 
         abort_unless($user !== null && $user->can($permission), 403);
     }
+
+    /**
+     * Sensitive actions (2FA doc §6) need a password confirmed within `auth.password_timeout`.
+     * Pages carry the `password.confirm` middleware; an action that arrives after the window
+     * sends the user to confirm again and does nothing.
+     */
+    protected function hasRecentPassword(): bool
+    {
+        $confirmedAt = (int) session('auth.password_confirmed_at', 0);
+        if (time() - $confirmedAt < (int) config('auth.password_timeout')) {
+            return true;
+        }
+
+        session()->put('url.intended', url()->previous());
+        $this->redirectRoute('password.confirm');
+
+        return false;
+    }
 }

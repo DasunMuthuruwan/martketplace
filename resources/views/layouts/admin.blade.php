@@ -36,6 +36,12 @@
             @can(\App\Authorization\Permissions::REPORTS_VIEW)
                 <a href="{{ route('admin.reports') }}">{{ __('admin.nav.reports') }}</a>
             @endcan
+            @can(\App\Authorization\Permissions::USERS_VIEW)
+                <a href="{{ route('admin.users') }}">{{ __('admin.nav.users') }}</a>
+            @endcan
+            @can(\App\Authorization\Permissions::STAFF_MANAGE)
+                <a href="{{ route('admin.staff') }}">{{ __('admin.nav.staff') }}</a>
+            @endcan
             <a href="{{ route('home') }}">{{ __('admin.nav.site') }}</a>
         </nav>
     </header>

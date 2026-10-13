@@ -7,6 +7,8 @@ return [
         'moderation' => 'Moderation',
         'changes' => 'Recent changes',
         'reports' => 'Reports',
+        'users' => 'Users',
+        'staff' => 'Staff',
         'site' => 'View site',
     ],
 
