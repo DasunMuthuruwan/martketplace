@@ -11,7 +11,9 @@ use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Search\ListingSearch;
+use App\Services\Search\SearchCriteria;
 use App\Services\Search\SearchCriteriaFactory;
+use App\Services\Seo\PageSeo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -90,15 +92,41 @@ class SearchController extends Controller
             return redirect()->to($request->url().$this->queryWithout($request->query(), array_keys($e->errors())));
         }
 
+        $results = $this->search->search($criteria);
+
         return view('public.search', [
             'country' => $country,
             'criteria' => $criteria,
-            'results' => $this->search->search($criteria),
+            'results' => $results,
             'categories' => $this->tree->forCountry($country?->iso2),
             'filters' => $category !== null && $country !== null ? $this->filterFields($category, $country) : [],
             'present' => $this->present,
-            'robots' => $this->robots($request),
+            'seo' => $this->seo($request, $criteria, $results->total()),
         ]);
+    }
+
+    /**
+     * "{Category} in {City}, {Region}, {Country}". Landing pages (category / location in the path, no query) may
+     * be indexed; any keyword, filter or later page is `noindex,follow` with the canonical pointing
+     * at its landing page, which avoids crawl traps (architecture §8).
+     */
+    private function seo(Request $request, SearchCriteria $criteria, int $total): PageSeo
+    {
+        $what = $criteria->category->name ?? __('public.seo.search_title');
+        $place = implode(', ', array_filter([
+            $criteria->cityIds !== null ? City::find($criteria->cityIds[0])?->name : null,
+            $criteria->subregionId !== null ? Region::find($criteria->subregionId)?->name : ($criteria->regionId !== null ? Region::find($criteria->regionId)?->name : null),
+            $criteria->country?->name,
+        ]));
+
+        $title = $place === '' ? $what : __('public.seo.in_place', ['what' => $what, 'place' => $place]);
+        $description = __('public.seo.search_description', [
+            'count' => trans_choice('public.ads_count', $total, ['count' => number_format($total)]),
+            'what' => $what,
+            'place' => $place === '' ? __('public.all_countries') : $place,
+        ]);
+
+        return PageSeo::make($title, $description, $request->url(), $request->query() === []);
     }
 
     /**
@@ -186,20 +214,6 @@ class SearchController extends Controller
         $keys = array_flip($schema->filterableKeys());
 
         return array_values(array_filter($schema->form(), fn (array $field) => isset($keys[$field['key']]) && $field['type'] !== 'text'));
-    }
-
-    /**
-     * Landing pages (category / location in the path) may be indexed; any extra filter, keyword
-     * or page beyond the first is `noindex,follow` (routes doc §1). Indexing itself is switched
-     * on per environment (SEO_INDEXING).
-     */
-    private function robots(Request $request): string
-    {
-        if (! config('marketplace.seo.indexing')) {
-            return 'noindex,nofollow';
-        }
-
-        return $request->query() === [] ? 'index,follow' : 'noindex,follow';
     }
 
     /**

@@ -86,6 +86,9 @@ return [
 
     'seo' => [
         'indexing' => (bool) env('SEO_INDEXING', false),
+        // Folder the static sitemap.xml and sitemaps/*.xml are written to (served by the web server).
+        'sitemap_root' => env('SITEMAP_ROOT', public_path()),
+        'sitemap_chunk' => 10000,
     ],
 
     'geo' => [

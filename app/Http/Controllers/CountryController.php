@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use App\Models\Listing;
 use App\Services\Geo\CountryContext;
+use App\Services\Seo\PageSeo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -30,6 +31,7 @@ class CountryController extends Controller
         return view('public.countries', [
             'countries' => Country::active()->get()->sortBy('name')->values(),
             'counts' => $counts,
+            'seo' => PageSeo::make(__('public.seo.countries_title'), __('public.seo.countries_description'), route('countries')),
         ]);
     }
 

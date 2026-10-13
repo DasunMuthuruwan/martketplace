@@ -13,3 +13,4 @@ Schedule::command('marketplace:prune-images')->daily()->withoutOverlapping();
 Schedule::command('marketplace:expire-listings')->hourly()->withoutOverlapping();
 // Retention (docs/architecture/09-data-retention.md): Prunable models, e.g. contact reveals after 90 days.
 Schedule::command('model:prune')->daily()->withoutOverlapping();
+Schedule::command('sitemap:generate')->daily()->withoutOverlapping();

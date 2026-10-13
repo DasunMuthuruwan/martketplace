@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Seo\PageSeo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -31,6 +32,16 @@ class SellerController extends Controller
             ->orderByDesc('published_at')->orderByDesc('id')
             ->paginate((int) config('marketplace.listings.per_page'));
 
-        return view('public.seller', ['seller' => $seller, 'listings' => $listings, 'present' => $present]);
+        return view('public.seller', [
+            'seller' => $seller,
+            'listings' => $listings,
+            'present' => $present,
+            'seo' => PageSeo::make(
+                __('public.seo.seller_title', ['name' => $seller->name]),
+                __('public.seo.seller_description', ['name' => $seller->name]),
+                $seller->sellerUrl(),
+                $listings->currentPage() === 1 && $listings->isNotEmpty(),
+            ),
+        ]);
     }
 }

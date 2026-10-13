@@ -4,8 +4,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="{{ $robots ?? (config('marketplace.seo.indexing') ? 'index,follow' : 'noindex,nofollow') }}">
-    <title>@yield('title') | {{ config('app.name') }}</title>
+    @isset($seo)
+        <title>{{ $seo->title }} | {{ config('app.name') }}</title>
+        <meta name="robots" content="{{ $seo->robots }}">
+        @if ($seo->description)<meta name="description" content="{{ $seo->description }}">@endif
+        @if ($seo->canonical)<link rel="canonical" href="{{ $seo->canonical }}">@endif
+        <meta property="og:site_name" content="{{ config('app.name') }}">
+        <meta property="og:type" content="{{ $seo->ogType }}">
+        <meta property="og:title" content="{{ $seo->title }}">
+        @if ($seo->description)<meta property="og:description" content="{{ $seo->description }}">@endif
+        @if ($seo->canonical)<meta property="og:url" content="{{ $seo->canonical }}">@endif
+        @if ($seo->image)
+            <meta property="og:image" content="{{ $seo->image }}">
+            <meta name="twitter:card" content="summary_large_image">
+        @else
+            <meta name="twitter:card" content="summary">
+        @endif
+        @foreach ($seo->jsonLdBlocks() as $json)
+            <script type="application/ld+json" nonce="{{ Vite::cspNonce() }}">{!! $json !!}</script>
+        @endforeach
+    @else
+        <meta name="robots" content="{{ $robots ?? \App\Services\Seo\PageSeo::robots(false) }}">
+        <title>@yield('title') | {{ config('app.name') }}</title>
+    @endisset
     <style nonce="{{ Vite::cspNonce() }}">
         body { margin: 0; font-family: system-ui, sans-serif; background: #f7f7f7; color: #0a0a0a; }
         header, main, footer { max-width: 72rem; margin: 0 auto; padding: 1rem; }

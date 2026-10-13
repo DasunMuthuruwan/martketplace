@@ -32,6 +32,7 @@ class HardcodedValueScanner
         'example.org',
         'www.w3.org',
         'schema.org',
+        'www.sitemaps.org',
         'developer.mozilla.org',
         'sqs.us-east-1.amazonaws.com',
         'challenges.cloudflare.com',

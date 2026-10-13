@@ -7,6 +7,8 @@ use App\Models\Listing;
 use App\Services\Attributes\AttributeSchema;
 use App\Services\Contact\ContactResolver;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Seo\PageSeo;
+use App\Services\Seo\StructuredData;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +30,7 @@ class ListingController extends Controller
         private readonly ListingPresenter $present,
         private readonly ContactResolver $contact,
         private readonly AttributeSchema $schemas,
+        private readonly StructuredData $structured,
     ) {}
 
     public function show(Request $request, string $slugId): Response|RedirectResponse
@@ -69,8 +72,31 @@ class ListingController extends Controller
             'favourited' => $request->user()?->favourites()->whereKey($listing->id)->exists() ?? false,
             'similar' => $this->similar($listing),
             'currentCountry' => $listing->country,
-            'robots' => config('marketplace.seo.indexing') ? 'index,follow' : 'noindex,nofollow',
+            'seo' => $this->seo($listing),
         ];
+    }
+
+    /** Title "{title} – {place}, {country}", price in the description, cover as OG image, JSON-LD. */
+    private function seo(Listing $listing): PageSeo
+    {
+        $place = $listing->city->name ?? ($listing->subregion_id !== null ? $listing->subregion->name : ($listing->region_id !== null ? $listing->region->name : null));
+        $title = $listing->title.' – '.implode(', ', array_filter([$place, $listing->country->name]));
+        $description = trim($this->present->price($listing).' · '.$this->present->location($listing, true).'. '.$listing->description);
+
+        $cc = strtolower($listing->country->iso2);
+        $category = $listing->category;
+        $crumbs = [[$listing->country->name, route('country.home', ['cc' => $cc])]];
+        if ($category->parent !== null) {
+            $crumbs[] = [$category->parent->name, route('ads.category', ['cc' => $cc, 'category' => $category->parent->slug])];
+            $crumbs[] = [$category->name, route('ads.category', ['cc' => $cc, 'category' => $category->parent->slug, 'subcategory' => $category->slug])];
+        } else {
+            $crumbs[] = [$category->name, route('ads.category', ['cc' => $cc, 'category' => $category->slug])];
+        }
+        $crumbs[] = [$listing->title, $listing->publicUrl()];
+
+        return PageSeo::make($title, $description, $listing->publicUrl(), true, $this->present->coverUrl($listing, 'lg'), 'product')
+            ->withJsonLd($this->structured->product($listing))
+            ->withJsonLd($this->structured->breadcrumbs($crumbs));
     }
 
     /**

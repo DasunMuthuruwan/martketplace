@@ -50,5 +50,16 @@ return [
     'pages' => 'Pages',
     'previous' => 'Previous',
     'next' => 'Next',
+    'seo' => [
+        'country_title' => 'Buy and sell in :country',
+        'country_description' => 'Classified ads in :country: vehicles, property, phones, electronics and more. Contact sellers directly.',
+        'countries_title' => 'Countries',
+        'countries_description' => 'Choose a country to browse classified ads.',
+        'search_title' => 'Ads',
+        'in_place' => ':what in :place',
+        'search_description' => ':count for :what in :place.',
+        'seller_title' => 'Ads by :name',
+        'seller_description' => 'Classified ads posted by :name.',
+    ],
     'safety' => 'Meet in a public place, inspect the item before paying, and never send money in advance.',
 ];

@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Seo\PageSeo;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,6 +30,8 @@ class HomeController extends Controller
             'countries' => Country::active()->get()->sortBy('name')->values(),
             'latest' => $this->latest(null),
             'present' => $present,
+            // Only shown when no country is known; crawlers normally get the redirect.
+            'seo' => PageSeo::make(__('public.choose_country_title'), __('public.seo.countries_description'), route('home'), false),
         ]);
     }
 
@@ -41,6 +44,11 @@ class HomeController extends Controller
             'categories' => $tree->forCountry($country->iso2),
             'latest' => $this->latest($country),
             'present' => $present,
+            'seo' => PageSeo::make(
+                __('public.seo.country_title', ['country' => $country->name]),
+                __('public.seo.country_description', ['country' => $country->name]),
+                route('country.home', ['cc' => strtolower($country->iso2)]),
+            ),
         ]);
     }
 

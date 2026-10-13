@@ -37,3 +37,5 @@ Thumbs.db
 
 # Claude Code personal settings
 /.claude/settings.local.json
+/public/sitemap.xml
+/public/sitemaps
