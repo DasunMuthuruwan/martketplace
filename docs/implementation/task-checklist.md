@@ -42,8 +42,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T4.5 Contact reveal (merged f78bb63)
 - [x] T4.6 Favourites and reports (merged 7c9286a) — M4 complete
 ### M5 Search and SEO
-- [~] T5.1 ListingSearch (MySQL) — done on `feature/T5.1-listing-search`, **awaiting owner review**
-- [ ] T5.2 Public routes (G-8 default accepted)
+- [x] T5.1 ListingSearch (MySQL) (merged 8f0697f)
+- [~] T5.2 Public routes (G-8 default accepted) — in progress on `feature/T5.2-public-routes`
 - [ ] T5.3 SEO, JSON-LD, sitemaps
 - [ ] T5.4 Performance check (50k listings, 4 countries)
 ### M6 Admin backend
