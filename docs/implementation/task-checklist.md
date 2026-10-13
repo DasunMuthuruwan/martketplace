@@ -45,7 +45,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T5.1 ListingSearch (MySQL) (merged 8f0697f)
 - [x] T5.2 Public routes (merged 7a33762; `/page/{slug}` moves to M6)
 - [x] T5.3 SEO, JSON-LD, sitemaps (merged 3937cc8)
-- [~] T5.4 Performance check (50k listings, 4 countries) — done on `feature/T5.4-performance`, **awaiting owner review** (results: `docs/operations/performance.md`; re-run on the host before launch)
+- [x] T5.4 Performance check (merged a1c2b44; results in `docs/operations/performance.md`; re-run on the host before launch) — M5 complete
 ### M6 Admin backend
 - [ ] T6.1 Moderation + reports
 - [ ] T6.2 Users + staff
