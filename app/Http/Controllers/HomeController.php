@@ -46,7 +46,9 @@ class HomeController extends Controller
             'present' => $present,
             'seo' => PageSeo::make(
                 __('public.seo.country_title', ['country' => $country->name]),
-                __('public.seo.country_description', ['country' => $country->name]),
+                config('marketplace.seo.country_description')
+                    ? str_replace(':country', $country->name, (string) config('marketplace.seo.country_description'))
+                    : __('public.seo.country_description', ['country' => $country->name]),
                 route('country.home', ['cc' => strtolower($country->iso2)]),
             ),
         ]);

@@ -99,7 +99,7 @@ class AccountStatusAndAdminAccessTest extends TestCase
         $response = $this->actingAs($this->staff($role, $twoFactor))->get('/admin');
 
         $allowed
-            ? $response->assertOk()->assertSee(__('staff.admin.placeholder'))
+            ? $response->assertOk()->assertSee(__('admin.dashboard.title'))
             : $response->assertRedirect(route('account.two-factor'))->assertSessionHas('status', __('staff.two_factor_required'));
     }
 

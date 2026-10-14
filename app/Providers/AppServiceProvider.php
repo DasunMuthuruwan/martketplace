@@ -6,6 +6,7 @@ use App\Services\Geo\CountryContext;
 use App\Services\Search\ListingSearch;
 use App\Services\Search\MysqlListingSearch;
 use App\Support\RootUrl;
+use App\Support\Settings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -36,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RootUrl::configure();
+
+        // Owner-edited site settings over the config defaults (ADM-05).
+        Settings::apply();
 
         // 10+ characters; in production also refuse passwords found in known breaches (HIBP k-anonymity).
         Password::defaults(fn () => $this->app->isProduction()

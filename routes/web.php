@@ -7,17 +7,23 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
 use App\Livewire\Admin\AttributesAdmin;
+use App\Livewire\Admin\AuditLogViewer;
+use App\Livewire\Admin\BlocklistAdmin;
 use App\Livewire\Admin\CategoriesAdmin;
 use App\Livewire\Admin\CountriesAdmin;
+use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\LocationRequestsAdmin;
 use App\Livewire\Admin\LocationsAdmin;
 use App\Livewire\Admin\ModerationQueue;
+use App\Livewire\Admin\PagesAdmin;
 use App\Livewire\Admin\RecentChanges;
 use App\Livewire\Admin\ReportsQueue;
+use App\Livewire\Admin\SettingsAdmin;
 use App\Livewire\Admin\StaffAdmin;
 use App\Livewire\Admin\UsersAdmin;
 use Illuminate\Support\Facades\Route;
@@ -62,7 +68,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::view('/', 'admin.placeholder')->name('dashboard');
+        Route::livewire('/', Dashboard::class)->name('dashboard');
         // Each screen also checks its permission inside the component (mount and every action).
         Route::livewire('/moderation', ModerationQueue::class)->middleware('can:'.Permissions::LISTINGS_MODERATE)->name('moderation');
         Route::livewire('/moderation/changes', RecentChanges::class)->middleware('can:'.Permissions::LISTINGS_MODERATE)->name('changes');
@@ -72,8 +78,12 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/locations', LocationsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('locations');
         Route::livewire('/locations/countries', CountriesAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('countries');
         Route::livewire('/locations/requests', LocationRequestsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('location-requests');
+        Route::livewire('/pages', PagesAdmin::class)->middleware('can:'.Permissions::PAGES_MANAGE)->name('pages');
+        Route::livewire('/blocklist', BlocklistAdmin::class)->middleware('can:'.Permissions::BLOCKLIST_MANAGE)->name('blocklist');
+        Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');
         // Account and staff changes: password re-confirmed within 15 minutes (2FA doc §6).
         Route::livewire('/users', UsersAdmin::class)->middleware(['can:'.Permissions::USERS_VIEW, 'password.confirm'])->name('users');
+        Route::livewire('/settings', SettingsAdmin::class)->middleware(['can:'.Permissions::SETTINGS_MANAGE, 'password.confirm'])->name('settings');
         Route::livewire('/staff', StaffAdmin::class)->middleware(['can:'.Permissions::STAFF_MANAGE, 'password.confirm'])->name('staff');
     });
 
@@ -82,6 +92,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
 // `in` is reserved: it separates the category part from the location part.
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/countries', [CountryController::class, 'index'])->name('countries');
+Route::get('/page/{slug}', [PageController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('page.show');
 Route::get('/ad/{slugId}', [ListingController::class, 'show'])->where('slugId', '[A-Za-z0-9-]*-[0-9]+')->name('listing.show');
 Route::get('/seller/{idSlug}', [SellerController::class, 'show'])->where('idSlug', '[0-9]+(-[A-Za-z0-9-]*)?')->name('seller.show');
 Route::get('/ads', [SearchController::class, 'global'])->middleware('throttle:search')->name('ads.global');

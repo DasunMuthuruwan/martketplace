@@ -45,11 +45,23 @@
             @can(\App\Authorization\Permissions::LOCATIONS_MANAGE)
                 <a href="{{ route('admin.locations') }}">{{ __('admin.nav.locations') }}</a>
             @endcan
+            @can(\App\Authorization\Permissions::PAGES_MANAGE)
+                <a href="{{ route('admin.pages') }}">{{ __('admin.nav.pages') }}</a>
+            @endcan
+            @can(\App\Authorization\Permissions::BLOCKLIST_MANAGE)
+                <a href="{{ route('admin.blocklist') }}">{{ __('admin.nav.blocklist') }}</a>
+            @endcan
             @can(\App\Authorization\Permissions::USERS_VIEW)
                 <a href="{{ route('admin.users') }}">{{ __('admin.nav.users') }}</a>
             @endcan
             @can(\App\Authorization\Permissions::STAFF_MANAGE)
                 <a href="{{ route('admin.staff') }}">{{ __('admin.nav.staff') }}</a>
+            @endcan
+            @can(\App\Authorization\Permissions::AUDIT_VIEW)
+                <a href="{{ route('admin.audit') }}">{{ __('admin.nav.audit') }}</a>
+            @endcan
+            @can(\App\Authorization\Permissions::SETTINGS_MANAGE)
+                <a href="{{ route('admin.settings') }}">{{ __('admin.nav.settings') }}</a>
             @endcan
             <a href="{{ route('home') }}">{{ __('admin.nav.site') }}</a>
         </nav>

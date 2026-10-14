@@ -65,6 +65,11 @@
         @endif
         @yield('content')
     </main>
-    <footer class="muted">{{ config('marketplace.geo.attribution') }}</footer>
+    <footer class="muted">
+        @foreach (\App\Models\Page::footerLinks() as $pageSlug => $pageTitle)
+            <a href="{{ route('page.show', $pageSlug) }}">{{ $pageTitle }}</a>
+        @endforeach
+        <p>{{ config('marketplace.geo.attribution') }}</p>
+    </footer>
 </body>
 </html>

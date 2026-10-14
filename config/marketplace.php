@@ -17,6 +17,11 @@ return [
     // ISO 3166-1 alpha-2 of the fallback country. Null = first active country.
     'default_country' => env('MARKETPLACE_DEFAULT_COUNTRY'),
 
+    // Site details (ADM-05; editable in Admin → Settings, which overrides these defaults).
+    'site' => [
+        'contact_email' => env('MARKETPLACE_CONTACT_EMAIL'),
+    ],
+
     // Extra hosts trusted temporarily during a domain migration (APP_ALIASES, comma-separated).
     'app_aliases' => array_values(array_filter(array_map('trim', explode(',', (string) env('APP_ALIASES', ''))))),
 
@@ -86,6 +91,8 @@ return [
 
     'seo' => [
         'indexing' => (bool) env('SEO_INDEXING', false),
+        // Country home description; :country is replaced. Null = the text in lang/en/public.php.
+        'country_description' => null,
         // Folder the static sitemap.xml and sitemaps/*.xml are written to (served by the web server).
         'sitemap_root' => env('SITEMAP_ROOT', public_path()),
         'sitemap_chunk' => 10000,
