@@ -71,6 +71,18 @@
                     @if ($details['can']['delete'])<button type="button" wire:click="delete">{{ __('staff.accounts.delete') }}</button>@endif
                 </p>
             @endif
+
+            @if ($details['legalHold'])
+                <p>
+                    @if ($selected->legal_hold)<strong>{{ __('staff.accounts.on_hold') }}</strong>@endif
+                    <button type="button" wire:click="toggleLegalHold">{{ $selected->legal_hold ? __('staff.accounts.lift_hold') : __('staff.accounts.set_hold') }}</button>
+                    <span class="muted">{{ __('staff.accounts.hold_help') }}</span>
+                </p>
+                @unless (in_array(true, $details['can'], true))
+                    <label for="hold-reason">{{ __('staff.accounts.reason') }}</label>
+                    <textarea id="hold-reason" wire:model="reason" rows="2" maxlength="500"></textarea>
+                @endunless
+            @endif
         </section>
     @endif
 </div>

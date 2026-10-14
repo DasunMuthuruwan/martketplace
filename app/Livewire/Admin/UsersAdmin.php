@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Actions\Staff\ManageAccount;
+use App\Actions\Staff\SetLegalHold;
 use App\Authorization\Permissions;
 use App\Enums\UserStatus;
 use App\Livewire\Admin\Concerns\RequiresPermission;
@@ -104,6 +105,21 @@ class UsersAdmin extends Component
         $this->selectedId = null;
     }
 
+    /** Retention §3: keep the account and its listings out of retention deletion (Owner, reason required). */
+    public function toggleLegalHold(SetLegalHold $hold): void
+    {
+        $this->requirePermission(Permissions::USERS_DELETE);
+        if (! $this->hasRecentPassword()) {
+            return;
+        }
+        $this->validate(['reason' => ['required', 'string', 'max:500']]);
+
+        $user = User::withTrashed()->findOrFail($this->selectedId);
+        $hold->handle(Auth::user(), $user, ! $user->legal_hold, $this->reason);
+        session()->flash('status', __($user->legal_hold ? 'staff.accounts.hold_set' : 'staff.accounts.hold_lifted'));
+        $this->reset('reason');
+    }
+
     public function render(): View
     {
         $term = trim($this->q);
@@ -170,6 +186,7 @@ class UsersAdmin extends Component
                 'verify' => ! $user->hasVerifiedEmail() && Gate::forUser($actor)->allows('verifyEmail', $user),
                 'delete' => ! $user->trashed() && Gate::forUser($actor)->allows('delete', $user),
             ],
+            'legalHold' => $actor->can(Permissions::USERS_DELETE),
         ];
     }
 }

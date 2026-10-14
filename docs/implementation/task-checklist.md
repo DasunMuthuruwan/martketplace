@@ -54,7 +54,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T6.5 Settings, pages, blocklist, audit, dashboard (merged af82ab7)
 ### M7 Background and retention
 - [x] T7.1 Scheduler, web runner, mail budget, mail gate (merged f600e8a)
-- [~] T7.2 Retention pruning
+- [~] T7.2 Retention pruning — awaiting review on `feature/T7.2-retention`
 
 ## Phase 6 — Frontend
 - [!] F1.1 Tokens, fonts, icons, dark mode — gated by Q-UX-2, Q-UX-5 (G-11 accepted)

@@ -40,7 +40,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property UserStatus $status
  * @property string|null $status_reason
  * @property Carbon|null $suspended_until
+ * @property Carbon|null $status_changed_at retention: a ban is anonymised 30 days after this
  * @property Carbon|null $last_login_at
+ * @property Carbon|null $inactive_warned_at retention: inactive-account warning sent
+ * @property Carbon|null $anonymised_at
  * @property bool $legal_hold
  * @property string|null $two_factor_secret encrypted
  * @property string|null $two_factor_recovery_codes encrypted
@@ -79,11 +82,23 @@ class User extends Authenticatable implements MustVerifyEmail
             'contact_visibility' => ContactVisibility::class,
             'status' => UserStatus::class,
             'suspended_until' => 'datetime',
+            'status_changed_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'inactive_warned_at' => 'datetime',
             'legal_hold' => 'boolean',
             'anonymised_at' => 'datetime',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Retention §1: banned accounts are anonymised a set time after the ban.
+        static::saving(function (User $user): void {
+            if ($user->isDirty('status')) {
+                $user->status_changed_at = now();
+            }
+        });
     }
 
     /** Emails are stored lower-cased so lookups and uniqueness are case-insensitive. */

@@ -30,6 +30,8 @@
 | **Backups** | Daily | Daily ×7, weekly ×4, monthly ×3, so **up to about 90 days**. Deleted data can persist in backups until they rotate out. This is disclosed in the Privacy Policy. Backups are not restored selectively to revive deleted personal data. | Disaster recovery |
 > **Implementation status (T6.2):** the re-registration block for banned accounts is built: `banned_identities` keeps only HMAC hashes of the email and phone, checked on registration and on profile email or phone changes, removed when the ban is lifted, and pruned after 730 days by `model:prune`. Anonymising banned accounts after 30 days belongs to the retention job (M7).
 
+> **Implementation status (T7.2):** `marketplace:prune` (`App\Console\Commands\Retention\PruneData`, daily 03:00, `--dry-run`) applies §1 with the periods in `marketplace.retention.*`; contact reveals and ban hashes are pruned by `model:prune`, failed jobs by `queue:prune-failed`. Anonymisation (`AccountAnonymiser`) deletes listings and photos (files included), replaces name and email (`deleted+{id}@invalid`), clears phones, password, 2FA and login data, unlinks reports the person filed and contact-reveal rows, and keeps the soft-deleted row. Bans are timed from `users.status_changed_at`; the inactive-account warning is `users.inactive_warned_at` (cleared on sign-in). Staff accounts are never deleted for inactivity. Legal hold (§3) is built: Owner on the users screen or `php artisan marketplace:legal-hold user|listing {id} "reason" [--lift]`. Not built: the day-45 draft reminder; read-notification pruning (no database notifications exist).
+
 ## 2. Account Deletion Behaviour (User-Facing)
 
 1. Settings → Security → Delete account. Requires password confirmation and states what happens.

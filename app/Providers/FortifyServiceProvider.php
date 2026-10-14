@@ -52,7 +52,8 @@ class FortifyServiceProvider extends ServiceProvider
 
         Event::listen(Login::class, function (Login $event): void {
             if ($event->user instanceof User) {
-                $event->user->forceFill(['last_login_at' => now()])->saveQuietly();
+                // Signing in also cancels a pending inactive-account deletion (retention §1).
+                $event->user->forceFill(['last_login_at' => now(), 'inactive_warned_at' => null])->saveQuietly();
             }
         });
     }

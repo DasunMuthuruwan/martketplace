@@ -65,4 +65,13 @@ return [
         'profile-information-updated' => 'Profile saved.',
         'password-updated' => 'Password changed.',
     ],
+    'deleted_user' => 'Deleted user',
+
+    // Retention §1: inactive accounts.
+    'inactive' => [
+        'mail_subject' => 'Your account will be deleted',
+        'mail_line' => 'You have not signed in for a long time. To keep your account, sign in within :days days. Otherwise it will be deleted along with your ads.',
+        'mail_action' => 'Sign in',
+        'mail_ignore' => 'If you no longer need the account, you do not have to do anything.',
+    ],
 ];
