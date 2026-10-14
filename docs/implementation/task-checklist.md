@@ -51,9 +51,9 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T6.2 Users + staff (merged 81e30eb)
 - [x] T6.3 Catalogue admin (merged 1d2a082)
 - [x] T6.4 Locations admin (merged fdae767)
-- [~] T6.5 Settings, pages, blocklist, audit, dashboard — awaiting review on `feature/T6.5-settings-pages-audit`
+- [x] T6.5 Settings, pages, blocklist, audit, dashboard (merged af82ab7)
 ### M7 Background and retention
-- [ ] T7.1 Scheduler, web runner, mail budget, mail gate
+- [~] T7.1 Scheduler, web runner, mail budget, mail gate
 - [ ] T7.2 Retention pruning
 
 ## Phase 6 — Frontend
