@@ -57,7 +57,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T7.2 Retention pruning (merged 768938f)
 
 ## Phase 6 — Frontend
-- [~] F1.1 Tokens, fonts, icons, dark mode — in progress on `feature/F1.1-design-tokens` (Q-UX approved)
+- [~] F1.1 Tokens, fonts, icons, dark mode — awaiting review on `feature/F1.1-design-tokens`
 - [ ] F1.2 Core components
 - [ ] F1.3 Layouts + style guide (Q-UX-1/3 approved)
 - [ ] F2.1 Home / country home

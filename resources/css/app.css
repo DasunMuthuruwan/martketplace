@@ -1,9 +1,217 @@
+/*
+ * Design system (docs/design/01-design-system.md). Tokens are defined once as CSS variables
+ * (:root = light, .dark = dark) and exposed to Tailwind through @theme inline, so components use
+ * bg-surface, text-fg-muted, border-line … and never raw colours. Fonts and flags are bundled by
+ * Vite (no external requests, Q-UX-5).
+ */
 @import 'tailwindcss';
+@import '@fontsource-variable/geist/wght.css';
+@import '@fontsource-variable/geist-mono/wght.css';
+@import 'flag-icons/css/flag-icons.min.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../../app/**/*.php';
 
+/* Dark mode follows the .dark class set before first paint (partials/theme-script). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- Colour tokens (design system §3) -------------------------------------------------- */
+:root {
+    color-scheme: light;
+    --canvas: #f7f7f7;
+    --surface: #ffffff;
+    --surface-muted: #f0f0f0;
+    --surface-hover: #f0f0f0;
+    --line: #e5e5e5;
+    --control: #858585;
+    --fg: #0a0a0a;
+    --fg-muted: #4d4d4d;
+    --fg-subtle: #666666;
+    --primary: #0a0a0a;
+    --primary-fg: #ffffff;
+    --primary-hover: #262626;
+    --success: #137333;
+    --danger: #c5221f;
+    --warning: #8a5300;
+    --info: #1a56db;
+    --overlay: rgb(10 10 10 / 0.5);
+    --whatsapp: #25d366;
+    --shadow-overlay: 0 12px 32px -8px rgb(0 0 0 / 0.18);
+}
+
+.dark {
+    color-scheme: dark;
+    --canvas: #0a0a0a;
+    --surface: #141414;
+    --surface-muted: #1c1c1c;
+    --surface-hover: #1f1f1f;
+    --line: #2a2a2a;
+    --control: #6e6e6e;
+    --fg: #f5f5f5;
+    --fg-muted: #b3b3b3;
+    --fg-subtle: #949494;
+    --primary: #f5f5f5;
+    --primary-fg: #0a0a0a;
+    --primary-hover: #d9d9d9;
+    --success: #4cc38a;
+    --danger: #ff7a70;
+    --warning: #f5b83d;
+    --info: #7ea6ff;
+    --overlay: rgb(0 0 0 / 0.7);
+    --shadow-overlay: 0 16px 40px -8px rgb(0 0 0 / 0.7);
+}
+
+@theme inline {
+    --color-canvas: var(--canvas);
+    --color-surface: var(--surface);
+    --color-surface-muted: var(--surface-muted);
+    --color-surface-hover: var(--surface-hover);
+    --color-line: var(--line);
+    --color-control: var(--control);
+    --color-fg: var(--fg);
+    --color-fg-muted: var(--fg-muted);
+    --color-fg-subtle: var(--fg-subtle);
+    --color-primary: var(--primary);
+    --color-primary-fg: var(--primary-fg);
+    --color-primary-hover: var(--primary-hover);
+    --color-success: var(--success);
+    --color-danger: var(--danger);
+    --color-warning: var(--warning);
+    --color-info: var(--info);
+    --color-overlay: var(--overlay);
+    --color-whatsapp: var(--whatsapp);
+    --shadow-overlay: var(--shadow-overlay);
+}
+
+/* ---- Typography, shape, motion (design system §4, §5, §8) ----------------------------- */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --text-display: 2rem;
+    --text-display--line-height: 2.5rem;
+    --text-h1: 1.625rem;
+    --text-h1--line-height: 2rem;
+    --text-h2: 1.25rem;
+    --text-h2--line-height: 1.75rem;
+    --text-h3: 1rem;
+    --text-h3--line-height: 1.5rem;
+    --text-price-xl: 1.75rem;
+    --text-price-xl--line-height: 2.125rem;
+    --text-price: 1rem;
+    --text-price--line-height: 1.375rem;
+    --text-body: 0.9375rem;
+    --text-body--line-height: 1.5rem;
+    --text-ui: 0.875rem;
+    --text-ui--line-height: 1.25rem;
+    --text-small: 0.8125rem;
+    --text-small--line-height: 1.125rem;
+    --text-micro: 0.75rem;
+    --text-micro--line-height: 1rem;
+
+    --radius-control: 6px;
+    --radius-card: 10px;
+    --radius-sheet: 14px;
+
+    --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --duration-fast: 120ms;
+    --duration-menu: 180ms;
+    --duration-modal: 220ms;
+
+    --breakpoint-sm: 40rem;
+    --breakpoint-md: 48rem;
+    --breakpoint-lg: 64rem;
+    --breakpoint-xl: 80rem;
+    --container-page: 77.5rem;
+}
+
+/* ---- Base ---------------------------------------------------------------------------- */
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+        scroll-padding-top: 5rem;
+    }
+
+    body {
+        background-color: var(--canvas);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: var(--text-body);
+        line-height: var(--text-body--line-height);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    /* 16 px inputs on small screens stop iOS zooming in on focus (design system §4). */
+    input, select, textarea {
+        font-size: max(16px, 1em);
+    }
+
+    @media (min-width: 64rem) {
+        input, select, textarea {
+            font-size: var(--text-ui);
+        }
+    }
+
+    /* User content never forces horizontal scrolling. */
+    .prose-user {
+        overflow-wrap: anywhere;
+    }
+
+    .tabular {
+        font-variant-numeric: tabular-nums;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+/* ---- Card grid by available width (design system §6, Q-UX-6) --------------------------- */
+@layer components {
+    .listing-grid-area {
+        container-type: inline-size;
+    }
+
+    .listing-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    @container (min-width: 340px) {
+        .listing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @container (min-width: 600px) {
+        .listing-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    }
+
+    @container (min-width: 1100px) {
+        .listing-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    /* Browsers without container queries: approximate with the viewport. */
+    @supports not (container-type: inline-size) {
+        .listing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        @media (min-width: 40rem) {
+            .listing-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        }
+    }
+
+    .icon {
+        flex-shrink: 0;
+    }
 }
