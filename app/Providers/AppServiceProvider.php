@@ -5,10 +5,14 @@ namespace App\Providers;
 use App\Services\Geo\CountryContext;
 use App\Services\Search\ListingSearch;
 use App\Services\Search\MysqlListingSearch;
+use App\Support\MailBudget;
+use App\Support\MailGate;
 use App\Support\RootUrl;
 use App\Support\Settings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -40,6 +44,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Owner-edited site settings over the config defaults (ADM-05).
         Settings::apply();
+
+        // Email: real transports stay off until MAIL_SENDING_ENABLED (CD-09); every message counts
+        // against the hourly budget (queued mail waits when it is spent).
+        MailGate::apply();
+        Event::listen(MessageSending::class, fn () => MailBudget::record());
 
         // 10+ characters; in production also refuse passwords found in known breaches (HIBP k-anonymity).
         Password::defaults(fn () => $this->app->isProduction()

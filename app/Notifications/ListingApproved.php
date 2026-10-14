@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Listing;
+use App\Notifications\Concerns\UsesMailBudget;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notification;
 /** MOD-05: the seller's ad is live. Queued (architecture §6); the in-app channel arrives with notifications (M7). */
 class ListingApproved extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, UsesMailBudget;
 
     public function __construct(public readonly Listing $listing)
     {

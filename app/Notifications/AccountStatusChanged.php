@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Enums\UserStatus;
+use App\Notifications\Concerns\UsesMailBudget;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,7 +13,7 @@ use Illuminate\Support\Carbon;
 /** MOD-05: the account was suspended, banned or reinstated, with the reason. Queued after commit. */
 class AccountStatusChanged extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, UsesMailBudget;
 
     public function __construct(
         public readonly UserStatus $status,

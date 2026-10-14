@@ -117,11 +117,11 @@ class SiteAdminTest extends TestCase
 
     public function test_custom_country_description(): void
     {
-        $country = Country::factory()->create();
+        $country = Country::factory()->create(['name' => ['en' => 'Isles & Keys']]); // an ampersand: the text is escaped in the page
 
         Livewire::actingAs($this->owner)->test(SettingsAdmin::class)->set('values.seo_country_description', 'Buy and sell in :country.')->call('save');
 
-        $this->get('/'.strtolower($country->iso2))->assertSee('Buy and sell in '.$country->name.'.', false);
+        $this->get('/'.strtolower($country->iso2))->assertSee('Buy and sell in '.$country->name.'.');
     }
 
     // ---- Pages ------------------------------------------------------------------------------

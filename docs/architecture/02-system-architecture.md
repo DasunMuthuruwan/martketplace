@@ -211,6 +211,8 @@ The register.lk host appears to block 1-minute cron jobs [INFERRED]. Design rule
 | `marketplace:prune` (retention, see [data retention](09-data-retention.md)) | daily 03:00 |
 | `model:prune` (contact reveals, old notifications) | daily |
 
+> **Implementation status (T7.1):** the schedule lives in `routes/console.php`. Expiry and the 3-day reminder run together in `marketplace:expire-listings` (hourly), not as a separate 09:00 job. The scheduler drains the queue on every run. `RunBackgroundTasks` (enabled by `WEB_RUNNER_ENABLED`) only drains the queue (it does not run the scheduler, which needs the host cron at its shortest allowed interval). `MailGate` sends everything to the `log` mailer until `MAIL_SENDING_ENABLED=true`. `MailBudget` counts every message per clock hour and holds queued mail when `MAIL_HOURLY_LIMIT` is reached.
+
 ## 7. Caching and Performance Plan
 
 [ASSUMPTION — not a target] Year-one planning envelope: up to about **5,000 active listings**, **50,000 monthly visits** and **1,000 registered sellers**. The owner has not confirmed any volume (Q16). These numbers only size the design.
