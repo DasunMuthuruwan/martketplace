@@ -60,8 +60,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F1.1 Tokens, fonts, icons, dark mode (merged 250926a)
 - [x] F1.2 Core components (merged 50d893e)
 - [x] F1.3 Layouts + style guide (merged bfac7c9)
-- [~] F2.1 Home / country home
-- [!] F2.2 Search UI — gated by Q-UX-4, Q-UX-6
+- [~] F2.1 Home / country home — awaiting review on `feature/F2.1-home`
+- [ ] F2.2 Search UI (Q-UX-4/6 approved)
 - [ ] F2.3 Listing detail + seller page
 - [ ] F3.1 Auth screens
 - [ ] F3.2 Account area

@@ -62,4 +62,27 @@ return [
         'seller_description' => 'Classified ads posted by :name.',
     ],
     'safety' => 'Meet in a public place, inspect the item before paying, and never send money in advance.',
+
+    // Home pages (layout doc §3.1).
+    'home' => [
+        'hero' => 'Buy and sell anything in :country',
+        'subline' => 'Vehicles, property, phones and more. Contact sellers directly.',
+        'post_cta' => 'Post your ad',
+        'browse' => 'Browse categories',
+        'see_all' => 'See all',
+        'empty_title' => 'No ads yet',
+        'empty_text' => 'Be the first to post an ad in :country.',
+        'safety_label' => 'Safety',
+        'safety' => 'Never pay in advance. Meet in a public place and check the item before you pay.',
+        'safety_link' => 'Safety tips',
+        'choose_help' => 'Ads are listed per country. You can change the country at any time.',
+        'no_countries' => 'No countries are open yet.',
+        'latest_everywhere' => 'Latest ads from every country',
+    ],
+
+    // Listing card (components §5.1).
+    'card' => [
+        'photos' => 'photos',
+        'sold' => 'Sold',
+    ],
 ];

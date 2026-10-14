@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Country;
 use App\Models\Listing;
 use App\Services\Catalogue\CategoryTree;
@@ -11,6 +12,7 @@ use App\Services\Seo\PageSeo;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 /** `/` and `/{cc}` (routes doc §1, G-2). */
@@ -42,6 +44,7 @@ class HomeController extends Controller
         return view('public.country', [
             'country' => $country,
             'categories' => $tree->forCountry($country->iso2),
+            'categoryCounts' => $this->categoryCounts($country),
             'latest' => $this->latest($country),
             'present' => $present,
             'seo' => PageSeo::make(
@@ -54,12 +57,36 @@ class HomeController extends Controller
         ]);
     }
 
+    /**
+     * Live ads per top-level category in the country (home tiles), cached for 15 minutes like the
+     * country counts.
+     *
+     * @return array<int, int> root category id => ads
+     */
+    private function categoryCounts(Country $country): array
+    {
+        return Cache::remember('public:category-ad-counts:'.$country->id, now()->addMinutes(15), function () use ($country): array {
+            $perCategory = Listing::public()->where('listings.country_id', $country->id)->toBase()
+                ->selectRaw('listings.category_id, count(*) as total')->groupBy('listings.category_id')->pluck('total', 'category_id');
+            $parents = Category::whereIn('id', $perCategory->keys())->pluck('parent_id', 'id');
+
+            $counts = [];
+            foreach ($perCategory as $categoryId => $total) {
+                $root = $parents[$categoryId] ?? $categoryId;
+                $counts[$root] = ($counts[$root] ?? 0) + (int) $total;
+            }
+
+            return $counts;
+        });
+    }
+
     /** @return Collection<int, Listing> */
     private function latest(?Country $country): Collection
     {
         return Listing::public()
             ->when($country !== null, fn ($q) => $q->where('country_id', $country->id))
-            ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'category'])
+            ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
+            ->withCount('images')
             ->orderByDesc('published_at')->orderByDesc('id')
             ->limit(self::LATEST)
             ->get();

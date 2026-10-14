@@ -20,22 +20,39 @@ class ListingPresenter
     /** @param  bool  $withCode  add the ISO code on pages that mix countries */
     public function price(Listing $listing, bool $withCode = false): string
     {
+        $parts = $this->priceParts($listing, $withCode);
+
+        return trim($parts['amount'].($parts['suffix'] !== '' ? ' '.$parts['suffix'] : ''));
+    }
+
+    /**
+     * The figure and its suffix separately, so cards can let "/ month · Negotiable" wrap to the next
+     * line while the number never breaks (Q-UX-4). Without a price, the amount is the price type
+     * ("Free", "Price on request").
+     *
+     * @return array{amount: string, suffix: string}
+     */
+    public function priceParts(Listing $listing, bool $withCode = false): array
+    {
         $type = $listing->price_type;
         $currency = $listing->currencyModel;
 
         if ($listing->price === null || $currency === null) {
-            return $type === null ? '' : (string) __('public.price_types.'.$type->value);
+            return ['amount' => $type === null ? '' : (string) __('public.price_types.'.$type->value), 'suffix' => ''];
         }
 
-        $text = (string) $this->money->forCountry($listing->price, $currency, $listing->country, $withCode);
+        $suffix = [];
         if ($listing->rent_period !== null) {
-            $text .= ' '.__('public.rent_periods.'.$listing->rent_period->value);
+            $suffix[] = __('public.rent_periods.'.$listing->rent_period->value);
         }
         if ($type === PriceType::Negotiable) {
-            $text .= ' · '.__('public.price_types.negotiable');
+            $suffix[] = ($suffix === [] ? '· ' : '').__('public.price_types.negotiable');
         }
 
-        return $text;
+        return [
+            'amount' => (string) $this->money->forCountry($listing->price, $currency, $listing->country, $withCode),
+            'suffix' => implode(' · ', $suffix),
+        ];
     }
 
     /** e.g. "Rs 250,000 / P" (LST-14); null when it does not apply. */

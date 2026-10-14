@@ -72,7 +72,8 @@ class PublicPagesTest extends TestCase
 
     public function test_country_home(): void
     {
-        $this->get('/lk')->assertOk()->assertSee('Vehicles')->assertSee('Cars')->assertSee('Toyota Aqua 2015 hybrid')->assertSee('Rs');
+        // Top-level category tiles with live-ad counts (subcategories are on the category pages, F2.2).
+        $this->get('/lk')->assertOk()->assertSee('Vehicles')->assertSee('1 ad')->assertSee('Toyota Aqua 2015 hybrid')->assertSee('Rs');
         $this->get('/de')->assertNotFound();
         $this->get('/LK')->assertStatus(301)->assertRedirect(url('/lk'));
     }
