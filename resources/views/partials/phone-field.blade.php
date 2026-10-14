@@ -1,20 +1,16 @@
 {{--
     Phone number with a country picker (GLB-17). Stored as E.164; validated per country on the server.
+    The country list is long, so it is a searchable combobox (component doc §2).
     Params: name, countryName, label, countryLabel, hint, value, countryValue, phoneCountries, bag (error bag, default "default").
 --}}
-@php($bag = $bag ?? 'default')
-@php($errorBag = $errors->getBag($bag))
-
-<label for="{{ $countryName }}">{{ $countryLabel }}</label>
-<select id="{{ $countryName }}" name="{{ $countryName }}" autocomplete="tel-country-code" @if ($errorBag->has($countryName)) aria-invalid="true" aria-describedby="{{ $countryName }}-error" @endif>
-    <option value=""></option>
-    @foreach ($phoneCountries as $country)
-        <option value="{{ $country->iso2 }}" @selected($countryValue === $country->iso2)>{{ $country->name }} (+{{ $country->phone_country_code }})</option>
-    @endforeach
-</select>
-@if ($errorBag->has($countryName))<p class="error" id="{{ $countryName }}-error">{{ $errorBag->first($countryName) }}</p>@endif
-
-<label for="{{ $name }}">{{ $label }}</label>
-<input type="tel" id="{{ $name }}" name="{{ $name }}" value="{{ $value }}" maxlength="30" autocomplete="tel-national" inputmode="tel" aria-describedby="{{ $name }}-hint @if ($errorBag->has($name)) {{ $name }}-error @endif" @if ($errorBag->has($name)) aria-invalid="true" @endif>
-<p class="hint" id="{{ $name }}-hint">{{ $hint }}</p>
-@if ($errorBag->has($name))<p class="error" id="{{ $name }}-error">{{ $errorBag->first($name) }}</p>@endif
+@php
+    $errorBag = $errors->getBag($bag ?? 'default');
+    $options = $phoneCountries->mapWithKeys(fn ($country) => [$country->iso2 => $country->name.' (+'.$country->phone_country_code.')'])->all();
+@endphp
+{{-- Side by side only when the form itself is wide (container query), stacked in the narrow sign-up card. --}}
+<div class="@container"><div class="grid gap-4 @lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
+    <x-ui.combobox :label="$countryLabel" :name="$countryName" :id="'f-'.$countryName" :options="$options" :selected="$countryValue"
+        :error="$errorBag->first($countryName) ?: null" :placeholder="__('auth.ui.phone_country_search')" autocomplete="off" />
+    <x-ui.input type="tel" :label="$label" :name="$name" :id="'f-'.$name" :value="$value" :hint="$hint" :error="$errorBag->first($name) ?: null"
+        maxlength="30" autocomplete="tel-national" inputmode="tel" />
+</div></div>

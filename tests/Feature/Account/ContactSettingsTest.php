@@ -45,7 +45,7 @@ class ContactSettingsTest extends TestCase
             ->assertOk()
             ->assertSee('value="hidden" checked', false)
             ->assertSee('+447400123456')
-            ->assertSee('value="GB" selected', false);
+            ->assertSee('data-combobox-value value="GB"', false); // phone country: searchable combobox (F3.1)
     }
 
     public function test_each_visibility_can_be_chosen(): void

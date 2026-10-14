@@ -1,14 +1,12 @@
-@extends('layouts.plain')
+@extends('layouts.auth')
 
 @section('title', __('auth.ui.confirm_title'))
 
 @section('content')
-    <p>{{ __('auth.ui.confirm_intro') }}</p>
-    <form method="POST" action="{{ route('password.confirm.store') }}" novalidate>
+    <p class="mb-4 text-ui text-fg-muted">{{ __('auth.ui.confirm_intro') }}</p>
+    <form method="POST" action="{{ route('password.confirm.store') }}" novalidate class="space-y-4">
         @csrf
-        <label for="password">{{ __('auth.ui.password') }}</label>
-        <input type="password" id="password" name="password" required autofocus autocomplete="current-password">
-        @error('password')<p class="error">{{ $message }}</p>@enderror
-        <button type="submit">{{ __('auth.ui.confirm') }}</button>
+        <x-ui.input type="password" :label="__('auth.ui.password')" name="password" required autofocus autocomplete="current-password" />
+        <x-ui.button type="submit" size="lg" block>{{ __('auth.ui.confirm') }}</x-ui.button>
     </form>
 @endsection

@@ -1,38 +1,21 @@
-@extends('layouts.plain')
+@extends('layouts.auth')
 
 @section('title', __('auth.ui.register_title'))
 
 @section('content')
     @if ($countries->isEmpty())
-        <p class="status">{{ __('auth.ui.no_countries') }}</p>
+        <x-ui.alert>{{ __('auth.ui.no_countries') }}</x-ui.alert>
     @else
-        <form method="POST" action="{{ route('register.store') }}" novalidate>
+        <x-ui.form-errors class="mb-4" />
+        <form method="POST" action="{{ route('register.store') }}" novalidate class="space-y-4">
             @csrf
+            <x-ui.input :label="__('auth.ui.name')" name="name" :value="old('name')" required maxlength="100" autocomplete="name" />
+            <x-ui.input type="email" :label="__('auth.ui.email')" name="email" :value="old('email')" required maxlength="191" autocomplete="email" />
+            <x-ui.input type="password" :label="__('auth.ui.password')" name="password" :hint="__('auth.ui.password_hint')" required autocomplete="new-password" />
+            <x-ui.input type="password" :label="__('auth.ui.password_confirmation')" name="password_confirmation" required autocomplete="new-password" />
 
-            <label for="name">{{ __('auth.ui.name') }}</label>
-            <input type="text" id="name" name="name" value="{{ old('name') }}" required maxlength="100" autocomplete="name" @error('name') aria-invalid="true" aria-describedby="name-error" @enderror>
-            @error('name')<p class="error" id="name-error">{{ $message }}</p>@enderror
-
-            <label for="email">{{ __('auth.ui.email') }}</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" required maxlength="191" autocomplete="email" @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
-            @error('email')<p class="error" id="email-error">{{ $message }}</p>@enderror
-
-            <label for="password">{{ __('auth.ui.password') }}</label>
-            <input type="password" id="password" name="password" required autocomplete="new-password" aria-describedby="password-hint @error('password') password-error @enderror">
-            <p class="hint" id="password-hint">{{ __('auth.ui.password_hint') }}</p>
-            @error('password')<p class="error" id="password-error">{{ $message }}</p>@enderror
-
-            <label for="password_confirmation">{{ __('auth.ui.password_confirmation') }}</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required autocomplete="new-password">
-
-            <label for="country_id">{{ __('auth.ui.country') }}</label>
-            <select id="country_id" name="country_id" required @error('country_id') aria-invalid="true" aria-describedby="country-error" @enderror>
-                <option value="">{{ __('auth.ui.choose_country') }}</option>
-                @foreach ($countries as $country)
-                    <option value="{{ $country->id }}" @selected((string) old('country_id') === (string) $country->id)>{{ $country->name }}</option>
-                @endforeach
-            </select>
-            @error('country_id')<p class="error" id="country-error">{{ $message }}</p>@enderror
+            <x-ui.select :label="__('auth.ui.country')" name="country_id" required :placeholder="__('auth.ui.choose_country')"
+                :options="$countries->pluck('name', 'id')->all()" :selected="old('country_id')" :hint="__('auth.ui.country_hint')" />
 
             @include('partials.phone-field', [
                 'name' => 'phone',
@@ -44,14 +27,23 @@
                 'countryValue' => old('phone_country'),
             ])
 
-            <label><input type="checkbox" name="terms" value="1" @checked(old('terms'))> {{ __('auth.ui.terms') }}</label>
-            @error('terms')<p class="error">{{ $message }}</p>@enderror
+            @php($pages = \App\Models\Page::footerLinks())
+            <x-ui.checkbox name="terms" :checked="(bool) old('terms')" :label="__('auth.ui.terms')" />
+            @if ($pages->has('terms') || $pages->has('privacy'))
+                <p class="-mt-2 pl-6 text-small text-fg-subtle">
+                    @if ($pages->has('terms'))<a href="{{ route('page.show', 'terms') }}" target="_blank" rel="noopener" class="underline underline-offset-2">{{ $pages['terms'] }}</a>@endif
+                    @if ($pages->has('terms') && $pages->has('privacy')) · @endif
+                    @if ($pages->has('privacy'))<a href="{{ route('page.show', 'privacy') }}" target="_blank" rel="noopener" class="underline underline-offset-2">{{ $pages['privacy'] }}</a>@endif
+                </p>
+            @endif
 
             @include('partials.bot-protection')
 
-            <button type="submit">{{ __('auth.ui.register') }}</button>
+            <x-ui.button type="submit" size="lg" block>{{ __('auth.ui.register') }}</x-ui.button>
         </form>
     @endif
 
-    <p>{{ __('auth.ui.have_account') }} <a href="{{ route('login') }}">{{ __('auth.ui.login') }}</a></p>
+    <p class="mt-6 border-t border-line pt-4 text-center text-ui text-fg-muted">
+        {{ __('auth.ui.have_account') }} <a href="{{ route('login') }}" class="font-medium text-fg underline underline-offset-2">{{ __('auth.ui.login') }}</a>
+    </p>
 @endsection

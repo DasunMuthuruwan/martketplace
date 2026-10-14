@@ -28,6 +28,8 @@ return [
         'phone_country' => 'Phone country',
         'phone' => 'Mobile number (optional)',
         'phone_hint' => 'You can add it later. It stays hidden until you choose who can see it.',
+        'phone_country_search' => 'Type a country',
+        'country_hint' => 'Where you will mostly buy and sell. You can browse every country.',
         'terms' => 'I agree to the Terms of Use and the Privacy Policy.',
         'remember' => 'Keep me logged in',
         'login' => 'Log in',
