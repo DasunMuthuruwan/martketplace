@@ -1,6 +1,6 @@
 # Phase 3 — UI/UX Design
 
-**Status: Draft — awaiting owner review and approval.** No application code has been written. The prototype is a static design reference, not production code.
+**Status: Draft — awaiting owner approval of the whole design.** Q-UX-1 to Q-UX-6 were approved on 2026-10-14 (below, ADR-024). Phase 6 frontend work starts only after the design is approved. The prototype is a static design reference, not production code (it loads Geist and flag icons from a CDN for convenience; the real build bundles them).
 
 | # | Document | Contents |
 |---|---|---|
@@ -17,13 +17,15 @@
 - Token contrast verified by script (design system §3.3).
 - Not yet done (Phase 6/7, on the real build): axe accessibility scan, screen-reader pass, 320 px check, Lighthouse.
 
-## Decisions Needed from the Owner
+## Owner Decisions (Approved 2026-10-14, ADR-024)
 
-| # | Question | Proposal |
+| # | Decision | Where it is specified |
 |---|---|---|
-| Q-UX-1 | Show the Dev Talk association? | Footer text only, "A Dev Talk service" linking to dev-talk.com. No Dev Talk logo or colours. |
-| Q-UX-2 | Product name and logo | Configurable `APP_NAME`. Working name "Marketplace" with a text wordmark + monogram until a name or logo is chosen. |
-| Q-UX-3 | Mobile bottom navigation (Home · Search · Post · Saved · Account) | Recommended (fast posting and access to saved ads on phones) |
-| Q-UX-4 | Prices on cards | Full figures (`Rs 7,850,000`), not abbreviations (`7.85M`) |
-| Q-UX-5 | Typeface | Geist (self-hosted, OFL). Alternative: system UI font stack (zero font download). |
-| Q-UX-6 | Card density | 2 columns on phones, 3 on tablet / desktop with filters, 4 on wide home/category pages |
+| Q-UX-1 | Footer line only: "A Dev Talk service" linking to `https://dev-talk.com`. No Dev Talk logo, colours or other branding. The text and link are configuration (empty = hidden). | Design system §2, components §3 (footer) |
+| Q-UX-2 | Product name from `APP_NAME` (the Admin → Settings site name overrides it), working name "Marketplace", text wordmark + monogram. The name is never hardcoded: titles, metadata, Open Graph, emails and admin all read the configured name. Logo files are replaceable assets. No domain purchase or final brand without approval. | Design system §2 |
+| Q-UX-3 | Mobile bottom navigation: Home · Search · **Post** · Saved · Account. Post is the emphasised centre action. Sign-in where needed, accessible, safe-area aware, never covers content, hidden from 1024 px. | Components §3, navigation §2 |
+| Q-UX-4 | Full prices, never abbreviated (`7.85M`). Always the listing's own currency and the country's number format; never converted. Land: total plus the price per the country's land price unit (perch in Sri Lanka). Long prices stay readable on mobile cards. | Components §5.1, global UX §5, forms §5 |
+| Q-UX-5 | Geist, self-hosted after the licence (OFL-1.1) is verified, with a system UI fallback stack. One typography system for public pages, forms, account and admin. No external font requests. | Design system §4 |
+| Q-UX-6 | Card columns from the width actually available: phones 2, tablets 3, desktop with filters 3, wide pages without a sidebar 4. | Design system §6 |
+
+Note on Q-UX-4: the owner's examples are formatting illustrations. Grouping follows each country's convention, so 7,850,000 rupees in India shows as `₹78,50,000` (lakh grouping), not `₹7,850,000`.

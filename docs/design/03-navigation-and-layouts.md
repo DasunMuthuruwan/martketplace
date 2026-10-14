@@ -31,7 +31,7 @@ Public                          Account (logged in)               Admin (staff)
 |---|---|---|
 | Header | Logo · search bar (keyword + location + button) · **Post ad** (primary) · ♡ Saved · account menu / Log in · theme toggle | Logo · search icon (opens search sheet) · account icon |
 | Categories | Category bar under the header (7 top-level categories, mega-menu with subcategories on hover/focus/click) | Category chips on Home. Category list inside the search sheet. |
-| Primary actions | In header | **Bottom nav**: Home · Search · Post (centre) · Saved · Account |
+| Primary actions | In header | **Bottom nav** (approved Q-UX-3): Home · Search · Post (centre) · Saved · Account. Rules in [components §3.1](02-components.md). |
 | Account menu | Overview, My listings, Saved, Settings, (Admin panel for staff), Theme, Log out | Account tab page with the same list |
 | Footer | Categories · Help (Safety tips, Prohibited items, FAQ, Contact) · Legal (Terms, Privacy) · theme toggle · © · optional "A Dev Talk service" | Same, stacked accordions |
 
@@ -39,7 +39,7 @@ Public                          Account (logged in)               Admin (staff)
 
 ## 3. Page Layouts
 
-Wireframes use `█` for images, `[ ]` for controls, and `▸` for links.
+Wireframes use `█` for images, `[ ]` for controls, and `▸` for links. Prices in wireframes are cut off by the drawing width only: the real cards always show the full figure (Q-UX-4).
 
 ### 3.1 Home
 
@@ -61,7 +61,7 @@ Desktop                                                    Mobile
 │ │Vehic.││Prop. ││Parts ││Phones│  with counts       │    │ Latest ads   ▸ See all│
 │ └──────┘└──────┘└──────┘└──────┘                   │    │ ┌────────┐┌────────┐ │
 ├────────────────────────────────────────────────────┤    │ │████████││████████│ │ 2-col compact
-│ Latest ads                               ▸ See all │    │ │Rs 7.85M││Rs 125k │ │
+│ Latest ads                               ▸ See all │    │ │Rs 7,850,││Rs 125,0│ │
 │ ┌──────┐┌──────┐┌──────┐┌──────┐                   │    │ └────────┘└────────┘ │
 │ │██████││██████││██████││██████│  4 per row, 12    │    ├──────────────────────┤
 │ │Rs …  ││Rs …  ││Rs …  ││Rs …  │                   │    │ Stay safe ▸ tips     │
@@ -133,7 +133,7 @@ Desktop                                                     Mobile
 │ …                             │ ✓ Email verified    │    │ ⚑ Report             │
 │ Description                   │ ▸ 12 active ads     │    │ Similar ads          │
 │ (plain text, Show more)       │ ─────────────────── │    ├──────────────────────┤
-│ Location: Colombo 05, Colombo │ ♡ Save   ⇪ Share    │    │ Rs 7.85M [☎][WhatsApp]│ sticky
+│ Location: Colombo 05, Colombo │ ♡ Save   ⇪ Share    │    │Rs 7,850,000 [☎][WA] │ sticky
 │ Safety tips (collapsible)     │ ⚑ Report this ad    │    └──────────────────────┘
 ├───────────────────────────────┴─────────────────────┤
 │ Similar ads (4 compact cards)                         │

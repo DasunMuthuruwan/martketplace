@@ -106,3 +106,8 @@ Owner approval of CD-01 to CD-12: 2026-10-11 (conditions recorded in [architectu
 ### ADR-023 — Country-prefixed browse URLs; listing URLs unchanged
 - **Status:** Proposed
 - **Decision:** `/{cc}`, `/{cc}/ads/{category?}/{subcategory?}`, location landing pages `/{cc}/ads[/{category}]/in/{region}[/{city}]`, global `/ads`. The listing URL `/ad/{slug}-{id}` stays as approved (CD-12). Canonicals from `APP_URL`.
+
+### ADR-024 — UI/UX owner decisions Q-UX-1 to Q-UX-6
+- **Status:** Accepted (owner, 2026-10-14). The overall Phase 3 design still awaits approval.
+- **Decision:** (1) Dev Talk shown only as a configurable footer line "A Dev Talk service" → `https://dev-talk.com`, no Dev Talk branding. (2) Product name from `APP_NAME` / the site-name setting, working name "Marketplace", text wordmark + monogram, replaceable logo files; no hardcoded name; no domain or permanent brand without approval. (3) Mobile bottom navigation Home · Search · Post · Saved · Account, Post emphasised, sign-in where needed, safe-area aware, hidden from 1024 px. (4) Full prices in the listing's own currency and the country's number format, never abbreviated or converted; land shows the price per the country's land unit. (5) Geist self-hosted after licence verification, system UI fallback, one typography system for public, account and admin. (6) Card columns by available width: 2 phones, 3 tablets and desktop with filters, 4 wide pages.
+- **Details:** `docs/design/README.md` (owner decisions), design system §2, §4, §6; components §3.1, §5.1.

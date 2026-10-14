@@ -93,7 +93,7 @@ Nothing is converted or reinterpreted. Values with no dependency (title, descrip
 | Detail page | `Nugegoda, Colombo District, Western Province, Sri Lanka` (+ area text) | Yes |
 | Price | Original currency always: `Rs 12,500,000`, `₹1,25,00,000`, `£12,500,000`. On cross-country pages, ambiguous symbols get the code: `$12,500 USD`. | — |
 
-Mobile: card prices use the 16 px tabular style. Very long prices (e.g. `₹1,25,00,000`, `Rp 1.250.000.000`) wrap the "Negotiable" suffix to the next line instead of truncating the number. Numbers are never abbreviated (Q-UX-4).
+Approved Q-UX-4 (2026-10-14): the same rules apply on every card and page; examples such as `Rs 7,850,000` or `£7,850,000` illustrate formatting only, never conversion. Mobile: card prices use the 16 px tabular style. Very long prices (e.g. `₹1,25,00,000`, `Rp 1.250.000.000`) wrap the "Negotiable" suffix to the next line instead of truncating the number. Numbers are never abbreviated (Q-UX-4).
 
 ## 7. Admin: Locations (New Screens)
 

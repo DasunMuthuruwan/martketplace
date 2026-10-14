@@ -43,13 +43,36 @@ Notation: `<x-ui.*>` = generic Blade component, `<x-listing.*>` = marketplace do
 |---|---|
 | `x-layout.header` | Logo · search (keyword + location) · Post ad · favourites · account menu · theme toggle. Sticky, 64 px desktop / 56 px mobile. |
 | `x-layout.category-bar` | Horizontal list of top-level categories under the header (desktop). Scrollable chips on mobile home. |
-| `x-layout.bottom-nav` | Mobile only (< 1024 px): Home · Search · **Post** (centre, emphasised) · Saved · Account. Hidden on forms and checkout-like flows (posting wizard) to avoid mis-taps. |
+| `x-layout.bottom-nav` | **Approved Q-UX-3.** Mobile and tablet only (hidden at ≥ 1024 px). See §3.1. |
 | `x-ui.breadcrumbs` | Home › Vehicles › Cars › listing. Schema.org BreadcrumbList on public pages. |
 | `x-ui.tabs` | Underline tabs (My listings statuses, admin sections). Arrow-key navigation. |
 | `x-ui.pagination` | Prev / numbers / Next with total. "Page 2 of 14". Mobile: Prev / Next + page select. |
 | `x-ui.dropdown` | Menus (account, sort, row actions). Menu button pattern. |
-| `x-layout.footer` | Category links, help/safety/terms/privacy, theme toggle, language placeholder (hidden until locales ship). Optional "A Dev Talk service" (Q-UX-1). |
+| `x-layout.footer` | Category links, help/safety/terms/privacy (published pages), theme toggle, language placeholder (hidden until locales ship), © with the configured site name, and "A Dev Talk service" from config (Q-UX-1; hidden when the URL is empty). |
 | `x-layout.admin-sidebar` | Grouped admin navigation with badges (pending count, open reports). Collapsible on tablet, drawer on mobile. |
+
+### 3.1 Bottom Navigation (`x-layout.bottom-nav`)
+
+```
+┌────────────────────────────────────────────┐
+│  ⌂        ⌕       ( + )       ♡        ◯   │  56 px + safe area
+│ Home    Search    Post      Saved   Account │
+└────────────────────────────────────────────┘
+```
+
+| Item | Destination | Guest |
+|---|---|---|
+| Home | Visitor's country home (`/{cc}`), or `/` | Allowed |
+| Search | Opens the search sheet (keyword, category, location); from there the results page | Allowed |
+| **Post** | Posting wizard | Login/register, then back to the wizard (`url.intended`). Unverified email: the verify screen. |
+| Saved | Saved ads | Login, then back |
+| Account | Account overview (my ads, settings, admin link for staff) | Login/register page |
+
+- **Post** is the centre item: a 44 px filled circle (`primary` background, `primary-fg` icon) raised slightly above the bar, with the visible label "Post". It is the only filled item.
+- Every item has a visible text label under the icon (icons never stand alone), a ≥ 44 × 44 target, and `aria-current="page"` on the active item. The bar is a `<nav aria-label="Main">` landmark.
+- Safe areas: `padding-bottom: env(safe-area-inset-bottom)` (viewport meta `viewport-fit=cover`). Pages reserve the space with `padding-bottom: calc(56px + env(safe-area-inset-bottom) + 16px)` on `<main>`, so the last content, toasts and focus outlines are never hidden (WCAG 2.4.11).
+- Hidden at ≥ 1024 px (the header carries these actions), in the posting wizard and other step-by-step forms, and while the on-screen keyboard is open. On listing detail pages the sticky contact bar replaces it.
+- No badge counts in the MVP (no messaging yet).
 
 ## 4. Overlays and Feedback
 
@@ -81,8 +104,9 @@ Notation: `<x-ui.*>` = generic Blade component, `<x-listing.*>` = marketplace do
 
 | Detail | Rule |
 |---|---|
-| Price | Full figure (`Rs 7,850,000`). Price types: "Negotiable" small suffix, "Free", "Price on request". Rent: `Rs 85,000 / month`. |
-| Land | `Rs 12,500,000` + second line `Rs 250,000 / perch · 50 perches` (ADR-018) |
+| Price | **Approved Q-UX-4.** Full figure, never abbreviated (`7.85M` is not used anywhere). Formatted with the listing's stored currency and the listing country's number locale (ICU, `App\Services\Money\Money`): `Rs 7,850,000` (LK), `$7,850,000` (US), `£7,850,000` (GB), `₹78,50,000` (IN, lakh grouping). Never converted. Price types: "Negotiable" small suffix, "Free", "Price on request". Rent: `Rs 85,000 / month`. |
+| Long prices | The figure never truncates or shrinks below 16 px. On narrow cards the "Negotiable" / "/ month" suffix wraps to the next line; the number itself wraps only at its own separators as a last resort. |
+| Land | Total + a second line with the price per the country's land price unit, only when the country has one: `Rs 12,500,000` / `Rs 250,000 / perch · 50 perches` (LK), per acre in GB (ADR-018, ADR-021). |
 | Whole card | A single link (title is the link, stretched to the card). The favourite button sits above the link layer. |
 | States | default, hover (border darkens, photo zoom none), focus-visible (ring around the card), sold (grey "Sold" badge over photo), skeleton |
 | Missing photo | Neutral placeholder with category icon |

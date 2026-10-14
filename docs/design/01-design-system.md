@@ -20,10 +20,12 @@
 
 | Item | Proposal | Status |
 |---|---|---|
-| Product name | Configurable `APP_NAME`. Working name in designs: **"Marketplace"** | [OPEN Q-UX-2] owner to choose a name |
-| Wordmark | Text wordmark in Geist Semibold with a small square monogram (black on light, white on dark). Easy to replace with a real logo later. | [RECOMMENDED] |
-| Dev Talk association | Optional footer line "A Dev Talk service" linking to `dev-talk.com`, with no Dev Talk logo or colours in the UI | [OPEN Q-UX-1] |
+| Product name | `config('app.name')` (`APP_NAME`; Admin → Settings → Site name overrides it). Working name **"Marketplace"**. Used for page titles, meta and Open Graph `site_name`, email sender name and footers, the admin header and the PWA/app name. Never typed into templates or language strings. | **Approved Q-UX-2** |
+| Wordmark | Text wordmark (the configured name in Geist Semibold) with a small square monogram (first letter, black on light, white on dark). | **Approved Q-UX-2** |
+| Logo assets | Replaceable files in `public/brand/` (`logo.svg`, `logo-dark.svg`, `monogram.svg`, favicon and touch icons). Paths come from `config('marketplace.brand.*')`; when a logo file is set it replaces the text wordmark. Swapping the files needs no code change. | **Approved Q-UX-2** |
+| Dev Talk association | Footer line only: "A Dev Talk service" linking to `https://dev-talk.com` (new tab not needed; `rel="noopener"`). Configurable: `MARKETPLACE_PARENT_NAME`, `MARKETPLACE_PARENT_URL`; an empty URL hides the line. No Dev Talk logo, colours or other branding anywhere in the interface. | **Approved Q-UX-1** |
 | Favicon / app icons | Monogram on black square (generated in Phase 6) | [RECOMMENDED] |
+| Not in scope | Buying a domain or fixing a permanent brand identity: needs separate owner approval. | Owner |
 
 ## 3. Colour Tokens
 
@@ -89,7 +91,9 @@ Rules: status is never shown by colour alone (always text and/or icon). Links in
 
 | Item | Value |
 |---|---|
-| UI typeface | **Geist** variable (OFL-1.1, self-hosted via `@fontsource-variable/geist`, no Google Fonts request) |
+| UI typeface | **Geist** variable, self-hosted (bundled from `@fontsource-variable/geist` by Vite; no Google Fonts or CDN request). **Approved Q-UX-5.** Before bundling: confirm the package's licence file is SIL OFL-1.1 and ship `OFL.txt` with the fonts. |
+| Fallback stack | `"Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. `font-display: swap`, so text shows at once in the system font if Geist is slow or blocked. |
+| Scope | One typography system (this table and the scale below) for public pages, listing forms, account pages and the admin area. The admin layout uses the same tokens, not its own fonts. |
 | Numbers | `font-variant-numeric: tabular-nums` for prices, counts and tables |
 | Monospace (rare: IDs, codes in admin) | Geist Mono (OFL-1.1) |
 | Future Sinhala / Tamil | Fallback stack `"Geist", "Noto Sans Sinhala", "Noto Sans Tamil", system-ui, sans-serif`. Noto fonts (OFL) are loaded only when those locales ship. Line heights below already allow taller scripts. |
@@ -126,14 +130,24 @@ Rules: status is never shown by colour alone (always text and/or icon). Links in
 
 | Breakpoint | Min width | Layout |
 |---|---|---|
-| base | 0 | 1 column, 16 px gutters, bottom navigation bar |
-| `sm` | 640 | 2-column card grid stays, wider forms |
+| base | 0 | Single-column page, 16 px gutters, 2-column card grid, bottom navigation bar |
+| `sm` | 640 | Wider forms; card grid moves to 3 columns once its area allows (below) |
 | `md` | 768 | 3-column cards, filter drawer still used |
-| `lg` | 1024 | Filter sidebar (272 px) + 3-column results. Header search inline. No bottom nav. |
-| `xl` | 1280 | 4-column cards on home/category pages. Container max 1240 px, 24 px gutters. |
+| `lg` | 1024 | Filter sidebar (272 px) + results. Header search inline. **No bottom nav.** |
+| `xl` | 1280 | Container max 1240 px, 24 px gutters |
 
 - Container: `max-width: 1240px; padding-inline: 16px (base) / 24px (lg+)`.
-- Card grid: 2 columns from 360 px (compact cards), 3 at `md`, 4 at `xl` (3 when the filter sidebar is shown).
+
+**Card grid (approved Q-UX-6).** Columns follow the width of the listing area itself, not the screen, so a page with the filter sidebar and a page without one both get the right density. The grid wrapper is a CSS container (`container-type: inline-size`) and the grid uses container queries, with viewport media queries as a fallback for browsers without container queries.
+
+| Listing area width | Columns | Typical case |
+|---|---|---|
+| < 340 px | 1 | Very narrow phones (≈ 360 px screens and below with large text): avoids cramped cards |
+| 340–599 px | **2** | Phones |
+| 600–1099 px | **3** | Tablets; desktop results next to the filter sidebar (≈ 680–900 px wide) |
+| ≥ 1100 px | **4** | Wide home, category landing and "latest ads" pages without a sidebar (from ≈ 1150 px screens) |
+
+Rules: gap 12 px below 600 px, 16 px above; photos always 4:3 (`aspect-ratio`, `object-fit: cover`); title clamped to 2 lines; price on its own line (Q-UX-4); the whole card is one link and the favourite button keeps a 40 × 40 target. List view (`row` variant) stays one per line at every width.
 - The page never scrolls horizontally. Long words and URLs wrap (`overflow-wrap: anywhere`) in user content.
 
 ## 7. Iconography

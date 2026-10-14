@@ -61,7 +61,7 @@
 | Topic | Guideline |
 |---|---|
 | Tone | Plain, friendly, direct English. Short sentences. No jargon ("ad" in UI copy, "listing" in admin and docs). |
-| Prices | `Rs 7,850,000` (full figure, comma grouping). Never abbreviate on the detail page. Per perch: `Rs 250,000 / perch`. Rent: `Rs 85,000 / month`. |
+| Prices | Full figure everywhere (cards, detail, search, admin), never abbreviated (Q-UX-4). The listing's own currency and the country's grouping: `Rs 7,850,000`, `$7,850,000`, `₹78,50,000`. Per land unit: `Rs 250,000 / perch`. Rent: `Rs 85,000 / month`. |
 | Dates | Relative in lists ("2 hours ago", "Yesterday"). Absolute on hover/detail ("11 Oct 2026, 2:30 pm"). Timezone Asia/Colombo. |
 | Numbers | `85,000 km`, `1,500 cc`, `50 perches`, `2 acres (320 perches)` |
 | Buttons | Verb + object: "Post ad", "Show phone number", "Mark as sold", "Approve". |
