@@ -61,7 +61,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F1.2 Core components (merged 50d893e)
 - [x] F1.3 Layouts + style guide (merged bfac7c9)
 - [x] F2.1 Home / country home (merged 921ec7f)
-- [~] F2.2 Search UI — in progress on `feature/F2.2-search`
+- [~] F2.2 Search UI — awaiting review on `feature/F2.2-search`
 - [ ] F2.3 Listing detail + seller page
 - [ ] F3.1 Auth screens
 - [ ] F3.2 Account area

@@ -26,7 +26,8 @@ class MysqlListingSearch implements ListingSearch
         $perPage = (int) config('marketplace.listings.per_page');
 
         $items = (clone $query)
-            ->with(['category', 'country', 'currencyModel', 'coverImage', 'region', 'subregion', 'city'])
+            ->with(['category.parent', 'country', 'currencyModel', 'coverImage', 'region', 'subregion', 'city', 'locality'])
+            ->withCount('images')
             ->forPage($criteria->page, $perPage)
             ->get(['listings.*']);
 

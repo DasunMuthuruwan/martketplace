@@ -4,6 +4,7 @@ namespace App\Services\Listings;
 
 use App\Enums\PriceType;
 use App\Models\Listing;
+use App\Services\Attributes\AttributeSchema;
 use App\Services\Money\Money;
 
 /**
@@ -15,7 +16,46 @@ class ListingPresenter
     public function __construct(
         private readonly Money $money,
         private readonly ListingUnitPrice $unitPrice,
+        private readonly AttributeSchema $schemas,
     ) {}
+
+    /**
+     * Up to three key facts for cards ("2015 · 85000 · Hybrid"), from the category's "on the card"
+     * attributes in schema order (components §5.1). Read from the join-free summary: no queries
+     * beyond the cached schema.
+     *
+     * @return list<string>
+     */
+    public function cardFacts(Listing $listing, int $limit = 3): array
+    {
+        $summary = $listing->attributes_summary ?? [];
+        if ($summary === [] || $listing->category === null || $listing->country === null) {
+            return [];
+        }
+
+        $facts = [];
+        foreach ($this->schemas->for($listing->category, $listing->country->iso2)->cardKeys() as $key) {
+            if (array_key_exists($key, $summary) && ($text = $this->attributeValue($summary[$key])) !== '') {
+                $facts[] = $text;
+            }
+            if (count($facts) === $limit) {
+                break;
+            }
+        }
+
+        return $facts;
+    }
+
+    /** One value from `attributes_summary` as text. Areas show as entered: the value and its unit. */
+    public function attributeValue(mixed $value): string
+    {
+        return match (true) {
+            is_array($value) && isset($value['value'], $value['unit']) => $value['value'].' '.$value['unit'],
+            is_array($value) => implode(', ', array_map('strval', $value)),
+            is_bool($value) => $value ? (string) __('Yes') : (string) __('No'),
+            default => (string) $value,
+        };
+    }
 
     /** @param  bool  $withCode  add the ISO code on pages that mix countries */
     public function price(Listing $listing, bool $withCode = false): string

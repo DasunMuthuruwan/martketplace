@@ -109,13 +109,7 @@ class ListingController extends Controller
     {
         $rows = [];
         foreach ($listing->attributes_summary ?? [] as $key => $value) {
-            $text = match (true) {
-                is_array($value) && isset($value['value'], $value['unit']) => $value['value'].' '.$value['unit'],
-                is_array($value) => implode(', ', $value),
-                is_bool($value) => $value ? __('Yes') : __('No'),
-                default => (string) $value,
-            };
-            $rows[$labels[$key] ?? $key] = $text;
+            $rows[$labels[$key] ?? $key] = $this->present->attributeValue($value);
         }
 
         return $rows;

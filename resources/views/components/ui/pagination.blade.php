@@ -1,12 +1,13 @@
 @props([
     'paginator',          // LengthAwarePaginator
     'livewire' => false,  // Livewire component: buttons call its page methods
+    'maxPage' => null,    // deepest page that may be browsed (search caps it, routes doc §1.1)
 ])
 {{-- Prev / numbers / Next with "Page 2 of 14"; phones get Prev / Next only (component doc §3). --}}
 @if ($paginator->hasPages())
     @php
         $current = $paginator->currentPage();
-        $last = $paginator->lastPage();
+        $last = $maxPage !== null ? min($paginator->lastPage(), (int) $maxPage) : $paginator->lastPage();
         $pages = collect([1, $last, $current - 1, $current, $current + 1])->filter(fn ($p) => $p >= 1 && $p <= $last)->unique()->sort()->values();
         $pageName = $paginator->getPageName();
         $base = 'inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border px-3 text-ui';
@@ -40,7 +41,7 @@
                 </li>
             @endforeach
             <li>
-                @if (! $paginator->hasMorePages())
+                @if (! $paginator->hasMorePages() || $current >= $last)
                     <span class="{{ $off }}" aria-disabled="true"><span class="sr-only sm:not-sr-only">{{ __('ui.next') }}</span><x-ui.icon name="chevron-right" size="16" /></span>
                 @elseif ($livewire)
                     <button type="button" wire:click="nextPage('{{ $pageName }}')" rel="next" class="{{ $idle }}"><span class="sr-only sm:not-sr-only">{{ __('ui.next') }}</span><x-ui.icon name="chevron-right" size="16" /></button>

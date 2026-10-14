@@ -131,6 +131,8 @@ Notation: `<x-ui.*>` = generic Blade component, `<x-listing.*>` = marketplace do
 
 ### 5.3 Search and Discovery
 
+> **Implementation note (F2.2):** filters are a server-rendered GET form (`public/partials/search-filters`), not a Livewire component: the URL holds the whole search, pages work without JavaScript and stay cacheable and crawlable. `resources/js/ui/search.js` applies selects and checkboxes at once. The category is the page (changed through the category links), so it is not shown as a removable chip.
+
 | Component | Notes |
 |---|---|
 | `x-search.bar` | Keyword input + location combobox + Search button. Mobile: a full-screen search sheet. |

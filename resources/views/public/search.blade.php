@@ -3,106 +3,106 @@
 @section('title', $criteria->category?->name ?? ($country?->name ?? __('public.search_all')))
 
 @section('content')
-    <h1>
-        {{ $criteria->category?->name ?? __('public.search_all') }}
-        @if ($country) <span class="muted">· {{ $country->name }}</span> @endif
-    </h1>
+    @php
+        $total = $results->total();
+        $capped = $total >= $countCap;
+        $count = trans_choice('public.ads_count', $total, ['count' => number_format($capped ? $total - 1 : $total).($capped ? '+' : '')]);
+        $chips = $page->chips();
+        $view = $page->view();
+        $cc = $country ? strtolower($country->iso2) : null;
+        $category = $criteria->category;
+    @endphp
 
-    @php($currency = $criteria->currency ?? ($country?->default_currency))
-    <form method="GET" action="{{ request()->url() }}" class="filters" role="search">
-        <label>{{ __('public.keyword') }}
-            <input type="search" name="q" value="{{ $criteria->keyword }}" maxlength="100">
-        </label>
-        <label>{{ __('public.type') }}
-            <select name="type">
-                <option value="">{{ __('public.any') }}</option>
-                @foreach (__('public.types') as $value => $label)
-                    <option value="{{ $value }}" @selected($criteria->type === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </label>
-        <label>{{ __('public.condition') }}
-            <select name="condition">
-                <option value="">{{ __('public.any') }}</option>
-                @foreach (__('public.conditions') as $value => $label)
-                    <option value="{{ $value }}" @selected($criteria->condition === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </label>
-        @if ($country === null)
-            <label>{{ __('public.currency') }}
-                <input type="text" name="currency" value="{{ $criteria->currency }}" maxlength="3" size="4" autocomplete="off">
-            </label>
-        @endif
-        @if ($currency)
-            <label>{{ __('public.min_price', ['currency' => $currency]) }}
-                <input type="number" name="min_price" value="{{ $criteria->minPrice }}" min="0" step="any">
-            </label>
-            <label>{{ __('public.max_price', ['currency' => $currency]) }}
-                <input type="number" name="max_price" value="{{ $criteria->maxPrice }}" min="0" step="any">
-            </label>
-        @endif
-        <label>{{ __('public.sort') }}
-            <select name="sort">
-                @foreach (__('public.sort_options') as $value => $label)
-                    <option value="{{ $value }}" @selected($criteria->sort === $value) @disabled($value !== 'newest' && ! $currency)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </label>
-
-        @foreach ($filters as $field)
-            @php($current = request()->input('a.'.$field['key']))
-            @if (in_array($field['type'], ['select', 'multiselect'], true))
-                <label>{{ $field['label'] }}
-                    <select name="a[{{ $field['key'] }}]">
-                        <option value="">{{ __('public.any') }}</option>
-                        @foreach ($field['options'] as $option)
-                            <option value="{{ $option['value'] }}" @selected($current === $option['value'])>{{ $option['label'] }}</option>
-                        @endforeach
-                    </select>
-                </label>
-            @elseif ($field['type'] === 'boolean')
-                <label><input type="checkbox" name="a[{{ $field['key'] }}]" value="1" @checked($current === '1')> {{ $field['label'] }}</label>
-            @else
-                <label>{{ $field['label'] }} ≥
-                    <input type="number" name="a[{{ $field['key'] }}][min]" value="{{ is_array($current) ? ($current['min'] ?? '') : '' }}" step="any">
-                </label>
-                <label>≤
-                    <input type="number" name="a[{{ $field['key'] }}][max]" value="{{ is_array($current) ? ($current['max'] ?? '') : '' }}" step="any">
-                </label>
-                @if ($field['units'] !== [])
-                    <label>&nbsp;
-                        <select name="a[{{ $field['key'] }}][unit]">
-                            @foreach ($field['units'] as $unit)
-                                <option value="{{ $unit['code'] }}" @selected(is_array($current) && ($current['unit'] ?? null) === $unit['code'])>{{ $unit['label'] }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                @endif
+    {{-- Breadcrumbs (components §3) --}}
+    <nav aria-label="{{ __('search.breadcrumbs') }}" class="mb-3 text-small text-fg-subtle">
+        <ol class="flex flex-wrap items-center gap-1">
+            <li><a class="hover:text-fg" href="{{ $cc ? route('country.home', ['cc' => $cc]) : route('home') }}">{{ $country?->name ?? __('layout.nav.home') }}</a></li>
+            @if ($category?->parent)
+                <li aria-hidden="true">›</li>
+                <li><a class="hover:text-fg" href="{{ $page->url(['category' => $category->parent->slug, 'a' => null]) }}">{{ $category->parent->name }}</a></li>
             @endif
-        @endforeach
+            @if ($category)
+                <li aria-hidden="true">›</li>
+                <li aria-current="page" class="text-fg">{{ $category->name }}</li>
+            @endif
+        </ol>
+    </nav>
 
-        <button type="submit">{{ __('public.search') }}</button>
-    </form>
+    <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+            <h1 class="text-h1 font-[650]">{{ $seo->title }}</h1>
+            <p class="mt-0.5 text-ui text-fg-muted" role="status" aria-live="polite">{{ $count }}</p>
+        </div>
+    </div>
 
     @if ($criteria->priceIgnored)
-        <p class="status" role="status">{{ __('public.price_needs_currency') }}</p>
+        <x-ui.alert variant="info" class="mb-4">{{ __('public.price_needs_currency') }}</x-ui.alert>
     @endif
 
-    @php($capped = $results->total() >= $countCap)
-    <p class="muted">{{ trans_choice('public.ads_count', $results->total(), ['count' => number_format($capped ? $results->total() - 1 : $results->total()).($capped ? '+' : '')]) }}</p>
+    <div class="lg:grid lg:grid-cols-[272px_minmax(0,1fr)] lg:gap-8">
+        <aside class="hidden lg:block" aria-label="{{ __('search.filters') }}">
+            <div class="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pr-1">
+                @include('public.partials.search-filters', ['prefix' => 'side'])
+            </div>
+        </aside>
 
-    @if ($results->isEmpty())
-        <p>{{ __('public.no_results') }}</p>
-    @else
-        <ul class="cards">
-            @foreach ($results as $listing)
-                @include('partials.listing-card', ['withCode' => $country === null])
-            @endforeach
-        </ul>
-        <nav aria-label="{{ __('public.pages') }}">
-            @if ($results->previousPageUrl())<a href="{{ $results->previousPageUrl() }}" rel="prev">{{ __('public.previous') }}</a>@endif
-            @if ($results->nextPageUrl() && $results->currentPage() < config('marketplace.listings.max_page'))<a href="{{ $results->nextPageUrl() }}" rel="next">{{ __('public.next') }}</a>@endif
-        </nav>
-    @endif
+        <div class="min-w-0" data-search-results>
+            {{-- Toolbar: filters (phones), sort, grid / list --}}
+            <div class="mb-3 flex flex-wrap items-center gap-2">
+                <x-ui.button variant="secondary" icon="sliders-horizontal" class="lg:hidden" data-modal-open="search-filters">
+                    {{ __('search.filters') }}@if ($chips !== [])<span class="rounded-full bg-primary px-1.5 text-micro tabular text-primary-fg">{{ count($chips) }}</span>@endif
+                </x-ui.button>
+                <x-ui.dropdown :label="__('search.sort_label', ['sort' => __('public.sort_options.'.$criteria->sort)])" icon="arrow-up-down" align="left">
+                    @foreach (__('public.sort_options') as $value => $text)
+                        @if ($value === 'newest' || $criteria->currency !== null || $country !== null)
+                            <x-ui.dropdown-item :href="$page->url(['sort' => $value])" @class(['font-semibold' => $criteria->sort === $value]) :aria-current="$criteria->sort === $value ? 'true' : null">{{ $text }}</x-ui.dropdown-item>
+                        @endif
+                    @endforeach
+                </x-ui.dropdown>
+                <div class="ml-auto inline-flex rounded-control border border-line bg-surface p-0.5" role="group" aria-label="{{ __('search.view_label') }}">
+                    <a href="{{ $page->url(['view' => null]) }}" aria-label="{{ __('search.view_grid') }}" @if ($view === 'grid') aria-current="true" @endif class="grid size-9 place-items-center rounded-[4px] text-fg-muted hover:text-fg aria-[current]:bg-surface-muted aria-[current]:text-fg"><x-ui.icon name="layout-grid" size="16" /></a>
+                    <a href="{{ $page->url(['view' => 'list']) }}" aria-label="{{ __('search.view_list') }}" @if ($view === 'list') aria-current="true" @endif class="grid size-9 place-items-center rounded-[4px] text-fg-muted hover:text-fg aria-[current]:bg-surface-muted aria-[current]:text-fg"><x-ui.icon name="list" size="16" /></a>
+                </div>
+            </div>
+
+            {{-- Active filters --}}
+            @if ($chips !== [])
+                <div class="mb-4 flex flex-wrap items-center gap-2" aria-label="{{ __('search.active_filters') }}" role="group">
+                    @foreach ($chips as $chip)
+                        <x-ui.chip variant="filter" :href="$chip['url']">{{ $chip['label'] }}</x-ui.chip>
+                    @endforeach
+                    <a href="{{ $page->clearUrl() }}" class="text-small font-medium text-fg underline underline-offset-2">{{ __('search.clear_all') }}</a>
+                </div>
+            @endif
+
+            @if ($results->isEmpty())
+                <x-ui.empty-state icon="search" :title="__('search.empty_title')">
+                    {{ $chips !== [] ? __('search.empty_filters') : __('search.empty_text') }}
+                    @if ($chips !== [])
+                        <x-slot:action><x-ui.button variant="secondary" :href="$page->clearUrl()">{{ __('search.clear_all') }}</x-ui.button></x-slot:action>
+                    @endif
+                </x-ui.empty-state>
+            @elseif ($view === 'list')
+                <ul class="space-y-3">
+                    @foreach ($results as $listing)
+                        <li><x-listing.card :listing="$listing" :present="$present" :with-code="$country === null" variant="row" /></li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="listing-grid-area">
+                    <ul class="listing-grid">
+                        @foreach ($results as $listing)
+                            <li><x-listing.card :listing="$listing" :present="$present" :with-code="$country === null" class="h-full" /></li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <x-ui.pagination :paginator="$results" :max-page="config('marketplace.listings.max_page')" class="mt-8" />
+        </div>
+    </div>
+
+    <x-ui.drawer id="search-filters" :title="__('search.filters')" side="left">
+        @include('public.partials.search-filters', ['prefix' => 'drawer'])
+    </x-ui.drawer>
 @endsection

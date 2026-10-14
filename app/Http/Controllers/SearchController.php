@@ -15,6 +15,7 @@ use App\Services\Search\MysqlListingSearch;
 use App\Services\Search\SearchCriteria;
 use App\Services\Search\SearchCriteriaFactory;
 use App\Services\Seo\PageSeo;
+use App\View\SearchPage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -94,13 +95,17 @@ class SearchController extends Controller
         }
 
         $results = $this->search->search($criteria);
+        $categories = $this->tree->forCountry($country?->iso2);
+        $filters = $criteria->category !== null && $country !== null ? $this->filterFields($criteria->category, $country) : [];
 
         return view('public.search', [
             'country' => $country,
+            'currentCountry' => $country,
             'criteria' => $criteria,
             'results' => $results,
-            'categories' => $this->tree->forCountry($country?->iso2),
-            'filters' => $category !== null && $country !== null ? $this->filterFields($category, $country) : [],
+            'categories' => $categories,
+            'filters' => $filters,
+            'page' => new SearchPage($request, $criteria, $country, $filters, $categories),
             'present' => $this->present,
             'seo' => $this->seo($request, $criteria, $results->total()),
             'countCap' => MysqlListingSearch::countCap(),
