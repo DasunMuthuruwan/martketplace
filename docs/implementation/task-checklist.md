@@ -57,9 +57,9 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] T7.2 Retention pruning (merged 768938f)
 
 ## Phase 6 — Frontend
-- [!] F1.1 Tokens, fonts, icons, dark mode — gated by Q-UX-2, Q-UX-5 (G-11 accepted)
+- [~] F1.1 Tokens, fonts, icons, dark mode — in progress on `feature/F1.1-design-tokens` (Q-UX approved)
 - [ ] F1.2 Core components
-- [!] F1.3 Layouts + style guide — gated by Q-UX-1, Q-UX-3
+- [ ] F1.3 Layouts + style guide (Q-UX-1/3 approved)
 - [ ] F2.1 Home / country home
 - [!] F2.2 Search UI — gated by Q-UX-4, Q-UX-6
 - [ ] F2.3 Listing detail + seller page
