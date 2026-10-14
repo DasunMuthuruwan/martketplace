@@ -42,6 +42,9 @@
             @can(\App\Authorization\Permissions::ATTRIBUTES_MANAGE)
                 <a href="{{ route('admin.attributes') }}">{{ __('admin.nav.attributes') }}</a>
             @endcan
+            @can(\App\Authorization\Permissions::LOCATIONS_MANAGE)
+                <a href="{{ route('admin.locations') }}">{{ __('admin.nav.locations') }}</a>
+            @endcan
             @can(\App\Authorization\Permissions::USERS_VIEW)
                 <a href="{{ route('admin.users') }}">{{ __('admin.nav.users') }}</a>
             @endcan

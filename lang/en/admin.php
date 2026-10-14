@@ -11,6 +11,9 @@ return [
         'staff' => 'Staff',
         'categories' => 'Categories',
         'attributes' => 'Attributes',
+        'locations' => 'Locations',
+        'countries' => 'Countries',
+        'location_requests' => 'Place requests',
         'site' => 'View site',
     ],
 

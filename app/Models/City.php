@@ -66,6 +66,12 @@ class City extends Model
         return $this->belongsTo(Region::class);
     }
 
+    /** @return HasMany<Listing, $this> */
+    public function listings(): HasMany
+    {
+        return $this->hasMany(Listing::class);
+    }
+
     /** @return HasMany<Locality, $this> */
     public function localities(): HasMany
     {

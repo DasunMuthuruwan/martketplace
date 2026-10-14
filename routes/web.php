@@ -12,6 +12,9 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\CategoriesAdmin;
+use App\Livewire\Admin\CountriesAdmin;
+use App\Livewire\Admin\LocationRequestsAdmin;
+use App\Livewire\Admin\LocationsAdmin;
 use App\Livewire\Admin\ModerationQueue;
 use App\Livewire\Admin\RecentChanges;
 use App\Livewire\Admin\ReportsQueue;
@@ -66,6 +69,9 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/reports', ReportsQueue::class)->middleware('can:'.Permissions::REPORTS_VIEW)->name('reports');
         Route::livewire('/categories', CategoriesAdmin::class)->middleware('can:'.Permissions::CATEGORIES_MANAGE)->name('categories');
         Route::livewire('/attributes', AttributesAdmin::class)->middleware('can:'.Permissions::ATTRIBUTES_MANAGE)->name('attributes');
+        Route::livewire('/locations', LocationsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('locations');
+        Route::livewire('/locations/countries', CountriesAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('countries');
+        Route::livewire('/locations/requests', LocationRequestsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('location-requests');
         // Account and staff changes: password re-confirmed within 15 minutes (2FA doc §6).
         Route::livewire('/users', UsersAdmin::class)->middleware(['can:'.Permissions::USERS_VIEW, 'password.confirm'])->name('users');
         Route::livewire('/staff', StaffAdmin::class)->middleware(['can:'.Permissions::STAFF_MANAGE, 'password.confirm'])->name('staff');
