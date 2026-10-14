@@ -5,6 +5,8 @@
 | Status | **Draft — awaiting owner review** |
 | Rule | One component per pattern, reused on public, account and admin screens. New variants are added to the component, never copied. |
 
+> **Implementation status (F1.2):** the generic `x-ui.*` components in §1–§4 exist in `resources/views/components/ui/` (plus `x-ui.money`, `x-ui.flag`, `x-ui.toasts`, `x-ui.dropdown-item`). Interactive behaviour is plain JavaScript in `resources/js/ui/` with `data-*` hooks (not Alpine expressions, which Livewire's CSP-safe build restricts): `data-modal-open="id"`, `data-modal-close`, `data-password-toggle`, `data-combobox`, `data-toasts`. Livewire components show toasts with `$this->dispatch('toast', message: '…', variant: 'success|error|info')`. Form controls accept `label`, `hint`, `error`, `required` and take their name from `name` or `wire:model`. `x-ui.range`, `x-ui.radio-cards`, `x-ui.tooltip`, `x-ui.confirm` and `x-ui.turnstile` are built with the screens that first need them.
+
 Notation: `<x-ui.*>` = generic Blade component, `<x-listing.*>` = marketplace domain component, **[LW]** = Livewire-driven.
 
 ## 1. Foundations

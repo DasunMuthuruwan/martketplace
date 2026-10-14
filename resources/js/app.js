@@ -1,3 +1,8 @@
+import { initServerToasts } from './ui/toasts.js';
+import { focusErrorSummary } from './ui/forms.js';
+import { openMarkedDialogs } from './ui/overlays.js';
+import './ui/combobox.js';
+
 // Theme choice (design system §9): buttons with data-theme-choice="light|dark|system" switch the
 // theme; the choice is remembered per browser. partials/theme-script applies it before first paint.
 const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -39,4 +44,17 @@ media.addEventListener('change', () => {
     }
 });
 
-applyTheme(storedTheme());
+// Things rendered by the server that need a nudge: on load, and after Livewire updates the page.
+function enhance() {
+    applyTheme(storedTheme());
+    initServerToasts();
+    openMarkedDialogs();
+    focusErrorSummary();
+}
+
+enhance();
+new MutationObserver(() => {
+    initServerToasts();
+    openMarkedDialogs();
+    focusErrorSummary();
+}).observe(document.body, { childList: true, subtree: true });
