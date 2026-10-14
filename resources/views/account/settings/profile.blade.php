@@ -1,9 +1,8 @@
-@extends('layouts.plain')
+@extends('layouts.account')
 
 @section('title', __('account.profile.title'))
 
-@section('content')
-    @include('account.settings._nav')
+@section('account')
 
     @php($bag = $errors->getBag('updateProfileInformation'))
     <form method="POST" action="{{ route('user-profile-information.update') }}" novalidate>

@@ -18,6 +18,7 @@ return [
         'blocklist' => 'Blocklist',
         'audit' => 'Audit log',
         'settings' => 'Settings',
+        'design_system' => 'Design system',
         'site' => 'View site',
     ],
 
@@ -53,6 +54,32 @@ return [
             'contact' => 'Please remove phone numbers, emails and links from the text; buyers contact you through the buttons.',
             'price' => 'The price looks wrong or misleading.',
         ],
+    ],
+
+    'menu' => 'Admin menu',
+    'waiting' => 'waiting',
+    'groups' => [
+        'work' => 'Work',
+        'catalogue' => 'Catalogue',
+        'content' => 'Content',
+        'people' => 'People',
+        'system' => 'System',
+    ],
+
+    'design' => [
+        'intro' => 'Every component in the current theme. Switch the theme in the top bar to check the other.',
+        'colours' => 'Colours',
+        'typography' => 'Typography',
+        'buttons' => 'Buttons, badges and chips',
+        'prices' => 'Prices and flags',
+        'feedback' => 'Alerts, states and feedback',
+        'forms' => 'Form controls',
+        'navigation' => 'Navigation and overlays',
+        'grid' => 'Card grid (columns follow the available width)',
+        'show_toast' => 'Show a toast',
+        'toast_sample' => 'Saved. This is a sample message.',
+        'open_modal' => 'Open dialog',
+        'open_sheet' => 'Open bottom sheet',
     ],
 
     'dashboard' => [

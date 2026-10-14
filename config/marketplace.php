@@ -22,6 +22,17 @@ return [
         'contact_email' => env('MARKETPLACE_CONTACT_EMAIL'),
     ],
 
+    // Brand (ADR-024, Q-UX-1/2). The product name is APP_NAME (or the Admin site-name setting).
+    // Logo paths are relative to public/ (e.g. brand/logo.svg); empty = the text wordmark.
+    // Parent footer line (Q-UX-1): not set = the approved default in lang/en/layout.php
+    // (`parent`); set to an empty value = hidden; any other value replaces it.
+    'brand' => [
+        'logo' => env('MARKETPLACE_LOGO'),
+        'logo_dark' => env('MARKETPLACE_LOGO_DARK'),
+        'parent_name' => env('MARKETPLACE_PARENT_NAME'),
+        'parent_url' => env('MARKETPLACE_PARENT_URL'),
+    ],
+
     // Extra hosts trusted temporarily during a domain migration (APP_ALIASES, comma-separated).
     'app_aliases' => array_values(array_filter(array_map('trim', explode(',', (string) env('APP_ALIASES', ''))))),
 

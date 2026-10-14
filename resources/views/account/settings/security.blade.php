@@ -1,9 +1,8 @@
-@extends('layouts.plain')
+@extends('layouts.account')
 
 @section('title', __('account.security.title'))
 
-@section('content')
-    @include('account.settings._nav')
+@section('account')
 
     <h2>{{ __('account.security.password_title') }}</h2>
     @php($bag = $errors->getBag('updatePassword'))

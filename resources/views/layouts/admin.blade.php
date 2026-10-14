@@ -1,73 +1,50 @@
-{{-- Plain admin layout for M6. Replaced by the designed admin UI in Phase 6 (F5.1). Livewire injects its
-     CSP-safe scripts with the request nonce. --}}
+{{-- Admin layout (layout doc §3.6): top bar, grouped sidebar on desktop, drawer on phones and
+     tablets. Used by the Livewire admin screens (#[Layout('layouts.admin')], $slot, $title). Livewire
+     injects its CSP-safe scripts with the request nonce. --}}
+@php
+    $adminBadges = [];
+    try {
+        if (auth()->user()?->can(\App\Authorization\Permissions::LISTINGS_MODERATE)) {
+            $adminBadges['pending'] = \App\Models\Listing::where('status', \App\Enums\ListingStatus::PendingReview)->count() ?: null;
+        }
+        if (auth()->user()?->can(\App\Authorization\Permissions::REPORTS_VIEW)) {
+            $adminBadges['reports'] = \App\Models\Report::where('status', \App\Enums\ReportStatus::Open)->count() ?: null;
+        }
+    } catch (\Throwable $e) {
+        report($e);
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.layout.head')
     <meta name="robots" content="noindex,nofollow">
     <title>{{ $title ?? __('admin.title') }} | {{ config('app.name') }}</title>
-    <style nonce="{{ Vite::cspNonce() }}">
-        body { margin: 0; font-family: system-ui, sans-serif; background: #f7f7f7; color: #0a0a0a; }
-        header, main { max-width: 80rem; margin: 0 auto; padding: 1rem; }
-        header nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-        main { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border-bottom: 1px solid #e5e5e5; padding: .4rem; text-align: left; vertical-align: top; }
-        .muted { color: #4d4d4d; font-size: .875rem; }
-        .status { background: #f0f0f0; padding: .75rem; border-radius: 6px; }
-        .error { color: #c5221f; }
-        .flag { color: #c5221f; font-weight: 600; }
-        .pane { border: 1px solid #e5e5e5; border-radius: 8px; padding: 1rem; margin-top: 1rem; }
-        .pane img { max-width: 12rem; height: auto; margin: .25rem; }
-        textarea, input, select, button { font: inherit; padding: .4rem; }
-        textarea { width: 100%; box-sizing: border-box; }
-        :focus-visible { outline: 2px solid #0a0a0a; outline-offset: 2px; }
-    </style>
 </head>
-<body>
-    <header>
-        <nav aria-label="{{ __('admin.title') }}">
-            <a href="{{ route('admin.dashboard') }}"><strong>{{ __('admin.title') }}</strong></a>
-            @can(\App\Authorization\Permissions::LISTINGS_MODERATE)
-                <a href="{{ route('admin.moderation') }}">{{ __('admin.nav.moderation') }}</a>
-                <a href="{{ route('admin.changes') }}">{{ __('admin.nav.changes') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::REPORTS_VIEW)
-                <a href="{{ route('admin.reports') }}">{{ __('admin.nav.reports') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::CATEGORIES_MANAGE)
-                <a href="{{ route('admin.categories') }}">{{ __('admin.nav.categories') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::ATTRIBUTES_MANAGE)
-                <a href="{{ route('admin.attributes') }}">{{ __('admin.nav.attributes') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::LOCATIONS_MANAGE)
-                <a href="{{ route('admin.locations') }}">{{ __('admin.nav.locations') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::PAGES_MANAGE)
-                <a href="{{ route('admin.pages') }}">{{ __('admin.nav.pages') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::BLOCKLIST_MANAGE)
-                <a href="{{ route('admin.blocklist') }}">{{ __('admin.nav.blocklist') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::USERS_VIEW)
-                <a href="{{ route('admin.users') }}">{{ __('admin.nav.users') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::STAFF_MANAGE)
-                <a href="{{ route('admin.staff') }}">{{ __('admin.nav.staff') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::AUDIT_VIEW)
-                <a href="{{ route('admin.audit') }}">{{ __('admin.nav.audit') }}</a>
-            @endcan
-            @can(\App\Authorization\Permissions::SETTINGS_MANAGE)
-                <a href="{{ route('admin.settings') }}">{{ __('admin.nav.settings') }}</a>
-            @endcan
-            <a href="{{ route('home') }}">{{ __('admin.nav.site') }}</a>
-        </nav>
+<body class="min-h-dvh">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-fg">{{ __('layout.skip') }}</a>
+    <header class="sticky top-0 z-30 border-b border-line bg-surface">
+        <div class="flex h-14 items-center gap-3 px-4 lg:px-6">
+            <x-ui.button variant="ghost" icon="menu" :label="__('admin.menu')" class="lg:hidden" data-modal-open="admin-menu" />
+            @include('partials.layout.brand', ['href' => route('admin.dashboard')])
+            <x-ui.badge variant="outline">{{ __('admin.title') }}</x-ui.badge>
+            <div class="ml-auto flex items-center gap-2">
+                <x-ui.button variant="ghost" size="sm" :href="route('home')" icon="external-link">{{ __('admin.nav.site') }}</x-ui.button>
+                @include('partials.layout.theme-toggle')
+            </div>
+        </div>
     </header>
-    <main>
-        {{ $slot }}
-    </main>
+    <div class="lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+        <aside class="hidden border-r border-line bg-surface px-3 py-5 lg:block">
+            <div class="sticky top-20">@include('partials.layout.admin-nav')</div>
+        </aside>
+        <main id="main" tabindex="-1" class="legacy min-w-0 px-4 py-6 lg:px-8">
+            {{ $slot }}
+        </main>
+    </div>
+    <x-ui.drawer id="admin-menu" :title="__('admin.title')" side="left">
+        @include('partials.layout.admin-nav')
+    </x-ui.drawer>
+    <x-ui.toasts />
 </body>
 </html>

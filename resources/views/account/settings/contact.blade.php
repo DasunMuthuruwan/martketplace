@@ -1,9 +1,8 @@
-@extends('layouts.plain')
+@extends('layouts.account')
 
 @section('title', __('account.contact.title'))
 
-@section('content')
-    @include('account.settings._nav')
+@section('account')
 
     <p>{{ __('account.contact.intro') }}</p>
     @if ($user->phone === null)

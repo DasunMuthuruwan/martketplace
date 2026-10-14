@@ -1,8 +1,8 @@
-@extends('layouts.plain')
+@extends('layouts.account')
 
 @section('title', __('staff.two_factor.title'))
 
-@section('content')
+@section('account')
     @php($user = auth()->user())
     <p>{{ __('staff.two_factor.intro') }}</p>
 

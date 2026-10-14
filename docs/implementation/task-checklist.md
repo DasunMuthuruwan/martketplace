@@ -59,7 +59,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ## Phase 6 — Frontend
 - [x] F1.1 Tokens, fonts, icons, dark mode (merged 250926a)
 - [x] F1.2 Core components (merged 50d893e)
-- [~] F1.3 Layouts + style guide — in progress on `feature/F1.3-layouts`
+- [~] F1.3 Layouts + style guide — awaiting review on `feature/F1.3-layouts`
 - [ ] F2.1 Home / country home
 - [!] F2.2 Search UI — gated by Q-UX-4, Q-UX-6
 - [ ] F2.3 Listing detail + seller page

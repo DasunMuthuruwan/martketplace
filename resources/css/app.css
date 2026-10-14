@@ -178,6 +178,51 @@
     }
 }
 
+/* ---- Pages not yet redesigned (Phase 5 markup; removed as F2–F5 replace them) ------------
+ * Only plain elements without a class attribute inside .legacy are styled, so the designed
+ * components (which always carry classes) are never affected. */
+@layer base {
+    .hp {
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+
+    .legacy h1:not([class]) { font-size: var(--text-h1); line-height: var(--text-h1--line-height); font-weight: 650; margin-bottom: 1rem; }
+    .legacy h2:not([class]) { font-size: var(--text-h2); line-height: var(--text-h2--line-height); font-weight: 600; margin: 1.5rem 0 .75rem; }
+    .legacy h3:not([class]) { font-size: var(--text-h3); font-weight: 600; margin: 1rem 0 .5rem; }
+    .legacy p:not([class]), .legacy ul:not([class]), .legacy dl:not([class]), .legacy form:not([class]) { margin-bottom: .75rem; }
+    .legacy ul:not([class]) { list-style: disc; padding-left: 1.25rem; }
+    .legacy a:not([class]) { text-decoration: underline; text-underline-offset: 2px; }
+    .legacy label:not([class]) { display: block; margin-top: .75rem; font-size: var(--text-ui); font-weight: 500; }
+    .legacy label:not([class]):has(> input[type=checkbox], > input[type=radio]) { display: flex; gap: .5rem; align-items: center; font-weight: 400; }
+    .legacy :is(input:not([type=checkbox], [type=radio], [type=hidden]), select, textarea):not([class]) {
+        display: block; width: 100%; max-width: 32rem; margin-top: .25rem; min-height: 2.5rem; padding: .375rem .75rem;
+        border: 1px solid var(--control); border-radius: var(--radius-control); background: var(--surface); color: var(--fg);
+    }
+    .legacy :is(input[type=checkbox], input[type=radio]):not([class]) { accent-color: var(--primary); width: 1rem; height: 1rem; }
+    .legacy button:not([class]) {
+        display: inline-flex; align-items: center; height: 2.5rem; margin: .5rem .25rem 0 0; padding: 0 1rem; border-radius: var(--radius-control);
+        background: var(--primary); color: var(--primary-fg); font-size: var(--text-ui); font-weight: 500; cursor: pointer;
+    }
+    .legacy button:not([class]):hover { background: var(--primary-hover); }
+    .legacy table:not([class]) { width: 100%; border-collapse: collapse; font-size: var(--text-ui); margin: .75rem 0; }
+    .legacy :is(th, td):not([class]) { border-bottom: 1px solid var(--line); padding: .5rem; text-align: left; vertical-align: top; }
+    .legacy th:not([class]) { color: var(--fg-muted); font-weight: 500; background: var(--surface-muted); }
+    .legacy fieldset:not([class]) { border: 1px solid var(--line); border-radius: var(--radius-card); padding: .75rem 1rem; margin: 1rem 0; }
+    .legacy img:not([class]) { max-width: 100%; height: auto; }
+    .legacy .muted { color: var(--fg-subtle); font-size: var(--text-small); }
+    .legacy .hint { color: var(--fg-subtle); font-size: var(--text-small); }
+    .legacy .error, .legacy .flag { color: var(--danger); font-size: var(--text-small); }
+    .legacy .status { background: var(--surface-muted); padding: .75rem; border-radius: var(--radius-control); }
+    .legacy .pane { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 1rem; margin-top: 1rem; }
+    .legacy .pane img { max-width: 12rem; margin: .25rem; }
+    .legacy .cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); list-style: none; padding: 0; }
+    .legacy .filters { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; }
+}
+
 /* ---- Card grid by available width (design system §6, Q-UX-6) --------------------------- */
 @layer components {
     .listing-grid-area {

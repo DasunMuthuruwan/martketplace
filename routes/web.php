@@ -17,6 +17,7 @@ use App\Livewire\Admin\BlocklistAdmin;
 use App\Livewire\Admin\CategoriesAdmin;
 use App\Livewire\Admin\CountriesAdmin;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\DesignSystem;
 use App\Livewire\Admin\LocationRequestsAdmin;
 use App\Livewire\Admin\LocationsAdmin;
 use App\Livewire\Admin\ModerationQueue;
@@ -83,6 +84,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');
         // Account and staff changes: password re-confirmed within 15 minutes (2FA doc §6).
         Route::livewire('/users', UsersAdmin::class)->middleware(['can:'.Permissions::USERS_VIEW, 'password.confirm'])->name('users');
+        Route::livewire('/design-system', DesignSystem::class)->middleware('can:'.Permissions::SETTINGS_MANAGE)->name('design-system');
         Route::livewire('/settings', SettingsAdmin::class)->middleware(['can:'.Permissions::SETTINGS_MANAGE, 'password.confirm'])->name('settings');
         Route::livewire('/staff', StaffAdmin::class)->middleware(['can:'.Permissions::STAFF_MANAGE, 'password.confirm'])->name('staff');
     });

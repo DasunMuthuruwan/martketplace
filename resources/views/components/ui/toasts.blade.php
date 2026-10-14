@@ -6,7 +6,7 @@
     @if (session('status'))
         <div data-toast data-variant="success" role="status" class="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-card border border-line bg-surface p-3 text-ui text-fg shadow-overlay">
             <x-ui.icon name="circle-check" size="20" class="text-success" />
-            <p class="flex-1">{{ session('status') }}</p>
+            <p class="flex-1">{{ trans()->has('account.status.'.session('status')) ? __('account.status.'.session('status')) : session('status') }}</p>
             <button type="button" data-toast-close aria-label="{{ __('ui.close') }}" class="text-fg-muted hover:text-fg"><x-ui.icon name="x" size="16" /></button>
         </div>
     @endif
