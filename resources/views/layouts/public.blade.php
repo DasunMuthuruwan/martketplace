@@ -41,7 +41,12 @@
     </main>
 
     @include('partials.layout.footer')
-    @include('partials.layout.bottom-nav')
+    {{-- A page can replace the bottom navigation with its own phone bar (listing page: price + contact). --}}
+    @hasSection('mobile_bar')
+        @yield('mobile_bar')
+    @else
+        @include('partials.layout.bottom-nav')
+    @endif
     <x-ui.toasts />
 </body>
 </html>

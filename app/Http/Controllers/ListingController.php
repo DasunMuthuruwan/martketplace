@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Services\Attributes\AttributeSchema;
 use App\Services\Contact\ContactResolver;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Security\Turnstile;
 use App\Services\Seo\PageSeo;
 use App\Services\Seo\StructuredData;
 use Illuminate\Database\Eloquent\Collection;
@@ -71,6 +72,8 @@ class ListingController extends Controller
             'buttons' => $this->contact->buttons($listing, $request->user()),
             'favourited' => $request->user()?->favourites()->whereKey($listing->id)->exists() ?? false,
             'similar' => $this->similar($listing),
+            'sellerAds' => Listing::public()->where('listings.user_id', $listing->user_id)->count(),
+            'turnstileSiteKey' => app(Turnstile::class)->enabled() ? app(Turnstile::class)->siteKey() : null,
             'currentCountry' => $listing->country,
             'seo' => $this->seo($listing),
         ];
@@ -120,7 +123,8 @@ class ListingController extends Controller
     {
         return Listing::public()->where('category_id', $listing->category_id)->where('country_id', $listing->country_id)
             ->whereKeyNot($listing->id)
-            ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion'])
+            ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
+            ->withCount('images')
             ->orderByDesc('published_at')->limit(self::SIMILAR)->get();
     }
 
