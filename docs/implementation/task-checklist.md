@@ -65,8 +65,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F2.3 Listing detail + seller page (merged 93d7a02)
 - [x] F3.1 Auth screens (merged f14b9f6)
 - [x] F3.2 Account area (merged fae5a52)
-- [~] F4.1 Posting wizard — part 1 merged (d1e6dc8); part 2 merged (90521af); part 3 (photos, contact, review, submit, owner banners) awaiting review on `feature/F4.1c-photos-submit`
-- [ ] F5.1 Admin UI
+- [x] F4.1 Posting wizard (part 1 merged d1e6dc8; part 2 merged 90521af; part 3 merged 4cf407b)
+- [~] F5.1 Admin UI — in progress on `feature/F5.1-admin-ui`
 - [ ] F6.1 Accessibility, responsive, performance pass
 
 ## Phases 7–10
