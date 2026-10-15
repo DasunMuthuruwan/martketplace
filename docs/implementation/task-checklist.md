@@ -66,7 +66,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F3.1 Auth screens (merged f14b9f6)
 - [x] F3.2 Account area (merged fae5a52)
 - [x] F4.1 Posting wizard (part 1 merged d1e6dc8; part 2 merged 90521af; part 3 merged 4cf407b)
-- [~] F5.1 Admin UI — part 1 (shared admin components, dashboard, moderation review pane with shortcuts, reports, recent changes) awaiting review on `feature/F5.1-admin-ui`; part 2 (users, staff, audit, blocklist) and part 3 (catalogue, locations incl. merge preview, settings, pages) to follow
+- [~] F5.1 Admin UI — part 1 merged (134eadb); part 2 (users, staff, audit, blocklist) in progress on `feature/F5.1b-people-audit`; part 3 (catalogue, locations incl. merge preview, settings, pages) to follow
 - [ ] F6.1 Accessibility, responsive, performance pass
 
 ## Phases 7–10
