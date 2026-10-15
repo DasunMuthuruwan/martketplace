@@ -20,6 +20,8 @@
 @endphp
 
 @section('content')
+    @if ($ownerView ?? false)<x-listing.status-banner :listing="$listing" />@endif
+
     <nav aria-label="{{ __('search.breadcrumbs') }}" class="mb-3 text-small text-fg-subtle">
         <ol class="flex flex-wrap items-center gap-1">
             <li><a class="hover:text-fg" href="{{ route('country.home', ['cc' => $cc]) }}">{{ $listing->country->name }}</a></li>

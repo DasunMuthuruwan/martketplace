@@ -47,7 +47,19 @@ class ListingController extends Controller
                 return redirect()->to($listing->publicUrl(), 301);
             }
 
-            return response()->view('public.listing', $this->viewData($request, $listing));
+            return response()->view('public.listing', $this->viewData($request, $listing) + ['ownerView' => $this->ownedBy($request, $listing)]);
+        }
+
+        // The owner sees their own ad in any state with a status banner (components §5.2); nobody
+        // else learns anything about it. Never indexed. A draft without details goes to the wizard.
+        if ($this->ownedBy($request, $listing) && ! $listing->trashed()) {
+            if ($listing->title === null) {
+                return redirect()->route('listings.edit', $listing);
+            }
+            $data = $this->viewData($request, $listing);
+            $data['seo'] = PageSeo::make((string) $listing->title, null, null, false);
+
+            return response()->view('public.listing', $data + ['ownerView' => true]);
         }
 
         return match (true) {
@@ -126,6 +138,11 @@ class ListingController extends Controller
             ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
             ->withCount('images')
             ->orderByDesc('published_at')->limit(self::SIMILAR)->get();
+    }
+
+    private function ownedBy(Request $request, Listing $listing): bool
+    {
+        return $request->user() !== null && $request->user()->id === $listing->user_id;
     }
 
     private function isExpired(Listing $listing): bool

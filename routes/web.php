@@ -3,6 +3,7 @@
 use App\Authorization\Permissions;
 use App\Http\Controllers\Account\DashboardController;
 use App\Http\Controllers\Account\FavouritesController;
+use App\Http\Controllers\Account\ListingPhotosController;
 use App\Http\Controllers\Account\ListingsController;
 use App\Http\Controllers\Account\PostListingController;
 use App\Http\Controllers\Account\SettingsController;
@@ -61,7 +62,17 @@ Route::middleware(['auth', 'verified'])->prefix('account/listings')->name('listi
     Route::post('/', 'store')->name('store');
     Route::get('/{listing}/edit/{step?}', 'edit')->whereNumber('listing')->name('edit');
     Route::post('/{listing}/edit/{step}', 'update')->whereNumber('listing')->name('update');
+    Route::post('/{listing}/contact-options', 'contact')->whereNumber('listing')->name('contact-options');
+    Route::post('/{listing}/submit', 'submit')->whereNumber('listing')->name('submit');
+    Route::get('/{listing}/submitted', 'submitted')->whereNumber('listing')->name('submitted');
 });
+Route::middleware(['auth', 'verified'])->prefix('account/listings/{listing}/photos')->name('listings.photos.')->controller(ListingPhotosController::class)
+    ->whereNumber(['listing', 'image'])->group(function () {
+        Route::post('/', 'store')->name('store');
+        Route::post('/{image}/move', 'move')->name('move');
+        Route::post('/{image}/cover', 'cover')->name('cover');
+        Route::delete('/{image}', 'destroy')->name('destroy');
+    });
 
 // Visitor country choice (G-2): remembered in a cookie.
 Route::post('/country', [CountryController::class, 'choose'])->name('country.choose');

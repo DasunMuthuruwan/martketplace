@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Account;
 use App\Actions\Listings\SaveListingDetails;
 use App\Actions\Listings\SaveListingLocation;
 use App\Actions\Listings\SaveListingPrice;
+use App\Actions\Listings\SubmitListing;
+use App\Actions\Listings\UpdateListingContact;
 use App\Enums\ItemCondition;
+use App\Enums\ListingStatus;
 use App\Enums\ListingType;
 use App\Enums\RentPeriod;
 use App\Exceptions\Listings\CountryChangeNeedsConfirmation;
@@ -23,6 +26,7 @@ use App\Services\Attributes\CategorySchema;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Security\Turnstile;
 use App\View\PostingSteps;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -88,8 +92,49 @@ class PostListingController extends Controller
             'location' => $this->locationStep($request, $listing, $country, $this->leaf($request->query('category')) ?? $listing->category),
             'details' => $this->detailsStep($request, $listing),
             'price' => $this->priceStep($listing),
-            default => $this->pendingStep($listing, $step),
+            'photos' => $this->photosStep($listing),
+            default => $this->reviewStep($request, $listing),
         };
+    }
+
+    /** Step 6 (MSG-02): which buttons the ad shows. Saved at once, also on a live ad. */
+    public function contact(Request $request, Listing $listing, UpdateListingContact $update): RedirectResponse
+    {
+        Gate::authorize('update', $listing);
+        try {
+            $update->handle($request->user(), $listing, [
+                'show_call' => $request->boolean('show_call'),
+                'show_whatsapp' => $request->boolean('show_whatsapp'),
+            ]);
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
+
+        return redirect()->route('listings.edit', [$listing, 'review'])->with('status', __('posting.saved'));
+    }
+
+    /** Send a draft (or a rejected ad) for review, or publish it, per the moderation mode (LST-03). */
+    public function submit(Request $request, Listing $listing, SubmitListing $submit): RedirectResponse
+    {
+        Gate::authorize('update', $listing);
+        try {
+            $submit->handle($request->user(), $listing, $request->only([Turnstile::RESPONSE_FIELD]));
+        } catch (ValidationException $e) {
+            // Straight to the first unfinished step (one redirect, so the errors survive).
+            $steps = new PostingSteps($listing);
+            $step = $steps->reachable('review') ? 'review' : $steps->next();
+
+            return redirect()->route('listings.edit', [$listing, $step])->withErrors($e->errors());
+        }
+
+        return redirect()->route('listings.submitted', $listing);
+    }
+
+    public function submitted(Request $request, Listing $listing): View
+    {
+        Gate::authorize('update', $listing);
+
+        return view('posting.submitted', ['listing' => $listing, 'live' => $listing->isPublic()]);
     }
 
     public function update(Request $request, Listing $listing, string $step): RedirectResponse
@@ -216,9 +261,27 @@ class PostListingController extends Controller
         return $decimal === '.' ? $plain : str_replace($decimal, '.', $plain);
     }
 
-    private function pendingStep(Listing $listing, string $step): View
+    private function photosStep(Listing $listing): View
     {
-        return view('posting.pending', $this->shared($listing, $step));
+        return view('posting.photos', $this->shared($listing, 'photos') + [
+            'images' => $listing->images()->orderBy('sort_order')->orderBy('id')->get(),
+            'max' => $listing->category->max_images,
+            'maxMb' => intdiv((int) config('marketplace.images.max_upload_kb'), 1024),
+        ]);
+    }
+
+    private function reviewStep(Request $request, Listing $listing): View
+    {
+        $listing->loadMissing(['currencyModel', 'city', 'region', 'subregion', 'locality', 'coverImage', 'user'])->loadCount('images');
+        $user = $request->user();
+
+        return view('posting.review', $this->shared($listing, 'review') + [
+            'present' => app(ListingPresenter::class),
+            'user' => $user,
+            'canSubmit' => in_array($listing->status, [ListingStatus::Draft, ListingStatus::Rejected], true),
+            'hasPhone' => $user->phone !== null,
+            'turnstileSiteKey' => app(Turnstile::class)->enabled() ? app(Turnstile::class)->siteKey() : null,
+        ]);
     }
 
     /** @return array<string, mixed> */

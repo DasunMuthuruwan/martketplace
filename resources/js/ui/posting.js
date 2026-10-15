@@ -96,3 +96,45 @@ document.addEventListener('change', (event) => {
         }
     }
 });
+
+// ---- Photos: upload with a progress bar, then reload to show the result -----------------------
+
+document.addEventListener('change', (event) => {
+    const input = event.target;
+    const form = input.closest?.('form[data-photo-upload]');
+    if (form && input.type === 'file' && input.files.length > 0) {
+        form.requestSubmit();
+    }
+});
+
+document.addEventListener('submit', (event) => {
+    const form = event.target.closest?.('form[data-photo-upload]');
+    if (!form || typeof XMLHttpRequest === 'undefined') {
+        return;
+    }
+    event.preventDefault();
+
+    const progress = form.querySelector('[data-upload-progress]');
+    const bar = form.querySelector('[data-upload-bar]');
+    const text = form.querySelector('[data-upload-text]');
+    const button = form.querySelector('[data-upload-submit]');
+    progress?.classList.remove('hidden');
+    button?.setAttribute('disabled', '');
+
+    const request = new XMLHttpRequest();
+    request.open('POST', form.action);
+    request.setRequestHeader('Accept', 'application/json');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && bar) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            bar.style.width = `${percent}%`;
+            if (text) {
+                text.textContent = `${percent}%`;
+            }
+        }
+    });
+    // Whatever happened (some files may have been refused), the page shows the current photos and messages.
+    request.addEventListener('loadend', () => window.location.reload());
+    request.send(new FormData(form));
+});
