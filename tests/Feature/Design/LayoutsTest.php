@@ -72,9 +72,10 @@ class LayoutsTest extends TestCase
         foreach (['Home', 'Search', 'Post', 'Saved', 'Account'] as $label) {
             $this->assertStringContainsString($label, $nav);
         }
-        // Account sends guests to log in; screens not built yet show as unavailable.
+        // Post, Saved and Account send guests to log in; every destination exists now (F3.2, F4.1).
         $this->assertStringContainsString('href="'.route('login').'"', $nav);
-        $this->assertStringContainsString('aria-disabled="true"', $nav);
+        $this->assertSame(3, substr_count($nav, 'href="'.route('login').'"'));
+        $this->assertStringNotContainsString('aria-disabled="true"', $nav);
     }
 
     public function test_footer_links_published_pages_by_group(): void

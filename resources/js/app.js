@@ -4,6 +4,7 @@ import { openMarkedDialogs } from './ui/overlays.js';
 import './ui/combobox.js';
 import './ui/search.js';
 import './ui/listing.js';
+import './ui/posting.js';
 
 // Theme choice (design system §9): buttons with data-theme-choice="light|dark|system" switch the
 // theme; the choice is remembered per browser. partials/theme-script applies it before first paint.
