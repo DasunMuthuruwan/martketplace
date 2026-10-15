@@ -14,7 +14,7 @@ final class Navigation
     /** destination => route names to try, first match wins */
     private const ROUTES = [
         'post' => ['listings.create'],
-        'saved' => ['account.saved'],
+        'saved' => ['account.favourites'],
         'account' => ['account.overview', 'account.settings.profile'],
         'my_ads' => ['account.listings'],
         'settings' => ['account.settings.profile'],

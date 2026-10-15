@@ -86,6 +86,8 @@ Unknown keys, or attributes that aren't filterable for the category/country, are
 | `/account/settings/security` | `Account\SecuritySettings` | Password, 2FA (staff), delete account (password confirm) |
 | `/account/notifications` | `Account\Notifications` | In-app list (S) |
 
+> **Implementation status (F3.2):** `/account` (`account.overview`, `Account\DashboardController`), `/account/listings` (`account.listings`, `?status=active|pending|drafts|rejected|expired|sold`), `POST /account/listings/{listing}/sold|renew`, `DELETE /account/listings/{listing}` (`Account\ListingsController`, through `ListingLifecycle`) and `/account/favourites` (`account.favourites`, `Account\FavouritesController`) are server-rendered pages, like the settings pages, not Livewire components. `/account/listings/create|{listing}/edit` arrive with the posting wizard (F4.1). There is no notifications page: notifications are email only.
+
 > **Implementation note (T2.3):** the settings pages exist as plain views served by `Account\SettingsController` (`account.settings.profile|contact|security`, `PUT account.settings.contact.update`, `DELETE /account` = `account.destroy`). Profile and password forms post to Fortify (`PUT /user/profile-information`, `PUT /user/password`). Profile and security need only `auth` (an unverified user can fix a mistyped email or delete the account); contact settings need `verified`. Deletion asks for the password in the form itself instead of the 15-minute `password.confirm` window. F3.2 replaces the views with the Livewire components named above and reuses the same actions.
 
 ### 3.1 PostListingWizard — Livewire Contract

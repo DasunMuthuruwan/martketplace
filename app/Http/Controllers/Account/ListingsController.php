@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Http\Controllers\Account;
+
+use App\Actions\Listings\ListingLifecycle;
+use App\Enums\ListingStatus;
+use App\Http\Controllers\Controller;
+use App\Models\Listing;
+use App\Services\Listings\ListingPresenter;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+
+/**
+ * My listings (routes doc §3, layout doc §3.5): the seller's ads by status tab, with renew, mark
+ * sold and delete through ListingLifecycle (owner-only policy). Plain forms and redirects.
+ */
+class ListingsController extends Controller
+{
+    /** Tab => what it shows. "Active" means live now; a live ad past its date counts as expired. */
+    public const TABS = ['active', 'pending', 'drafts', 'rejected', 'expired', 'sold'];
+
+    public function __construct(private readonly ListingLifecycle $lifecycle) {}
+
+    public function index(Request $request, ListingPresenter $present): View
+    {
+        $user = $request->user();
+        $tab = in_array($request->query('status'), self::TABS, true) ? $request->query('status') : 'active';
+        $counts = self::counts($user->id);
+
+        $listings = self::tab(Listing::where('user_id', $user->id), $tab)
+            ->with(['country', 'currencyModel', 'coverImage', 'category.parent', 'city', 'region', 'subregion', 'locality'])
+            ->latest('updated_at')->latest('id')
+            ->paginate(20)->withQueryString();
+
+        return view('account.listings', [
+            'tab' => $tab,
+            'counts' => $counts,
+            'listings' => $listings,
+            'present' => $present,
+            'lifecycle' => $this->lifecycle,
+        ]);
+    }
+
+    public function sold(Request $request, Listing $listing): RedirectResponse
+    {
+        return $this->run(fn () => $this->lifecycle->markSold($request->user(), $listing), __('account.listings.marked_sold'), 'sold');
+    }
+
+    public function renew(Request $request, Listing $listing): RedirectResponse
+    {
+        return $this->run(fn () => $this->lifecycle->renew($request->user(), $listing), __('account.listings.renewed'), 'active');
+    }
+
+    public function destroy(Request $request, Listing $listing): RedirectResponse
+    {
+        return $this->run(fn () => $this->lifecycle->delete($request->user(), $listing), __('account.listings.deleted'), null);
+    }
+
+    /** @return array<string, int> tab => number of the user's listings */
+    public static function counts(int $userId): array
+    {
+        $counts = [];
+        foreach (self::TABS as $tab) {
+            $counts[$tab] = self::tab(Listing::where('user_id', $userId), $tab)->count();
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @param  Builder<Listing>  $query
+     * @return Builder<Listing>
+     */
+    private static function tab(Builder $query, string $tab): Builder
+    {
+        $now = now();
+
+        return match ($tab) {
+            'pending' => $query->where('status', ListingStatus::PendingReview),
+            'drafts' => $query->where('status', ListingStatus::Draft),
+            'rejected' => $query->whereIn('status', [ListingStatus::Rejected, ListingStatus::Suspended]),
+            'expired' => $query->where(fn (Builder $q) => $q->where('status', ListingStatus::Expired)
+                ->orWhere(fn (Builder $q) => $q->where('status', ListingStatus::Active)->where('expires_at', '<=', $now))),
+            'sold' => $query->where('status', ListingStatus::Sold),
+            default => $query->where('status', ListingStatus::Active)->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', $now)),
+        };
+    }
+
+    private function run(callable $action, string $message, ?string $tab): RedirectResponse
+    {
+        try {
+            $action();
+        } catch (ValidationException $e) {
+            return back()->with('error', collect($e->errors())->flatten()->first());
+        }
+
+        $back = back();
+
+        return ($tab !== null ? redirect()->route('account.listings', ['status' => $tab]) : $back)->with('status', $message);
+    }
+}

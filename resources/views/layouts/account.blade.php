@@ -1,18 +1,22 @@
 {{-- Account area (navigation doc §2, layout §3.5): the public layout plus a side menu on desktop and
-     a tab row on phones. Pages: @extends('layouts.account'), @section('title'), @section('content'). --}}
+     a tab row on phones. Pages: @extends('layouts.account'), @section('title') and either
+     @section('account') (a form in a card, settings) or @section('account_full') (lists). --}}
 @extends('layouts.public')
 
 @php
     $accountLinks = collect([
-        'my_ads' => __('layout.my_ads'),
-        'saved' => __('layout.saved'),
-    ])->map(fn ($text, $key) => ['label' => $text, 'href' => \App\View\Navigation::url($key)])->filter(fn ($item) => $item['href'] !== null)
-        ->merge([
-            'profile' => ['label' => __('account.nav.profile'), 'href' => route('account.settings.profile')],
-            'contact' => ['label' => __('account.nav.contact'), 'href' => route('account.settings.contact')],
-            'security' => ['label' => __('account.nav.security'), 'href' => route('account.settings.security')],
-        ]);
-    $activeKey = $accountLinks->search(fn ($item) => rtrim($item['href'], '/') === rtrim(request()->url(), '/'));
+        'overview' => [__('account.nav.overview'), \App\View\Navigation::url('account')],
+        'my_ads' => [__('layout.my_ads'), \App\View\Navigation::url('my_ads')],
+        'saved' => [__('layout.saved'), \App\View\Navigation::url('saved')],
+        'profile' => [__('account.nav.profile'), route('account.settings.profile')],
+        'contact' => [__('account.nav.contact'), route('account.settings.contact')],
+        'security' => [__('account.nav.security'), route('account.settings.security')],
+    ])->filter(fn ($item) => $item[1] !== null)->map(fn ($item) => ['label' => $item[0], 'href' => $item[1]]);
+    // The overview URL falls back to the profile page when there is no overview: keep one entry per URL.
+    $accountLinks = $accountLinks->unique('href');
+    $current = rtrim(request()->url(), '/');
+    $activeKey = $accountLinks->search(fn ($item) => rtrim($item['href'], '/') === $current)
+        ?: (request()->routeIs('account.two-factor') ? 'security' : null);
 @endphp
 
 @section('content')
@@ -27,10 +31,15 @@
         </nav>
         <div class="min-w-0">
             <x-ui.tabs class="mb-6 lg:hidden" :label="__('account.nav.label')" :items="$accountLinks->all()" :active="$activeKey" />
-            <div class="mx-auto max-w-2xl rounded-card border border-line bg-surface p-5 sm:p-6 lg:mx-0">
+            @hasSection('account_full')
                 <h1 class="mb-4 text-h1 font-semibold">@yield('title')</h1>
-                @yield('account')
-            </div>
+                @yield('account_full')
+            @else
+                <div class="max-w-2xl rounded-card border border-line bg-surface p-5 sm:p-6">
+                    <h1 class="mb-4 text-h1 font-semibold">@yield('title')</h1>
+                    @yield('account')
+                </div>
+            @endif
         </div>
     </div>
 @endsection

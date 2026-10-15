@@ -3,25 +3,34 @@
 @section('title', __('account.contact.title'))
 
 @section('account')
-
-    <p>{{ __('account.contact.intro') }}</p>
+    <p class="mb-4 text-ui text-fg-muted">{{ __('account.contact.intro') }}</p>
     @if ($user->phone === null)
-        <p class="status">{{ __('account.contact.no_phone') }} <a href="{{ route('account.settings.profile') }}">{{ __('account.nav.profile') }}</a></p>
+        <x-ui.alert variant="warning" class="mb-4">
+            {{ __('account.contact.no_phone') }}
+            <x-slot:actions><x-ui.button size="sm" variant="secondary" :href="route('account.settings.profile')">{{ __('account.nav.profile') }}</x-ui.button></x-slot:actions>
+        </x-ui.alert>
     @endif
 
-    @php($bag = $errors->getBag('updateContactSettings'))
-    @php($current = old('contact_visibility', $user->contact_visibility->value))
-    <form method="POST" action="{{ route('account.settings.contact.update') }}" novalidate>
+    @php
+        $bag = $errors->getBag('updateContactSettings');
+        $current = old('contact_visibility', $user->contact_visibility->value);
+    @endphp
+    <form method="POST" action="{{ route('account.settings.contact.update') }}" novalidate class="space-y-5">
         @csrf
         @method('PUT')
 
         <fieldset @if ($bag->has('contact_visibility')) aria-describedby="visibility-error" @endif>
-            <legend>{{ __('account.contact.visibility') }}</legend>
-            @foreach ($visibilities as $visibility)
-                <label><input type="radio" name="contact_visibility" value="{{ $visibility->value }}" @checked($current === $visibility->value)> {{ __('account.contact.visibility_options.'.$visibility->value) }}</label>
-            @endforeach
+            <legend class="mb-2 text-ui font-medium text-fg">{{ __('account.contact.visibility') }}</legend>
+            <div class="space-y-2">
+                @foreach ($visibilities as $visibility)
+                    <label class="flex cursor-pointer items-start gap-3 rounded-card border border-line p-3 has-[:checked]:border-primary">
+                        <input type="radio" name="contact_visibility" value="{{ $visibility->value }}" @checked($current === $visibility->value) class="mt-1 size-4 accent-(--primary)">
+                        <span class="text-ui text-fg">{{ __('account.contact.visibility_options.'.$visibility->value) }}</span>
+                    </label>
+                @endforeach
+            </div>
+            @if ($bag->has('contact_visibility'))<p class="mt-1.5 text-small text-danger" id="visibility-error">{{ $bag->first('contact_visibility') }}</p>@endif
         </fieldset>
-        @if ($bag->has('contact_visibility'))<p class="error" id="visibility-error">{{ $bag->first('contact_visibility') }}</p>@endif
 
         @include('partials.phone-field', [
             'name' => 'whatsapp_phone',
@@ -34,6 +43,6 @@
             'bag' => 'updateContactSettings',
         ])
 
-        <button type="submit">{{ __('account.contact.save') }}</button>
+        <x-ui.button type="submit">{{ __('account.contact.save') }}</x-ui.button>
     </form>
 @endsection

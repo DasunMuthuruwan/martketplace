@@ -3,33 +3,16 @@
 @section('title', __('account.profile.title'))
 
 @section('account')
-
     @php($bag = $errors->getBag('updateProfileInformation'))
-    <form method="POST" action="{{ route('user-profile-information.update') }}" novalidate>
+    <form method="POST" action="{{ route('user-profile-information.update') }}" novalidate class="space-y-4">
         @csrf
         @method('PUT')
-
-        <label for="name">{{ __('auth.ui.name') }}</label>
-        <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required maxlength="100" autocomplete="name" @if ($bag->has('name')) aria-invalid="true" aria-describedby="name-error" @endif>
-        @if ($bag->has('name'))<p class="error" id="name-error">{{ $bag->first('name') }}</p>@endif
-
-        <label for="email">{{ __('auth.ui.email') }}</label>
-        <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="191" autocomplete="email" @if ($bag->has('email')) aria-invalid="true" aria-describedby="email-error" @endif>
-        @if ($bag->has('email'))<p class="error" id="email-error">{{ $bag->first('email') }}</p>@endif
-
-        <label for="current_password">{{ __('account.profile.current_password') }}</label>
-        <input type="password" id="current_password" name="current_password" autocomplete="current-password" aria-describedby="current_password-hint @if ($bag->has('current_password')) current_password-error @endif" @if ($bag->has('current_password')) aria-invalid="true" @endif>
-        <p class="hint" id="current_password-hint">{{ __('account.profile.current_password_hint') }}</p>
-        @if ($bag->has('current_password'))<p class="error" id="current_password-error">{{ $bag->first('current_password') }}</p>@endif
-
-        <label for="country_id">{{ __('auth.ui.country') }}</label>
-        <select id="country_id" name="country_id" required @if ($bag->has('country_id')) aria-invalid="true" aria-describedby="country-error" @endif>
-            <option value="">{{ __('auth.ui.choose_country') }}</option>
-            @foreach ($countries as $country)
-                <option value="{{ $country->id }}" @selected((string) old('country_id', $user->country_id) === (string) $country->id)>{{ $country->name }}</option>
-            @endforeach
-        </select>
-        @if ($bag->has('country_id'))<p class="error" id="country-error">{{ $bag->first('country_id') }}</p>@endif
+        <x-ui.input :label="__('auth.ui.name')" name="name" :value="old('name', $user->name)" :error="$bag->first('name') ?: null" required maxlength="100" autocomplete="name" />
+        <x-ui.input type="email" :label="__('auth.ui.email')" name="email" :value="old('email', $user->email)" :error="$bag->first('email') ?: null" required maxlength="191" autocomplete="email" />
+        <x-ui.input type="password" :label="__('account.profile.current_password')" name="current_password" :hint="__('account.profile.current_password_hint')"
+            :error="$bag->first('current_password') ?: null" autocomplete="current-password" />
+        <x-ui.select :label="__('auth.ui.country')" name="country_id" required :placeholder="__('auth.ui.choose_country')"
+            :options="$countries->pluck('name', 'id')->all()" :selected="old('country_id', $user->country_id)" :error="$bag->first('country_id') ?: null" />
 
         @include('partials.phone-field', [
             'name' => 'phone',
@@ -42,6 +25,6 @@
             'bag' => 'updateProfileInformation',
         ])
 
-        <button type="submit">{{ __('account.profile.save') }}</button>
+        <x-ui.button type="submit">{{ __('account.profile.save') }}</x-ui.button>
     </form>
 @endsection

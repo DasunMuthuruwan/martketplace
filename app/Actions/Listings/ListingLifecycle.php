@@ -78,6 +78,22 @@ class ListingLifecycle
         });
     }
 
+    /**
+     * Whether renew() would accept this listing now (ignoring the live-ad limit), so screens only
+     * offer the action when it can work. Mirrors the checks in renew().
+     */
+    public function renewable(Listing $listing): bool
+    {
+        if ($listing->expires_at === null || ! in_array($listing->status, [ListingStatus::Active, ListingStatus::Expired], true)) {
+            return false;
+        }
+        $expired = $listing->status === ListingStatus::Expired || $listing->expires_at->isPast();
+
+        return $expired
+            ? ! $listing->expires_at->isBefore(now()->subDays((int) config('marketplace.retention.expired_listing_renewable')))
+            : ! $listing->expires_at->isAfter(now()->addDays((int) config('marketplace.listings.renew_window_days')));
+    }
+
     /** Soft delete (LST-07); purged later by the retention job. Any status, owner only. */
     public function delete(User $user, Listing $listing): void
     {

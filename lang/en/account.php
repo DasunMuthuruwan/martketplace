@@ -4,7 +4,8 @@ return [
     'wrong_password' => 'The password is incorrect.',
 
     'nav' => [
-        'label' => 'Account settings',
+        'label' => 'Your account',
+        'overview' => 'Overview',
         'profile' => 'Profile',
         'contact' => 'Contact',
         'security' => 'Security',
@@ -73,5 +74,57 @@ return [
         'mail_line' => 'You have not signed in for a long time. To keep your account, sign in within :days days. Otherwise it will be deleted along with your ads.',
         'mail_action' => 'Sign in',
         'mail_ignore' => 'If you no longer need the account, you do not have to do anything.',
+    ],
+
+    // Account area (routes doc §3, layout doc §3.5).
+    'overview' => [
+        'title' => 'Hello, :name',
+        'verify_title' => 'Verify your email',
+        'verify_text' => 'You can post ads and contact sellers once your email address is verified.',
+        'verify_action' => 'Verify now',
+        'attention' => 'Some ads need your attention: :rejected rejected, :expired expired.',
+        'expiring' => 'Expiring soon',
+        'nothing_expiring' => 'None of your ads expire in the next few days.',
+        'shortcuts' => 'Shortcuts',
+    ],
+
+    'listings' => [
+        'title' => 'My ads',
+        'tabs' => 'Ad status',
+        'tab' => ['active' => 'Live', 'pending' => 'In review', 'drafts' => 'Drafts', 'rejected' => 'Needs changes', 'expired' => 'Expired', 'sold' => 'Sold'],
+        'status' => ['active' => 'Live', 'pending' => 'In review', 'draft' => 'Draft', 'rejected' => 'Rejected', 'suspended' => 'Taken down', 'expired' => 'Expired', 'sold' => 'Sold'],
+        'empty' => [
+            'active' => 'You have no live ads.',
+            'pending' => 'No ads are waiting for review.',
+            'drafts' => 'No drafts.',
+            'rejected' => 'No ads need changes.',
+            'expired' => 'No expired ads.',
+            'sold' => 'Nothing marked as sold yet.',
+        ],
+        'untitled' => 'Untitled draft',
+        'expires_in' => 'Expires :when',
+        'expired_on' => 'Expired on :date',
+        'pending_note' => 'Our team is reviewing it. You will get an email.',
+        'draft_note' => 'Last edited :when',
+        'sold_on' => 'Sold on :date',
+        'reason' => 'Reason: :reason',
+        'renew' => 'Renew',
+        'mark_sold' => 'Mark as sold',
+        'edit' => 'Edit',
+        'edit_resubmit' => 'Edit and resubmit',
+        'delete' => 'Delete',
+        'delete_title' => 'Delete this ad?',
+        'delete_text' => '":title" will be removed from the site. This cannot be undone.',
+        'renewed' => 'Your ad is live again.',
+        'marked_sold' => 'Marked as sold. Congratulations!',
+        'deleted' => 'Ad deleted.',
+    ],
+
+    'favourites' => [
+        'title' => 'Saved ads',
+        'empty_title' => 'No saved ads yet',
+        'empty_text' => 'Tap Save on an ad to keep it here.',
+        'browse' => 'Browse ads',
+        'unavailable' => 'This ad is no longer available.',
     ],
 ];

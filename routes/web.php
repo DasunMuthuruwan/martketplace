@@ -1,6 +1,9 @@
 <?php
 
 use App\Authorization\Permissions;
+use App\Http\Controllers\Account\DashboardController;
+use App\Http\Controllers\Account\FavouritesController;
+use App\Http\Controllers\Account\ListingsController;
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
 use App\Http\Controllers\CountryController;
@@ -40,6 +43,16 @@ Route::middleware('auth')->prefix('account/settings')->name('account.settings.')
     Route::put('/contact', 'updateContact')->middleware('verified')->name('contact.update');
 });
 Route::delete('/account', [SettingsController::class, 'destroy'])->middleware('auth')->name('account.destroy');
+
+// Account area (routes doc §3): overview, my listings with their actions, saved ads.
+Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
+    Route::get('/', DashboardController::class)->name('overview');
+    Route::get('/listings', [ListingsController::class, 'index'])->name('listings');
+    Route::post('/listings/{listing}/sold', [ListingsController::class, 'sold'])->whereNumber('listing')->name('listings.sold');
+    Route::post('/listings/{listing}/renew', [ListingsController::class, 'renew'])->whereNumber('listing')->name('listings.renew');
+    Route::delete('/listings/{listing}', [ListingsController::class, 'destroy'])->whereNumber('listing')->name('listings.destroy');
+    Route::get('/favourites', FavouritesController::class)->name('favourites');
+});
 
 // Visitor country choice (G-2): remembered in a cookie.
 Route::post('/country', [CountryController::class, 'choose'])->name('country.choose');

@@ -7,6 +7,7 @@ return [
     'session_expired' => 'For security, staff sessions end after a period of inactivity or a few hours. Please log in again.',
 
     'two_factor' => [
+        'scan' => 'Scan this code with an authenticator app, or type the key.',
         'title' => 'Two-factor authentication',
         'intro' => 'Use an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, Bitwarden…) to protect your account.',
         'status_on' => 'Two-factor authentication is on.',
