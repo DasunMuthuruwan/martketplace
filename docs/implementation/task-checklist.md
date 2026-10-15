@@ -66,8 +66,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F3.1 Auth screens (merged f14b9f6)
 - [x] F3.2 Account area (merged fae5a52)
 - [x] F4.1 Posting wizard (part 1 merged d1e6dc8; part 2 merged 90521af; part 3 merged 4cf407b)
-- [~] F5.1 Admin UI — part 1 merged (134eadb); part 2 merged (2946b1b); part 3 (catalogue, locations incl. merge preview, settings, pages) awaiting review on `feature/F5.1c-catalogue-site`
-- [ ] F6.1 Accessibility, responsive, performance pass
+- [x] F5.1 Admin UI (part 1 merged 134eadb; part 2 merged 2946b1b; part 3 merged a1a0656)
+- [~] F6.1 Accessibility, responsive, performance pass — in progress on `feature/F6.1-a11y-perf`
 
 ## Phases 7–10
 - [ ] M8 QA (browser tests: D-1 Playwright vs Dusk)
