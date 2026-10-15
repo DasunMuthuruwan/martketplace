@@ -9,6 +9,7 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\Listing;
 use App\Models\Locality;
+use App\Models\LocationRequest;
 use App\Models\Region;
 use App\Services\Audit\AuditLogger;
 use App\Services\Geo\GeoNames\UniqueSlug;
@@ -81,6 +82,10 @@ class LocationsAdmin extends Component
     public ?int $mergeId = null;
 
     public string $mergeSearch = '';
+
+    /** The city to keep, chosen for the preview; merging still needs a confirmation. */
+    #[Locked]
+    public ?int $mergeTargetId = null;
 
     // ---- Localities -------------------------------------------------------------------------
 
@@ -304,8 +309,23 @@ class LocationsAdmin extends Component
     {
         $this->requirePermission(Permissions::LOCATIONS_MANAGE);
         $this->mergeId = $this->city($id)->id;
-        $this->mergeSearch = '';
+        $this->reset(['mergeSearch', 'mergeTargetId']);
         $this->resetErrorBag();
+    }
+
+    /** Show what merging into this city would do, before anything changes. */
+    public function previewMerge(int $keepId): void
+    {
+        $this->requirePermission(Permissions::LOCATIONS_MANAGE);
+        $keep = $this->city($keepId);
+        abort_if($this->mergeId === null || $keep->id === $this->mergeId, 404);
+        $this->mergeTargetId = $keep->id;
+        $this->resetErrorBag();
+    }
+
+    public function clearMergeTarget(): void
+    {
+        $this->mergeTargetId = null;
     }
 
     public function mergeInto(int $keepId, MergeCities $merge): void
@@ -328,7 +348,7 @@ class LocationsAdmin extends Component
 
     public function cancelMerge(): void
     {
-        $this->reset(['mergeId', 'mergeSearch']);
+        $this->reset(['mergeId', 'mergeSearch', 'mergeTargetId']);
     }
 
     // ---- Localities -------------------------------------------------------------------------
@@ -337,6 +357,12 @@ class LocationsAdmin extends Component
     {
         $this->requirePermission(Permissions::LOCATIONS_MANAGE);
         $this->localitiesOf = $this->city($cityId)->id;
+        $this->closeLocality();
+    }
+
+    public function hideLocalities(): void
+    {
+        $this->localitiesOf = null;
         $this->closeLocality();
     }
 
@@ -415,13 +441,35 @@ class LocationsAdmin extends Component
                 ->withCount(['listings' => fn ($q) => $q->withTrashed()])
                 ->orderBy('ascii_name')
                 ->paginate(self::CITIES_PER_PAGE),
-            'mergeFrom' => $this->mergeId === null ? null : City::find($this->mergeId),
+            'mergeFrom' => $mergeFrom = $this->mergeId === null ? null : City::find($this->mergeId),
+            'mergePreview' => $mergeFrom === null || $this->mergeTargetId === null ? null : $this->mergePreview($mergeFrom, City::findOrFail($this->mergeTargetId)),
             'mergeTargets' => $this->mergeId === null || mb_strlen($this->mergeSearch) < 2 || $country === null ? collect()
                 : City::where('country_id', $country->id)->whereKeyNot($this->mergeId)
                     ->where(fn ($w) => $w->where('ascii_name', 'like', $mergeTerm)->orWhere('name', 'like', $mergeTerm))
                     ->orderBy('ascii_name')->limit(10)->get(),
             'localityCity' => $this->localitiesOf === null ? null : City::with(['localities' => fn ($q) => $q->orderBy('slug')])->find($this->localitiesOf),
         ]);
+    }
+
+    /**
+     * What MergeCities would do (counts only, nothing changes).
+     *
+     * @return array{into: City, listings: int, intoListings: int, localities: int, combined: int, requests: int, deleted: bool}
+     */
+    private function mergePreview(City $from, City $into): array
+    {
+        $keepSlugs = Locality::where('city_id', $into->id)->pluck('slug');
+        $localities = Locality::where('city_id', $from->id)->pluck('slug');
+
+        return [
+            'into' => $into,
+            'listings' => Listing::withTrashed()->where('city_id', $from->id)->count(),
+            'intoListings' => Listing::withTrashed()->where('city_id', $into->id)->count(),
+            'localities' => $localities->count(),
+            'combined' => $localities->intersect($keepSlugs)->count(),
+            'requests' => LocationRequest::where('city_id', $from->id)->orWhere('resolved_city_id', $from->id)->count(),
+            'deleted' => $from->geonames_id === null,
+        ];
     }
 
     private function country(): Country

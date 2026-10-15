@@ -28,6 +28,7 @@ return [
     'per_unit' => ':amount / :unit',
     'posted' => 'Posted :date',
     'details' => 'Details',
+    'page_updated' => 'Last updated :date',
     'description' => 'Description',
     'location' => 'Location',
     'seller' => 'Seller',

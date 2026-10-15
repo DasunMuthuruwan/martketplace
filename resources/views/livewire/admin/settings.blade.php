@@ -1,62 +1,46 @@
-<div>
-    <h1>{{ __('admin.nav.settings') }}</h1>
+{{-- Settings (ADM-05): values that override the server configuration, in three groups. Saving asks for the
+     password again when the confirmation has expired. --}}
+<div class="max-w-3xl">
+    <x-admin.page-header :title="__('admin.nav.settings')" :description="__('admin.settings.help')" />
 
     @if (session('status'))
-        <p class="status" role="status">{{ session('status') }}</p>
+        <x-ui.alert variant="success" role="status" class="mb-4">{{ session('status') }}</x-ui.alert>
     @endif
-    <p class="muted">{{ __('admin.settings.help') }}</p>
 
-    <form wire:submit="save">
-        <fieldset>
-            <legend>{{ __('admin.settings.site') }}</legend>
-            <label for="s-name">{{ __('admin.settings.site_name') }}</label>
-            <input id="s-name" type="text" wire:model="values.site_name" maxlength="60" required>
-            @error('values.site_name')<p class="error">{{ $message }}</p>@enderror
+    <form wire:submit="save" class="space-y-4">
+        <section aria-labelledby="s-site" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
+            <h2 id="s-site" class="text-h3 font-semibold">{{ __('admin.settings.site') }}</h2>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <x-ui.input :label="__('admin.settings.site_name')" id="s-name" wire:model="values.site_name" maxlength="60" required :error="$errors->first('values.site_name')" />
+                <x-ui.input type="email" :label="__('admin.settings.contact_email')" id="s-email" wire:model="values.contact_email" maxlength="191" :error="$errors->first('values.contact_email')" />
+            </div>
+            <x-ui.textarea :label="__('admin.settings.seo_country_description')" id="s-seo" wire:model="values.seo_country_description" rows="2" :maxlength="300"
+                :hint="__('admin.settings.seo_help')" :error="$errors->first('values.seo_country_description')">{{ $values['seo_country_description'] ?? '' }}</x-ui.textarea>
+        </section>
 
-            <label for="s-email">{{ __('admin.settings.contact_email') }}</label>
-            <input id="s-email" type="email" wire:model="values.contact_email" maxlength="191">
-            @error('values.contact_email')<p class="error">{{ $message }}</p>@enderror
+        <section aria-labelledby="s-ads" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
+            <h2 id="s-ads" class="text-h3 font-semibold">{{ __('admin.settings.ads') }}</h2>
+            <div class="max-w-sm">
+                <x-ui.select :label="__('admin.settings.moderation_mode')" id="s-moderation" wire:model="values.moderation_mode" :selected="$values['moderation_mode'] ?? null"
+                    :error="$errors->first('values.moderation_mode')"
+                    :options="collect(['all', 'new_users', 'none'])->mapWithKeys(fn ($m) => [$m => __('admin.settings.moderation_modes.'.$m)])->all()" />
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <x-ui.input type="number" :label="__('admin.settings.listing_expiry_days')" id="s-expiry" wire:model="values.listing_expiry_days" min="7" max="365" :error="$errors->first('values.listing_expiry_days')" />
+                <x-ui.input type="number" :label="__('admin.settings.max_images')" id="s-images" wire:model="values.max_images" min="1" max="20" :hint="__('admin.settings.max_images_help')" :error="$errors->first('values.max_images')" />
+                <x-ui.input type="number" :label="__('admin.settings.max_active_per_user')" id="s-active" wire:model="values.max_active_per_user" min="1" max="1000" :error="$errors->first('values.max_active_per_user')" />
+                <x-ui.input type="number" :label="__('admin.settings.max_new_per_day')" id="s-daily" wire:model="values.max_new_per_day" min="1" max="200" :error="$errors->first('values.max_new_per_day')" />
+            </div>
+        </section>
 
-            <label for="s-seo">{{ __('admin.settings.seo_country_description') }}</label>
-            <textarea id="s-seo" wire:model="values.seo_country_description" rows="2" maxlength="300"></textarea>
-            <p class="muted">{{ __('admin.settings.seo_help') }}</p>
-            @error('values.seo_country_description')<p class="error">{{ $message }}</p>@enderror
-        </fieldset>
+        <section aria-labelledby="s-contact" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
+            <h2 id="s-contact" class="text-h3 font-semibold">{{ __('admin.settings.contact') }}</h2>
+            <x-ui.checkbox type="switch" :label="__('admin.settings.contact_call')" id="s-call" wire:model="values.contact_call" :checked="(bool) ($values['contact_call'] ?? false)" />
+            <x-ui.checkbox type="switch" :label="__('admin.settings.contact_whatsapp')" id="s-whatsapp" wire:model="values.contact_whatsapp" :checked="(bool) ($values['contact_whatsapp'] ?? false)" />
+        </section>
 
-        <fieldset>
-            <legend>{{ __('admin.settings.ads') }}</legend>
-            <label for="s-moderation">{{ __('admin.settings.moderation_mode') }}</label>
-            <select id="s-moderation" wire:model="values.moderation_mode">
-                @foreach (['all', 'new_users', 'none'] as $mode)
-                    <option value="{{ $mode }}">{{ __('admin.settings.moderation_modes.'.$mode) }}</option>
-                @endforeach
-            </select>
-            @error('values.moderation_mode')<p class="error">{{ $message }}</p>@enderror
-
-            <label for="s-expiry">{{ __('admin.settings.listing_expiry_days') }}</label>
-            <input id="s-expiry" type="number" wire:model="values.listing_expiry_days" min="7" max="365">
-            @error('values.listing_expiry_days')<p class="error">{{ $message }}</p>@enderror
-
-            <label for="s-active">{{ __('admin.settings.max_active_per_user') }}</label>
-            <input id="s-active" type="number" wire:model="values.max_active_per_user" min="1" max="1000">
-            @error('values.max_active_per_user')<p class="error">{{ $message }}</p>@enderror
-
-            <label for="s-daily">{{ __('admin.settings.max_new_per_day') }}</label>
-            <input id="s-daily" type="number" wire:model="values.max_new_per_day" min="1" max="200">
-            @error('values.max_new_per_day')<p class="error">{{ $message }}</p>@enderror
-
-            <label for="s-images">{{ __('admin.settings.max_images') }}</label>
-            <input id="s-images" type="number" wire:model="values.max_images" min="1" max="20">
-            <p class="muted">{{ __('admin.settings.max_images_help') }}</p>
-            @error('values.max_images')<p class="error">{{ $message }}</p>@enderror
-        </fieldset>
-
-        <fieldset>
-            <legend>{{ __('admin.settings.contact') }}</legend>
-            <label><input type="checkbox" wire:model="values.contact_call"> {{ __('admin.settings.contact_call') }}</label>
-            <label><input type="checkbox" wire:model="values.contact_whatsapp"> {{ __('admin.settings.contact_whatsapp') }}</label>
-        </fieldset>
-
-        <p><button type="submit">{{ __('staff.manage.save') }}</button></p>
+        <div class="flex justify-end">
+            <x-ui.button type="submit" icon="check">{{ __('admin.settings.save') }}</x-ui.button>
+        </div>
     </form>
 </div>
