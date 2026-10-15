@@ -63,8 +63,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F2.1 Home / country home (merged 921ec7f)
 - [x] F2.2 Search UI (merged aa842ad)
 - [x] F2.3 Listing detail + seller page (merged 93d7a02)
-- [~] F3.1 Auth screens — awaiting review on `feature/F3.1-auth-screens`
-- [ ] F3.2 Account area
+- [x] F3.1 Auth screens (merged f14b9f6)
+- [~] F3.2 Account area — in progress on `feature/F3.2-account-area`
 - [ ] F4.1 Posting wizard
 - [ ] F5.1 Admin UI
 - [ ] F6.1 Accessibility, responsive, performance pass
