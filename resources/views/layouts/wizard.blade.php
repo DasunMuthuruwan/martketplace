@@ -18,7 +18,8 @@
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-fg">{{ __('layout.skip') }}</a>
     <header class="sticky top-0 z-30 border-b border-line bg-surface">
         <div class="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
-            <x-ui.button variant="ghost" size="sm" icon="chevron-left" :href="route('account.listings', ['status' => 'drafts'])">{{ $listing ? __('posting.exit_saved') : __('posting.exit') }}</x-ui.button>
+            @php($isDraft = $listing === null || $listing->status === \App\Enums\ListingStatus::Draft)
+            <x-ui.button variant="ghost" size="sm" icon="chevron-left" :href="$isDraft ? route('account.listings', ['status' => 'drafts']) : route('account.listings')">{{ $listing && $isDraft ? __('posting.exit_saved') : __('posting.exit') }}</x-ui.button>
             <p class="flex-1 text-center text-ui font-semibold text-fg">{{ $listing && $listing->status !== \App\Enums\ListingStatus::Draft ? __('posting.edit_title') : __('posting.title') }}</p>
             <p class="w-24 text-right text-small text-fg-subtle" role="status" aria-live="polite">@if (session('status'))<x-ui.icon name="check" size="16" class="inline text-success" /> {{ session('status') }}@endif</p>
         </div>

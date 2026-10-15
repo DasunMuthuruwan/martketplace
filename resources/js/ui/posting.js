@@ -49,3 +49,50 @@ document.addEventListener('input', (event) => {
     });
     list.classList.toggle('hidden', shown === 0);
 });
+
+// ---- Details and price steps --------------------------------------------------------------
+
+function syncOther(select) {
+    const box = document.getElementById(select.dataset.otherToggle);
+    if (box) {
+        box.toggleAttribute('data-other-hidden', select.value !== 'other');
+    }
+}
+
+// Dependent lists (Model under Make): only the chosen parent's group is offered.
+function syncDependent(select) {
+    const parent = select.form?.querySelector(`[name="${select.dataset.dependsOn}"]`);
+    const parentValue = parent?.value ?? '';
+    let keep = false;
+    select.querySelectorAll('optgroup[data-parent-value]').forEach((group) => {
+        const match = parentValue !== '' && group.dataset.parentValue === parentValue;
+        group.hidden = !match;
+        group.disabled = !match;
+        keep ||= match && [...group.options].some((o) => o.selected);
+    });
+    if (!keep && select.value !== 'other') {
+        select.value = '';
+    }
+}
+
+function syncPrice(form) {
+    const chosen = form.querySelector('[data-price-type]:checked')?.value;
+    form.querySelector('[data-price-amount]')?.toggleAttribute('data-amount-hidden', !['fixed', 'negotiable'].includes(chosen));
+}
+
+document.querySelectorAll('select[data-other-toggle]').forEach(syncOther);
+document.querySelectorAll('select[data-depends-on]').forEach(syncDependent);
+document.querySelectorAll('form[data-price-form]').forEach(syncPrice);
+
+document.addEventListener('change', (event) => {
+    const field = event.target;
+    if (field.matches?.('select[data-other-toggle]')) {
+        syncOther(field);
+    }
+    if (field.form) {
+        field.form.querySelectorAll(`select[data-depends-on="${field.name}"]`).forEach(syncDependent);
+        if (field.matches('[data-price-type]')) {
+            syncPrice(field.form);
+        }
+    }
+});

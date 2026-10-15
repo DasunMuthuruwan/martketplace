@@ -260,6 +260,11 @@
         flex-shrink: 0;
     }
 
+    /* Posting form: parts shown only when they apply (resources/js/ui/posting.js). */
+    [data-other-hidden], [data-amount-hidden] {
+        display: none;
+    }
+
     /* Results dim while the next search loads (resources/js/ui/search.js). */
     [data-search-results][aria-busy='true'] {
         opacity: 0.55;

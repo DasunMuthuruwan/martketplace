@@ -54,6 +54,36 @@ return [
         'change' => 'Change to :country',
     ],
 
+    'details' => [
+        'title' => 'Tell buyers about it',
+        'intro' => 'Details for :category. Fields marked * are required.',
+        'type' => 'Ad type',
+        'ad_title' => 'Title',
+        'title_hint' => 'What it is, with the key details. For example: brand, model and year.',
+        'condition_hint' => 'Not needed for "Wanted" ads.',
+        'description' => 'Description',
+        'description_hint' => 'Condition, history, what is included. Phone numbers and links go in the contact step, not here.',
+        'required_for' => 'Required for: :conditions.',
+        'other' => 'Other…',
+        'other_label' => ':field (other)',
+        'type_to_find' => 'Type to find',
+    ],
+
+    'price' => [
+        'title' => 'Set your price',
+        'intro' => 'Buyers see the full price, in the currency of the ad\'s country.',
+        'type' => 'Price',
+        'types' => ['fixed' => 'Fixed', 'negotiable' => 'Negotiable', 'free' => 'Free', 'on_request' => 'On request'],
+        'amount' => 'Amount',
+        'currency_hint' => ':name · :decimals',
+        'no_decimals' => 'no decimals',
+        'decimals' => '{1} up to :n decimal|[2,*] up to :n decimals',
+        'rent_period' => 'Rent per',
+        'periods' => ['day' => 'Day', 'month' => 'Month', 'year' => 'Year'],
+        'unit_price' => 'Price per unit: :price (calculated from the size).',
+        'none' => 'This category has no price.',
+    ],
+
     'pending' => [
         'title' => 'This step is coming soon',
         'text' => 'Your draft is saved. The remaining steps of the posting form are being built.',

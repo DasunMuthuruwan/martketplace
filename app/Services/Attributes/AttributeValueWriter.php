@@ -52,6 +52,58 @@ class AttributeValueWriter
         });
     }
 
+    /**
+     * The listing's stored values in the shape write() accepts (the `attributes` input), so an edit
+     * form starts from what was saved: option values, "other" + its text, area value + unit code.
+     *
+     * @return array<string, mixed>
+     */
+    public function currentInput(Listing $listing, CategorySchema $schema): array
+    {
+        $byAttribute = $listing->attributeValues()->with(['attribute', 'option', 'inputUnit'])->get()->groupBy('attribute.key');
+        $input = [];
+
+        foreach ($schema->fields() as $field) {
+            $key = $field['key'];
+            $rows = $byAttribute->get($key);
+            if ($rows === null || $rows->isEmpty()) {
+                continue;
+            }
+            $row = $rows->first();
+
+            switch (AttributeType::from($field['type'])) {
+                case AttributeType::MultiSelect:
+                    $input[$key] = $rows->map(fn ($r) => $r->option?->value)->filter()->values()->all();
+                    break;
+                case AttributeType::Select:
+                    if ($row->option !== null) {
+                        $input[$key] = $row->option->value;
+                    } elseif ($row->value_text !== null) {
+                        $input[$key] = AttributeOption::OTHER;
+                        $input[$key.CategorySchema::OTHER_SUFFIX] = $row->value_text;
+                    }
+                    break;
+                case AttributeType::Boolean:
+                    $input[$key] = $row->value_bool ? '1' : '0';
+                    break;
+                case AttributeType::Text:
+                    $input[$key] = $row->value_text;
+                    break;
+                case AttributeType::Year:
+                case AttributeType::Number:
+                    if ($field['dimension'] === MeasurementUnit::AREA && $row->input_value !== null) {
+                        $input[$key] = Decimal::trim((string) $row->input_value);
+                        $input[$key.CategorySchema::UNIT_SUFFIX] = $row->inputUnit?->code;
+                    } else {
+                        $input[$key] = $row->value_number === null ? null : Decimal::trim((string) $row->value_number);
+                    }
+                    break;
+            }
+        }
+
+        return $input;
+    }
+
     /** Removes every attribute value (category change). */
     public function clear(Listing $listing): void
     {

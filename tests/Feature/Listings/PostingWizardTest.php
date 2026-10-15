@@ -99,7 +99,7 @@ class PostingWizardTest extends TestCase
         $this->assertSame([$this->cars->id, $this->city->id, 'Near the lake'], [$listing->category_id, $listing->city_id, $listing->locality_text]);
         $this->assertSame($this->country->default_currency, $listing->currency);
 
-        $this->get(route('listings.edit', [$listing, 'details']))->assertOk()->assertSee(__('posting.pending.title'));
+        $this->get(route('listings.edit', [$listing, 'details']))->assertOk()->assertSee(__('posting.details.title'));
     }
 
     public function test_location_errors_are_shown_on_the_step(): void

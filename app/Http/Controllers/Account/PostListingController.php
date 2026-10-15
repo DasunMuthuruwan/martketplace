@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers\Account;
 
+use App\Actions\Listings\SaveListingDetails;
 use App\Actions\Listings\SaveListingLocation;
+use App\Actions\Listings\SaveListingPrice;
+use App\Enums\ItemCondition;
+use App\Enums\ListingType;
+use App\Enums\RentPeriod;
 use App\Exceptions\Listings\CountryChangeNeedsConfirmation;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -12,8 +17,12 @@ use App\Models\Listing;
 use App\Models\Locality;
 use App\Models\LocationRequest;
 use App\Models\Region;
+use App\Services\Attributes\AttributeSchema;
+use App\Services\Attributes\AttributeValueWriter;
+use App\Services\Attributes\CategorySchema;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
+use App\Services\Listings\ListingPresenter;
 use App\View\PostingSteps;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -77,28 +86,39 @@ class PostListingController extends Controller
         return match ($step) {
             'category' => $this->categoryStep($request, $listing, $country),
             'location' => $this->locationStep($request, $listing, $country, $this->leaf($request->query('category')) ?? $listing->category),
+            'details' => $this->detailsStep($request, $listing),
+            'price' => $this->priceStep($listing),
             default => $this->pendingStep($listing, $step),
         };
     }
 
-    public function update(Request $request, Listing $listing, string $step, SaveListingLocation $save): RedirectResponse
+    public function update(Request $request, Listing $listing, string $step): RedirectResponse
     {
         Gate::authorize('update', $listing);
-        if (! in_array($step, ['category', 'location'], true)) {
-            abort(404);
-        }
+        $user = $request->user();
 
         try {
-            $save->handle($request->user(), $listing, $this->locationInput($request, $listing));
+            match ($step) {
+                'category', 'location' => app(SaveListingLocation::class)->handle($user, $listing, $this->locationInput($request, $listing)),
+                'details' => app(SaveListingDetails::class)->handle($user, $listing, $request->only(['title', 'description', 'type', 'condition', CategorySchema::INPUT])),
+                'price' => app(SaveListingPrice::class)->handle($user, $listing, array_map(
+                    fn ($v) => $v === '' ? null : $v,
+                    ['price' => $this->amount($request->input('price'), $listing->country->number_locale)] + $request->only(['price_type', 'rent_period']),
+                )),
+                default => abort(404),
+            };
         } catch (CountryChangeNeedsConfirmation $e) {
             return back()->withInput()->with('country_change', $e->clears);
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         }
-        $this->requestTown($request, $listing);
+        if ($step === 'location') {
+            $this->requestTown($request, $listing);
+        }
 
-        return redirect()->route('listings.edit', [$listing, (new PostingSteps($listing->fresh()))->after('location')])
-            ->with('status', __('posting.saved'));
+        $next = (new PostingSteps($listing->fresh()))->after($step === 'category' ? 'location' : $step);
+
+        return redirect()->route('listings.edit', [$listing, $next ?? 'review'])->with('status', __('posting.saved'));
     }
 
     // ---- Steps --------------------------------------------------------------------------------
@@ -146,6 +166,54 @@ class PostListingController extends Controller
             ],
             'countryChange' => session('country_change'),
         ]);
+    }
+
+    private function detailsStep(Request $request, Listing $listing): View
+    {
+        $schema = app(AttributeSchema::class)->for($listing->category, $listing->country->iso2);
+        $saved = app(AttributeValueWriter::class)->currentInput($listing, $schema);
+        $old = $request->old(CategorySchema::INPUT);
+
+        return view('posting.details', $this->shared($listing, 'details') + [
+            'category' => $listing->category,
+            'fields' => $schema->form(),
+            'values' => is_array($old) ? $old : $saved,
+            'types' => $listing->category->listingTypes(),
+            'conditions' => ItemCondition::cases(),
+        ]);
+    }
+
+    private function priceStep(Listing $listing): View
+    {
+        $listing->loadMissing('currencyModel');
+
+        return view('posting.price', $this->shared($listing, 'price') + [
+            'currency' => $listing->currencyModel,
+            'priceTypes' => $listing->category->priceTypes(),
+            'rent' => $listing->type === ListingType::Rent,
+            'rentPeriods' => RentPeriod::cases(),
+            'unitPrice' => app(ListingPresenter::class)->unitPrice($listing),
+            'needsDetails' => $listing->type === null,
+        ]);
+    }
+
+    /**
+     * The price as typed, in the country's number format (grouping and decimal sign from ICU, global
+     * UX §3): "1,250,000.50" in en_LK, "1.250.000,50" where a comma is the decimal sign. Anything
+     * else is passed on as typed, so the action reports it as invalid.
+     */
+    private function amount(mixed $value, string $locale): mixed
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return $value;
+        }
+        $formatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+        $group = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+        $decimal = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+
+        $plain = str_replace([$group, ' ', "\u{00A0}", "\u{202F}"], '', trim($value));
+
+        return $decimal === '.' ? $plain : str_replace($decimal, '.', $plain);
     }
 
     private function pendingStep(Listing $listing, string $step): View

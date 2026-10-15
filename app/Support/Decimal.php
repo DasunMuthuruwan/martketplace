@@ -42,6 +42,12 @@ final class Decimal
         return bcadd($value, '0', self::scaleOf($value));
     }
 
+    /** Without trailing fractional zeros, for showing a stored value back in a form: "50.0000" → "50". */
+    public static function trim(string $value): string
+    {
+        return str_contains($value, '.') ? rtrim(rtrim($value, '0'), '.') : $value;
+    }
+
     public static function round(string $value, int $scale): string
     {
         $value = self::require($value);
