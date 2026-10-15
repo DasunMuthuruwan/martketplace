@@ -150,6 +150,9 @@ Notation: `<x-ui.*>` = generic Blade component, `<x-listing.*>` = marketplace do
 | `x-admin.stat` | Stat tile: label, number, delta/link |
 | `x-ui.table` | Sortable headers, row hover, sticky header, responsive (stacked cards below `md`), bulk select where needed |
 | `x-admin.review-pane` | Moderation review: images, fields, flags (keyword hits, phone in text, possible duplicate), seller summary (account age, listings, past rejections, reports), actions Approve / Reject (reason templates) / Request changes. Keyboard shortcuts A / R / J / K with a help popover. |
+| `x-admin.page-header` | Admin screen title (+ count badge), description, actions slot, filters slot (F5.1) |
+
+**Built (F5.1 part 1):** `x-ui.table` renders a dense `.data-table` (13 px, sticky header, hover); below `md` each row stacks and every `<td data-label>` shows its column name. Sorting and bulk select are added when a screen needs them. Reject and Ask for changes open an inline reason step inside the pane (radio templates + note) instead of a modal: Livewire re-renders would close a native `<dialog>`, and the inline step keeps the ad in view. Shortcuts are handled in `resources/js/ui/admin.js` (`data-shortcuts` scope, `data-queue-item`, `data-shortcut`), ignored while typing or with modifier keys. After a decision the next ad in the queue opens.
 | `x-admin.audit-entry` | Actor, action, target, reason, time |
 
 ## 5.5 Global Components (2026-10-11)

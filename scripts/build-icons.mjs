@@ -24,6 +24,8 @@ export const ICONS = [
     'sliders-horizontal', 'arrow-up-down', 'layout-grid', 'list',
     // Categories
     'car', 'land-plot', 'wrench', 'smartphone', 'laptop', 'sofa', 'package',
+    // Admin
+    'keyboard', 'rotate-ccw', 'circle-x', 'ban', 'inbox', 'users',
 ];
 
 if (!existsSync(source)) {

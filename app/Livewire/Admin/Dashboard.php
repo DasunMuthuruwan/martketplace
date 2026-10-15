@@ -46,6 +46,8 @@ class Dashboard extends Component
             'newUsers30' => User::where('created_at', '>=', now()->subDays(30))->count(),
             'byCategory' => $breakdown['categories'],
             'byCountry' => $breakdown['countries'],
+            'countryNames' => Country::whereIn('iso2', array_keys($breakdown['countries']))->get()
+                ->mapWithKeys(fn (Country $country) => [$country->iso2 => $country->name])->all(),
             'live' => array_sum($breakdown['categories']),
         ]);
     }

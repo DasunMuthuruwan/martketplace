@@ -23,7 +23,22 @@ return [
     ],
 
     'moderation' => [
+        'intro' => 'Flagged ads first, then the oldest. The seller is emailed with your decision.',
         'empty' => 'No ads are waiting for review.',
+        'empty_text' => 'New ads appear here when sellers send them.',
+        'queue' => 'Ads waiting for review',
+        'choose' => 'Choose an ad to review',
+        'choose_text' => 'Or press J to open the first one.',
+        'back' => 'Back to the queue',
+        'sent' => 'Sent :when',
+        'photos' => '{0} Photos|{1} 1 photo|[2,*] :count photos',
+        'no_photos' => 'No photos.',
+        'reason_step_reject' => 'Why is the ad rejected?',
+        'reason_step_changes' => 'What should the seller change?',
+        'reason_shown' => 'Choose a reason, add your own words, or both. The seller sees this text.',
+        'confirm_reject' => 'Reject the ad',
+        'confirm_changes' => 'Send to the seller',
+        'cancel' => 'Cancel',
         'flagged_only' => 'Flagged only',
         'flagged' => 'Flagged',
         'ad' => 'Ad',
@@ -56,7 +71,20 @@ return [
         ],
     ],
 
+    // Keyboard shortcut help on the work queues.
+    'shortcuts' => [
+        'title' => 'Keyboard shortcuts',
+        'approve' => 'Approve',
+        'reject' => 'Reject (choose a reason)',
+        'next' => 'Next item',
+        'previous' => 'Previous item',
+        'cancel' => 'Cancel the reason step',
+        'keys' => ['a' => 'A', 'r' => 'R', 'j' => 'J', 'k' => 'K', 'esc' => 'Esc'],
+    ],
+
     'menu' => 'Admin menu',
+    'page_of' => 'Page :page of :pages',
+    'listing_statuses' => ['draft' => 'Draft', 'pending_review' => 'Waiting for review', 'active' => 'Live', 'rejected' => 'Rejected', 'suspended' => 'Taken down', 'sold' => 'Sold', 'expired' => 'Expired'],
     'waiting' => 'waiting',
     'groups' => [
         'work' => 'Work',
@@ -84,12 +112,13 @@ return [
 
     'dashboard' => [
         'title' => 'Dashboard',
-        'pending' => 'ads waiting for review',
-        'reports' => 'open reports',
-        'place_requests' => 'place requests',
-        'new_users_7' => 'new users in 7 days',
-        'new_users_30' => 'in 30 days',
-        'live' => 'live ads',
+        'intro' => 'What needs attention now, and how the marketplace is doing.',
+        'pending' => 'Waiting for review',
+        'reports' => 'Open reports',
+        'place_requests' => 'Place requests',
+        'new_users_7' => 'New users, 7 days',
+        'new_users_30' => ':count in 30 days',
+        'live' => 'Live ads',
         'open' => 'Open',
         'by_category' => 'Live ads by category',
         'by_country' => 'Live ads by country',
@@ -253,6 +282,7 @@ return [
     ],
 
     'changes' => [
+        'intro' => 'Price changes on live ads, newest first. A big drop or rise can be a sign of a bait ad.',
         'empty' => 'No price changes yet.',
         'before' => 'Before',
         'after' => 'After',
@@ -260,7 +290,16 @@ return [
     ],
 
     'reports' => [
+        'intro' => 'Reports from buyers and sellers, oldest first. Closing a report does not notify the reporter.',
         'empty' => 'No reports here.',
+        'empty_text' => 'Try another status or type.',
+        'choose' => 'Choose a report',
+        'back' => 'Back to the reports',
+        'anonymous' => 'Unknown (account deleted)',
+        'reported_item' => 'Reported',
+        'note' => 'Note (staff only)',
+        'note_hint' => 'Kept with the report and in the audit log. Required when taking an ad down.',
+        'closed' => 'Closed :when',
         'status' => 'Status',
         'statuses' => ['open' => 'Open', 'actioned' => 'Actioned', 'dismissed' => 'Dismissed'],
         'type' => 'Reported',

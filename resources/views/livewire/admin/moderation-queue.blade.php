@@ -1,96 +1,63 @@
-<div>
-    <h1>{{ __('admin.nav.moderation') }}</h1>
+{{-- Moderation queue (layout doc §3.6): the queue on the left, the review pane on the right. On phones the
+     list or the pane is shown, with "Back to the queue". Shortcuts: resources/js/ui/admin.js. --}}
+<div data-shortcuts>
+    <x-admin.page-header :title="__('admin.nav.moderation')" :count="$queue->total()" :description="__('admin.moderation.intro')">
+        <x-ui.button variant="ghost" size="sm" icon="clock" :href="route('admin.changes')">{{ __('admin.nav.changes') }}</x-ui.button>
+        @include('livewire.admin.partials.shortcuts', ['keys' => ['a' => 'approve', 'r' => 'reject', 'j' => 'next', 'k' => 'previous', 'esc' => 'cancel']])
+        <x-slot:filters>
+            <x-ui.select :label="__('auth.ui.country')" id="filter-country" wire:model.live="country" :placeholder="__('public.any')" class="min-w-44"
+                :options="$countries->mapWithKeys(fn ($c) => [strtolower($c->iso2) => $c->name])->all()" />
+            <x-ui.checkbox type="switch" :label="__('admin.moderation.flagged_only')" id="filter-flagged" wire:model.live="flaggedOnly" class="pb-2.5" />
+        </x-slot:filters>
+    </x-admin.page-header>
 
     @if (session('status'))
-        <p class="status" role="status">{{ session('status') }}</p>
+        <x-ui.alert variant="success" role="status" class="mb-4">{{ session('status') }}</x-ui.alert>
     @endif
 
-    <p>
-        <label><input type="checkbox" wire:model.live="flaggedOnly"> {{ __('admin.moderation.flagged_only') }}</label>
-        <label>{{ __('auth.ui.country') }}
-            <select wire:model.live="country">
-                <option value="">{{ __('public.any') }}</option>
-                @foreach ($countries as $c)
-                    <option value="{{ strtolower($c->iso2) }}">{{ $c->name }}</option>
-                @endforeach
-            </select>
-        </label>
-    </p>
-
-    @if ($queue->isEmpty())
-        <p>{{ __('admin.moderation.empty') }}</p>
+    @if ($queue->isEmpty() && ! $selected)
+        <x-ui.empty-state icon="inbox" :title="__('admin.moderation.empty')">{{ __('admin.moderation.empty_text') }}</x-ui.empty-state>
     @else
-        <table>
-            <thead><tr><th>{{ __('admin.moderation.ad') }}</th><th>{{ __('admin.moderation.seller') }}</th><th>{{ __('admin.moderation.submitted') }}</th><th></th></tr></thead>
-            <tbody>
-                @foreach ($queue as $item)
-                    <tr wire:key="queue-{{ $item->id }}">
-                        <td>
-                            @if ($item->flagged)<span class="flag">{{ __('admin.moderation.flagged') }}</span>@endif
-                            {{ $item->title }}<br>
-                            <span class="muted">{{ $item->category->name }} · {{ $item->country->name }}</span>
-                        </td>
-                        <td>{{ $item->user->name }}</td>
-                        <td class="muted">{{ $item->submitted_at?->diffForHumans() }}</td>
-                        <td><button type="button" wire:click="select({{ $item->id }})">{{ __('admin.moderation.review') }}</button></td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        {{ $queue->links('livewire.admin.pagination') }}
-    @endif
-
-    @if ($selected)
-        <section class="pane" aria-labelledby="review-title">
-            <h2 id="review-title">{{ $selected->title }}</h2>
-            <p class="muted">{{ $selected->category->name }} · {{ $present->location($selected, true) }} · {{ $present->price($selected) }}</p>
-
-            @if ($reasons !== [])
-                <p class="flag">{{ __('admin.moderation.reasons') }}:
-                    @foreach ($reasons as $reason)
-                        {{ str_starts_with($reason, 'term:') ? __('admin.moderation.reason_term', ['term' => substr($reason, 5)]) : __('admin.moderation.reason_'.$reason) }}@if (! $loop->last), @endif
-                    @endforeach
-                </p>
-            @endif
-
-            @foreach ($selected->images as $image)
-                <img src="{{ $image->url('sm') }}" alt="" width="{{ min($image->width, 480) }}" loading="lazy">
-            @endforeach
-
-            <p>{!! nl2br(e($selected->description)) !!}</p>
-            @if ($selected->attributes_summary)
-                <ul>
-                    @foreach ($selected->attributes_summary as $key => $value)
-                        <li>{{ $key }}: {{ is_array($value) ? (isset($value['value']) ? $value['value'].' '.$value['unit'] : implode(', ', $value)) : (is_bool($value) ? ($value ? '✓' : '✗') : $value) }}</li>
+        <div class="grid items-start gap-4 lg:grid-cols-[minmax(260px,340px)_minmax(0,1fr)]">
+            <div @class(['min-w-0', 'max-lg:hidden' => $selected])>
+                <ul class="divide-y divide-line overflow-hidden rounded-card border border-line bg-surface" aria-label="{{ __('admin.moderation.queue') }}">
+                    @foreach ($queue as $item)
+                        @php($current = $selected?->id === $item->id)
+                        <li wire:key="queue-{{ $item->id }}">
+                            <button type="button" wire:click="select({{ $item->id }})" data-queue-item @if ($current) aria-current="true" @endif
+                                @class([
+                                    'flex w-full items-start gap-3 px-3 py-2.5 text-left hover:bg-surface-hover',
+                                    'bg-surface-muted shadow-[inset_3px_0_0_var(--fg)]' => $current,
+                                ])>
+                                @if ($item->coverImage)
+                                    <img src="{{ $item->coverImage->url('sm') }}" alt="" loading="lazy" class="size-12 shrink-0 rounded-control bg-surface-muted object-cover">
+                                @else
+                                    <span class="grid size-12 shrink-0 place-items-center rounded-control bg-surface-muted text-fg-subtle"><x-ui.icon name="image" size="20" /></span>
+                                @endif
+                                <span class="min-w-0 flex-1">
+                                    <span class="block truncate text-ui font-medium text-fg">{{ $item->title }}</span>
+                                    <span class="block truncate text-small text-fg-muted">{{ $item->category->name }} · {{ $item->country->iso2 }} · {{ $item->submitted_at?->diffForHumans(short: true) }}</span>
+                                    <span class="block truncate text-small text-fg-subtle">{{ $item->user->name }}</span>
+                                </span>
+                                @if ($item->flagged)
+                                    <x-ui.icon name="triangle-alert" size="16" class="mt-0.5 text-warning" /><span class="sr-only">{{ __('admin.moderation.flagged') }}</span>
+                                @endif
+                            </button>
+                        </li>
                     @endforeach
                 </ul>
-            @endif
+                {{ $queue->links('livewire.admin.pagination') }}
+            </div>
 
-            <h3>{{ __('admin.moderation.seller') }}</h3>
-            <p class="muted">
-                {{ $seller['name'] }} · {{ __('public.member_since', ['date' => $seller['since']?->format('F Y')]) }}
-                · {{ $seller['verified'] ? __('public.email_verified') : __('admin.moderation.unverified') }}
-                · {{ __('admin.moderation.seller_stats', ['published' => $seller['published'], 'rejected' => $seller['rejected'], 'reports' => $seller['open_reports']]) }}
-            </p>
-
-            @error('status')<p class="error" role="alert">{{ $message }}</p>@enderror
-            @error('reason')<p class="error" role="alert">{{ $message }}</p>@enderror
-
-            <label for="template">{{ __('admin.moderation.template') }}</label>
-            <select id="template" wire:model="template">
-                <option value=""></option>
-                @foreach ($templates as $key => $text)
-                    <option value="{{ $key }}">{{ $text }}</option>
-                @endforeach
-            </select>
-            <label for="note">{{ __('admin.moderation.note') }}</label>
-            <textarea id="note" wire:model="note" rows="3" maxlength="500"></textarea>
-
-            <p>
-                <button type="button" wire:click="approve">{{ __('admin.moderation.approve') }}</button>
-                <button type="button" wire:click="requestChanges">{{ __('admin.moderation.request_changes') }}</button>
-                <button type="button" wire:click="reject">{{ __('admin.moderation.reject') }}</button>
-            </p>
-        </section>
+            <div class="min-w-0">
+                @if ($selected)
+                    <x-ui.button variant="ghost" size="sm" icon="chevron-left" wire:click="close" class="mb-2 lg:hidden">{{ __('admin.moderation.back') }}</x-ui.button>
+                    <x-admin.review-pane :listing="$selected" :present="$present" :reasons="$reasons" :seller="$seller" :fields="$fields"
+                        :templates="$templates" :decision="$decision" :messages="$errors" wire:key="pane-{{ $selected->id }}" />
+                @else
+                    <x-ui.empty-state icon="shield-check" :title="__('admin.moderation.choose')" class="max-lg:hidden">{{ __('admin.moderation.choose_text') }}</x-ui.empty-state>
+                @endif
+            </div>
+        </div>
     @endif
 </div>

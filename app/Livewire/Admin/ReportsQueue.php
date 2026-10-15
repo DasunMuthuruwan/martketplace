@@ -67,6 +67,13 @@ class ReportsQueue extends Component
         $this->resetErrorBag();
     }
 
+    /** Back to the list (phones). */
+    public function close(): void
+    {
+        $this->reset('selectedId', 'note');
+        $this->resetErrorBag();
+    }
+
     public function dismiss(ResolveReport $resolve): void
     {
         $this->resolveWith($resolve, ReportStatus::Dismissed, 'admin.reports.dismissed');

@@ -108,9 +108,13 @@ class ModerationAdminTest extends TestCase
 
         Livewire::actingAs($this->moderator)->test(ModerationQueue::class)
             ->call('select', $toApprove->id)->call('approve')
-            ->assertSet('selectedId', null)
-            ->call('select', $toReject->id)->set('template', 'photos')->set('note', 'Please add your own photos.')->call('reject')
-            ->call('select', $toChange->id)->set('template', 'price')->call('requestChanges');
+            // The next ad waiting opens straight away (F5.1).
+            ->assertSet('selectedId', $toReject->id)
+            ->call('startDecision', 'reject')->assertSet('decision', 'reject')
+            ->set('template', 'photos')->set('note', 'Please add your own photos.')->call('reject')
+            ->assertSet('selectedId', $toChange->id)->assertSet('decision', null)
+            ->call('startDecision', 'changes')->set('template', 'price')->call('requestChanges')
+            ->assertSet('selectedId', null);
 
         $this->assertSame(ListingStatus::Active, $toApprove->fresh()->status);
         $this->assertSame(ListingStatus::Rejected, $toReject->fresh()->status);

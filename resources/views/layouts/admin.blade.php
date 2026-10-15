@@ -34,7 +34,7 @@
             </div>
         </div>
     </header>
-    <div class="lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+    <div class="min-h-[calc(100dvh-3.5rem)] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
         <aside class="hidden border-r border-line bg-surface px-3 py-5 lg:block">
             <div class="sticky top-20">@include('partials.layout.admin-nav')</div>
         </aside>
