@@ -72,6 +72,13 @@ class UsersAdmin extends Component
         $this->resetErrorBag();
     }
 
+    /** Back to the list (phones). */
+    public function close(): void
+    {
+        $this->reset('selectedId', 'reason', 'until');
+        $this->resetErrorBag();
+    }
+
     public function suspend(ManageAccount $accounts): void
     {
         $until = $this->until === '' ? null : Carbon::parse($this->until)->endOfDay();

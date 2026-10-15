@@ -1,43 +1,38 @@
+{{-- Audit log (ADM-07): read-only, newest first, filtered by action (a prefix ending in "." matches a
+     group), actor (email or ID), item and dates. --}}
 <div>
-    <h1>{{ __('admin.nav.audit') }}</h1>
-
-    <div class="filters">
-        <label>{{ __('admin.audit.action') }} <input type="text" wire:model.live.debounce.500ms="action" maxlength="60" placeholder="listing."></label>
-        <label>{{ __('admin.audit.actor') }} <input type="text" wire:model.live.debounce.500ms="actor" maxlength="191"></label>
-        <label>{{ __('admin.audit.subject') }}
-            <select wire:model.live="subjectType">
-                <option value="">{{ __('public.any') }}</option>
-                @foreach ($subjectTypes as $type)
-                    <option value="{{ $type }}">{{ class_basename($type) }}</option>
-                @endforeach
-            </select>
-        </label>
-        <label>#<input type="text" inputmode="numeric" wire:model.live.debounce.500ms="subjectId" maxlength="20" aria-label="{{ __('admin.audit.subject_id') }}"></label>
-        <label>{{ __('admin.audit.from') }} <input type="date" wire:model.live="from"></label>
-        <label>{{ __('admin.audit.to') }} <input type="date" wire:model.live="to"></label>
-        <button type="button" wire:click="clear">{{ __('admin.audit.clear') }}</button>
-    </div>
+    <x-admin.page-header :title="__('admin.nav.audit')" :description="__('admin.audit.intro')">
+        <x-slot:filters>
+            <x-ui.input :label="__('admin.audit.action')" id="audit-action" wire:model.live.debounce.500ms="action" maxlength="60" placeholder="listing." class="w-40" />
+            <x-ui.input :label="__('admin.audit.actor')" id="audit-actor" wire:model.live.debounce.500ms="actor" maxlength="191" :placeholder="__('admin.audit.actor_hint')" class="w-56" />
+            <x-ui.select :label="__('admin.audit.subject')" id="audit-subject" wire:model.live="subjectType" :placeholder="__('public.any')" class="w-40"
+                :options="$subjectTypes->mapWithKeys(fn ($type) => [$type => class_basename($type)])->all()" />
+            <x-ui.input :label="__('admin.audit.subject_id')" id="audit-subject-id" inputmode="numeric" wire:model.live.debounce.500ms="subjectId" maxlength="20" class="w-28" />
+            <x-ui.input type="date" :label="__('admin.audit.from')" id="audit-from" wire:model.live="from" class="w-40" />
+            <x-ui.input type="date" :label="__('admin.audit.to')" id="audit-to" wire:model.live="to" class="w-40" />
+            <x-ui.button variant="ghost" icon="x" wire:click="clear">{{ __('admin.audit.clear') }}</x-ui.button>
+        </x-slot:filters>
+    </x-admin.page-header>
 
     @if ($entries->isEmpty())
-        <p class="muted">{{ __('admin.audit.empty') }}</p>
+        <x-ui.empty-state icon="eye" :title="__('admin.audit.empty')" />
     @else
-        <table>
-            <thead><tr><th>{{ __('admin.changes.when') }}</th><th>{{ __('admin.audit.actor') }}</th><th>{{ __('admin.audit.action') }}</th><th>{{ __('admin.audit.subject') }}</th><th>{{ __('admin.audit.details') }}</th></tr></thead>
+        <x-ui.table :caption="__('admin.nav.audit')">
+            <thead>
+                <tr>
+                    <th scope="col">{{ __('admin.changes.when') }}</th>
+                    <th scope="col">{{ __('admin.audit.actor') }}</th>
+                    <th scope="col">{{ __('admin.audit.action') }}</th>
+                    <th scope="col">{{ __('admin.audit.subject') }}</th>
+                    <th scope="col">{{ __('admin.audit.details') }}</th>
+                </tr>
+            </thead>
             <tbody>
                 @foreach ($entries as $entry)
-                    <tr wire:key="audit-{{ $entry->id }}">
-                        <td class="muted">{{ $entry->created_at?->toDateTimeString() }}</td>
-                        <td>{{ $entry->actor?->name ?? __('admin.audit.system') }}@if ($entry->actor)<br><span class="muted">{{ $entry->actor->email }}</span>@endif</td>
-                        <td><code>{{ $entry->action }}</code></td>
-                        <td>@if ($entry->subject_type){{ class_basename($entry->subject_type) }} #{{ $entry->subject_id }}@endif</td>
-                        <td>
-                            @if ($entry->reason)<p>{{ $entry->reason }}</p>@endif
-                            @if ($entry->changes)<pre>{{ json_encode($entry->changes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</pre>@endif
-                        </td>
-                    </tr>
+                    <x-admin.audit-entry :entry="$entry" wire:key="audit-{{ $entry->id }}" />
                 @endforeach
             </tbody>
-        </table>
+        </x-ui.table>
         {{ $entries->links('livewire.admin.pagination') }}
     @endif
 </div>

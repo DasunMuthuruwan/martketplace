@@ -175,6 +175,37 @@ return [
         'removed' => 'Removed ":term".',
         'exists' => 'This term is already on the list for that country.',
         'empty' => 'No terms yet.',
+        'add_title' => 'Add a word or phrase',
+        'search' => 'Search terms',
+        'remove' => 'Remove ":term"',
+    ],
+
+    'users' => [
+        'intro' => 'Find an account by name, email or phone. Every action is logged and the person is emailed where it affects them.',
+        'empty' => 'No accounts match.',
+        'empty_text' => 'Try part of the name, the email, or the last digits of the phone number.',
+        'choose' => 'Choose an account',
+        'back' => 'Back to the list',
+        'email_status' => 'Email status',
+        'email_address' => 'Email address',
+        'phone' => 'Phone',
+        'reports' => 'Open reports about this account',
+        'ads' => 'Ads',
+        'no_ads' => 'No ads.',
+        'actions' => 'Account actions',
+        'reason_hint' => 'Required for suspend, ban, delete and legal hold. Shown to the person for suspend and ban.',
+        'danger_help' => 'Banning stops the account and hides its ads for good. Deleting removes the account and its ads. Both ask for your password again.',
+        'confirm_delete' => 'Delete the account of :name and all its ads? This cannot be undone.',
+    ],
+
+    'staff' => [
+        'intro' => 'Who can use the admin area and what they may do. Changes ask for your password again.',
+        'actions' => 'Actions',
+        'you' => 'you',
+        'two_factor_on' => 'On',
+        'two_factor_off' => 'Not set up',
+        'add' => 'Add',
+        'confirm_reset' => 'Reset two-factor authentication for :name? They must set it up again at their next sign-in.',
     ],
 
     'audit' => [
@@ -188,6 +219,9 @@ return [
         'details' => 'Details',
         'system' => 'System',
         'empty' => 'No entries match.',
+        'intro' => 'Every staff action and important account change, newest first. Entries cannot be edited.',
+        'actor_hint' => 'Email or ID',
+        'show_changes' => 'Show changes',
     ],
 
     'catalogue' => [
