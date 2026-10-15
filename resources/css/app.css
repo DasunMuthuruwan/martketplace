@@ -132,6 +132,14 @@
     html {
         -webkit-text-size-adjust: 100%;
         scroll-padding-top: 5rem;
+        /* Phones: the bottom navigation / sticky action bar must not cover the focused element (WCAG 2.4.11). */
+        scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+    }
+
+    @media (min-width: 64rem) {
+        html {
+            scroll-padding-bottom: 0;
+        }
     }
 
     body {

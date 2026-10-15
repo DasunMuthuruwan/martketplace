@@ -29,3 +29,5 @@
 | Q-UX-6 | Card columns from the width actually available: phones 2, tablets 3, desktop with filters 3, wide pages without a sidebar 4. | Design system §6 |
 
 Note on Q-UX-4: the owner's examples are formatting illustrations. Grouping follows each country's convention, so 7,850,000 rupees in India shows as `₹78,50,000` (lakh grouping), not `₹7,850,000`.
+
+- [06 Accessibility and performance audit](06-accessibility-performance-audit.md) (F6.1): budgets measured, WCAG checks and fixes, open items.

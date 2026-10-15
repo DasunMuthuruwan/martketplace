@@ -85,14 +85,14 @@
             @elseif ($view === 'list')
                 <ul class="space-y-3">
                     @foreach ($results as $listing)
-                        <li><x-listing.card :listing="$listing" :present="$present" :with-code="$country === null" variant="row" /></li>
+                        <li><x-listing.card :listing="$listing" :present="$present" :with-code="$country === null" variant="row" :eager="$loop->first ? 'high' : $loop->index < 4" /></li>
                     @endforeach
                 </ul>
             @else
                 <div class="listing-grid-area">
                     <ul class="listing-grid">
                         @foreach ($results as $listing)
-                            <li><x-listing.card :listing="$listing" :present="$present" :with-code="$country === null" class="h-full" /></li>
+                            <li><x-listing.card :listing="$listing" :present="$present" :with-code="$country === null" class="h-full" :eager="$loop->first ? 'high' : $loop->index < 4" /></li>
                         @endforeach
                     </ul>
                 </div>

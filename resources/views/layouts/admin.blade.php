@@ -24,13 +24,14 @@
 <body class="min-h-dvh">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-fg">{{ __('layout.skip') }}</a>
     <header class="sticky top-0 z-30 border-b border-line bg-surface">
-        <div class="flex h-14 items-center gap-3 px-4 lg:px-6">
+        <div class="flex h-14 items-center gap-2 px-4 sm:gap-3 lg:px-6">
             <x-ui.button variant="ghost" icon="menu" :label="__('admin.menu')" class="lg:hidden" data-modal-open="admin-menu" />
             @include('partials.layout.brand', ['href' => route('admin.dashboard')])
-            <x-ui.badge variant="outline">{{ __('admin.title') }}</x-ui.badge>
-            <div class="ml-auto flex items-center gap-2">
-                <x-ui.button variant="ghost" size="sm" :href="route('home')" icon="external-link">{{ __('admin.nav.site') }}</x-ui.button>
-                @include('partials.layout.theme-toggle')
+            <x-ui.badge variant="outline" class="max-sm:hidden">{{ __('admin.title') }}</x-ui.badge>
+            {{-- Narrow screens: "View site" shows its icon only and the theme choice moves into the menu drawer (WCAG 1.4.10). --}}
+            <div class="ml-auto flex shrink-0 items-center gap-2">
+                <x-ui.button variant="ghost" size="sm" :href="route('home')" icon="external-link"><span class="max-sm:sr-only">{{ __('admin.nav.site') }}</span></x-ui.button>
+                <div class="max-sm:hidden">@include('partials.layout.theme-toggle')</div>
             </div>
         </div>
     </header>
@@ -44,6 +45,10 @@
     </div>
     <x-ui.drawer id="admin-menu" :title="__('admin.title')" side="left">
         @include('partials.layout.admin-nav')
+        <div class="mt-6 flex items-center justify-between border-t border-line px-3 pt-4 sm:hidden">
+            <span class="text-small text-fg-subtle">{{ __('ui.theme.label') }}</span>
+            @include('partials.layout.theme-toggle')
+        </div>
     </x-ui.drawer>
     <x-ui.toasts />
 </body>

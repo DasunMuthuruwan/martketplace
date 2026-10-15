@@ -3,6 +3,7 @@
     'present',            // App\Services\Listings\ListingPresenter
     'withCode' => false,  // pages that mix countries: ISO code after ambiguous symbols, country in the place
     'variant' => 'grid',  // grid | row (list view: photo left)
+    'eager' => false,     // first cards of a page (likely above the fold): load at once, not lazily (LCP)
 ])
 {{-- Listing card (components §5.1): 4:3 photo, full price (Q-UX-4), title (2 lines), up to three key
      facts, place · time. The whole card is one link (the title, stretched). Photo count needs
@@ -28,7 +29,7 @@
 ]) }}>
     <div @class(['relative shrink-0 bg-surface-muted aspect-[4/3]', 'w-32 sm:w-40' => $row])>
         @if ($cover)
-            <img src="{{ $cover }}" alt="" width="480" height="360" loading="lazy" decoding="async" class="size-full object-cover">
+            <img src="{{ $cover }}" alt="" width="480" height="360" @if ($eager) fetchpriority="{{ $eager === 'high' ? 'high' : 'auto' }}" @else loading="lazy" @endif decoding="async" class="size-full object-cover">
         @else
             <div class="grid size-full place-items-center text-fg-subtle"><x-ui.icon :name="$icon" size="24" /></div>
         @endif

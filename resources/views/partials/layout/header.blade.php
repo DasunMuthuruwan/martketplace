@@ -7,7 +7,7 @@
     $savedUrl = \App\View\Navigation::url('saved');
 @endphp
 <header class="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
-    <div class="mx-auto flex h-14 max-w-(--container-page) items-center gap-3 px-4 lg:h-16 lg:px-6">
+    <div class="mx-auto flex h-14 max-w-(--container-page) items-center gap-2 px-4 sm:gap-3 lg:h-16 lg:px-6">
         @include('partials.layout.brand')
 
         <form method="GET" action="{{ $searchAction }}" role="search" class="ml-4 hidden max-w-xl flex-1 lg:flex">
@@ -19,7 +19,7 @@
             </button>
         </form>
 
-        <div class="ml-auto flex items-center gap-1">
+        <div class="ml-auto flex shrink-0 items-center gap-1">
             <a href="{{ $searchAction }}" class="grid size-10 place-items-center rounded-control text-fg hover:bg-surface-hover lg:hidden" aria-label="{{ __('layout.search') }}">
                 <x-ui.icon name="search" size="20" />
             </a>

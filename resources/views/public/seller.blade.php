@@ -25,7 +25,7 @@
         <div class="listing-grid-area">
             <ul class="listing-grid">
                 @foreach ($listings as $listing)
-                    <li><x-listing.card :listing="$listing" :present="$present" :with-code="true" class="h-full" /></li>
+                    <li><x-listing.card :listing="$listing" :present="$present" :with-code="true" class="h-full" :eager="$loop->first ? 'high' : $loop->index < 4" /></li>
                 @endforeach
             </ul>
         </div>

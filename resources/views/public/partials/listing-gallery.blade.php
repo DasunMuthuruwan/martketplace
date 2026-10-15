@@ -41,7 +41,8 @@
         @endif
         <dialog id="gallery-zoom" aria-label="{{ __('listings.detail.photos') }}" class="m-0 size-full max-h-none max-w-none bg-[#0a0a0a] p-0 backdrop:bg-black/90">
             <x-ui.button variant="secondary" icon="x" :label="__('ui.close')" class="fixed right-4 top-4 z-10" data-modal-close />
-            <img src="" alt="" data-gallery-zoom-image class="size-full object-contain">
+            {{-- No src until a photo is opened (an empty src would request the page again). --}}
+            <img alt="" data-gallery-zoom-image class="size-full object-contain">
         </dialog>
     </section>
 @endif
