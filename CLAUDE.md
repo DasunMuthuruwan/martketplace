@@ -113,6 +113,7 @@ Record completed tasks, architectural decisions, known issues and pending work. 
 - **Global marketplace (2026-10-11):** multi-country. Never hardcode a country, currency, phone format, location label or land unit (`LKR`, `Sri Lanka`, `+94`, `Province`, `perch`) in code. These live in data (countries, currencies, regions, cities, measurement units). See `docs/architecture/13-global-marketplace.md`.
 - Local database for this project: standalone MariaDB 10.11 at `C:\mariadb10.11`, `127.0.0.1:3307` (start with `C:\mariadb10.11\start-marketplace-db.bat`). Do not use XAMPP's MariaDB on port 3306 (pre-existing corruption; shared with other projects).
 - Local PHP for this project: `C:\php8.4\php.exe` (standalone PHP 8.4, not on PATH). Never modify `C:\php8.2` (used by Dev Talk), other PHP folders or the global PATH.
+- Browser checks (ADR-025): `npm run build`, then `PHP_BINARY=C:/php8.4/php.exe npm run test:browser` (Playwright + axe) and `npm run lighthouse`. They use their own SQLite database (`BrowserTestSeeder`) on port 8130 and the installed Edge.
 
 ## Initial Instruction
 

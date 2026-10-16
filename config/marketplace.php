@@ -164,4 +164,9 @@ return [
         'failed_job' => 30,
     ],
 
+    // Browser tests only (BrowserTestSeeder, tests/Browser, ADR-025): password of the seeded accounts.
+    'testing' => [
+        'browser_password' => env('BROWSER_TEST_PASSWORD'),
+    ],
+
 ];

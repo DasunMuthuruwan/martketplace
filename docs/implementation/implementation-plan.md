@@ -179,7 +179,7 @@ Remaining hosting checks (SSH, symlinks, cron interval, inodes, mail limit, outb
 
 | Milestone | Content |
 |---|---|
-| **M8 QA (Phase 7)** | Browser end-to-end tests ([OPEN D-1]: Laravel Dusk vs Playwright; recommend **Playwright**: Node is available, axe-core integration, no ChromeDriver management). Key journeys per country (LK, plus one 1-level country such as US): register → post → moderate → search → contact. Global scenarios 1–15. Authorization boundary sweep. Regression of all feature tests on MySQL. |
+| **M8 QA (Phase 7)** | Browser end-to-end tests (D-1 decided: **Playwright**, ADR-025; set up in F6.1 with axe and Lighthouse). Key journeys per country (LK, plus one 1-level country such as US): register → post → moderate → search → contact. Global scenarios 1–15. Authorization boundary sweep. Regression of all feature tests on MySQL. |
 | **M9 Security (Phase 8)** | Security-doc checklist review, OWASP ASVS L1-style pass, upload abuse tests, rate-limit verification, dependency audit, secrets scan. Fix + retest evidence. |
 | **M10 Deployment (Phase 9)** | Hosting verification script (approved upload), account decision (CD-03), staging subdomain, release packaging (vendor included, prebuilt assets), migrations via SSH or one-off cron, DNS/SSL (**approval**), production launch with Sri Lanka active, smoke tests, rollback rehearsal. |
 | **M11 Operations (Phase 10)** | Backups + restore drill, monitoring (logs, disk/inodes, queue backlog), runbooks (2FA break-glass, location curation, country activation checklist, domain migration), update cadence. |

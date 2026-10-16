@@ -3,8 +3,10 @@
 @auth
     @php($user = auth()->user())
     <details class="group relative" data-dropdown>
-        <summary class="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-control px-1.5 hover:bg-surface-hover [&::-webkit-details-marker]:hidden" aria-label="{{ __('layout.account_menu') }}">
-            <x-ui.avatar :name="$user->name" size="32" />
+        <summary class="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-control px-1.5 hover:bg-surface-hover [&::-webkit-details-marker]:hidden">
+            {{-- Name from content, not aria-label: the initials are decorative (WCAG 2.5.3 label in name). --}}
+            <span aria-hidden="true"><x-ui.avatar :name="$user->name" size="32" /></span>
+            <span class="sr-only">{{ __('layout.account_menu') }}</span>
         </summary>
         <div class="absolute right-0 z-40 mt-1 w-64 rounded-card border border-line bg-surface p-1 shadow-overlay">
             <p class="truncate px-3 pb-2 pt-1.5 text-small text-fg-subtle">{{ $user->name }}</p>

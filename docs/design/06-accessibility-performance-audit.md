@@ -1,6 +1,6 @@
 # Accessibility and Performance Audit (F6.1)
 
-Checks against [forms, states and accessibility](04-forms-states-accessibility.md) §3 (WCAG 2.2 AA checklist) and §5 (performance budget). Part 1 was done without new tools; automated axe and Lighthouse runs are part 2 and need the tooling decision below.
+Checks against [forms, states and accessibility](04-forms-states-accessibility.md) §3 (WCAG 2.2 AA checklist) and §5 (performance budget). Part 1 was done without new tools; part 2 added automated axe and Lighthouse runs (ADR-025: Playwright, `@axe-core/playwright`, `lighthouse` as dev tools).
 
 Date: 2026-10-15. Build: Vite production build of `main` plus the F6.1 changes.
 
@@ -13,7 +13,7 @@ Date: 2026-10-15. Build: Vite production build of `main` plus the F6.1 changes.
 | Fonts | Geist variable, Latin, ≤ 45 KB woff2, `swap`, preloaded | Latin 29.4 KB, `font-display: swap` (Fontsource). Other subsets (Latin Extended, Cyrillic, Vietnamese) load only when a page uses those characters (`unicode-range`). **Now preloaded** (Latin text font). | Pass |
 | Listing card image | `sm` WebP ≤ 40 KB, lazy below the fold, width and height | WebP `sm`, width/height set. **Changed:** the first four cards of a results grid load at once (the first with `fetchpriority="high"`), the rest lazily. Before, every card was lazy, which delays the largest image above the fold. | Pass (file size depends on uploads; the encoder settings were checked in T4.3) |
 | LCP image (detail page) | `lg` WebP, `fetchpriority="high"` | First gallery photo: `fetchpriority="high"`, the others lazy, width and height from the stored image | Pass |
-| Lighthouse mobile | Perf ≥ 85, A11y ≥ 95, BP ≥ 95, SEO ≥ 95 | Not run yet (part 2) | Open |
+| Lighthouse mobile | Perf ≥ 85, A11y ≥ 95, BP ≥ 95, SEO ≥ 95 | Home 96 / 100 / 100 / 100; category page 97 / 100 / 100 / 100; listing 97 / 100 / 100 / 100; log in 99 / 100 / 100 / n/a (sign-in pages are noindex on purpose). Run on the PHP development server, so Performance is a lower bound. | Pass |
 
 ## 2. WCAG 2.2 AA Checklist
 
@@ -32,12 +32,21 @@ Date: 2026-10-15. Build: Vite production build of `main` plus the F6.1 changes.
 | Keyboard | Admin queues: A / R / J / K / Esc shortcuts, ignored while typing and with modifier keys. Dialogs: native `<dialog>`. | Pass (code review). A manual keyboard walk-through is still to do. |
 | Other fixes | The gallery zoom image had `src=""` (some browsers request the page again); it now has no `src` until a photo is opened. Brand logo images got a height. | Fixed |
 
-## 3. Still Open
+## 3. Automated Scans (Part 2)
+
+**axe** (`npm run test:browser`, `tests/Browser/accessibility.spec.mjs`): WCAG 2.0 / 2.1 / 2.2 A and AA rules on 22 screens (guest: country home, countries, search, log in, register, forgot password, help page, seller page, listing, listing with the number shown; seller: account, my ads, saved, profile, security, contact settings, post an ad; moderator: dashboard, moderation with an ad open, the reason step, reports with a report open, recent changes), each in desktop light, desktop dark and phone (66 checks).
+
+| Found by axe | Fix |
+|---|---|
+| `label-content-name-mismatch` (serious, WCAG 2.5.3) on every page: the wordmark link was named "Marketplace home" by `aria-label` while showing the monogram and name | The name now comes from the visible text plus a screen-reader-only "home"; with a logo, from the logo's alt text |
+| Same rule on the account menu button (named "Account menu", showing the initials) | Initials hidden from assistive technology, name from screen-reader-only text |
+
+**Lighthouse** (`npm run lighthouse`, `scripts/lighthouse.mjs`): mobile preset on home, a category page, a listing and log in, with indexing on as in production. It found: headings that skipped a level on the search page (filter groups and result cards were h3 with no h2), fixed with "Filters" and "Results" h2 headings for screen readers. Keyword searches are noindex by design, so the indexable category page is measured instead.
+
+## 4. Still Open
 
 | Item | Needs |
 |---|---|
-| Automated axe scan (contrast in context, ARIA rules) | A browser test tool. D-1 (Playwright vs Dusk) is open; the plan recommends Playwright with `@axe-core/playwright`. |
-| Lighthouse mobile scores | The `lighthouse` npm package (dev dependency or `npx`), run against a local production build. |
-| Manual pass | Keyboard and screen reader (NVDA + Chrome, TalkBack) on the key flows: search, listing, contact, post an ad, moderation. |
-
-These are proposed for F6.1 part 2 once the tooling is approved; the manual pass belongs to Phase 7 QA.
+| Manual pass | Keyboard and screen reader (NVDA + Chrome, TalkBack) on the key flows: search, listing, contact, post an ad, moderation. Phase 7 QA. |
+| Production Lighthouse | Repeat on staging (real web server, HTTPS, caching) before launch. |
+| CI | A browser job (Chromium download) can run `npm run test:browser` later. |

@@ -7,6 +7,7 @@ return [
     // Search page (layout doc §3.2).
     'breadcrumbs' => 'Breadcrumbs',
     'filters' => 'Filters',
+    'results' => 'Results',
     'active_filters' => 'Active filters',
     'all_categories' => 'All categories',
     'location' => 'Location',

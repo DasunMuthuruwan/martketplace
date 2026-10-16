@@ -5,6 +5,7 @@
 return [
     'skip' => 'Skip to content',
     'home_label' => ':name home',
+    'home_suffix' => 'home',
     'tagline' => 'Buy and sell directly with people near you.',
     'search' => 'Search',
     'search_label' => 'Search ads',

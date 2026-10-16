@@ -40,7 +40,9 @@
     @endif
 
     <div class="lg:grid lg:grid-cols-[272px_minmax(0,1fr)] lg:gap-8">
-        <aside class="hidden lg:block" aria-label="{{ __('search.filters') }}">
+        <aside class="hidden lg:block" aria-labelledby="filters-heading">
+            {{-- h2 for the filter groups (h3) and the results, so headings do not skip a level. --}}
+            <h2 id="filters-heading" class="sr-only">{{ __('search.filters') }}</h2>
             <div class="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pr-1">
                 @include('public.partials.search-filters', ['prefix' => 'side'])
             </div>
@@ -75,6 +77,7 @@
                 </div>
             @endif
 
+            <h2 class="sr-only">{{ __('search.results') }}</h2>
             @if ($results->isEmpty())
                 <x-ui.empty-state icon="search" :title="__('search.empty_title')">
                     {{ $chips !== [] ? __('search.empty_filters') : __('search.empty_text') }}
