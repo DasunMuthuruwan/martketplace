@@ -70,7 +70,13 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F6.1 Accessibility, responsive, performance pass (part 1 merged 3a787bb; part 2 merged 7c59579)
 
 ## Phases 7–10
-- [ ] M8 QA (browser tests: D-1 Playwright vs Dusk)
+- [~] M8 QA ([plan](../qa/qa-plan.md); D-1 = Playwright, ADR-025)
+  - [~] Q7.1 Baseline and findings log — in progress on `feature/Q7.1-qa-baseline`
+  - [ ] Q7.2 End-to-end journeys (Playwright)
+  - [ ] Q7.3 Global scenarios 1–15 traceability
+  - [ ] Q7.4 Authorization boundary sweep
+  - [ ] Q7.5 Performance re-check (50k listings)
+  - [ ] Q7.6 QA report
 - [ ] M9 Security review
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
