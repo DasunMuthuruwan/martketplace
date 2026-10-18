@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Category;
+use App\Models\Country;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 return [
@@ -131,6 +134,13 @@ return [
     |
     */
 
-    'serializable_classes' => false,
+    // Only what the application caches as objects (CatalogueCache: the category tree and the active
+    // countries). Anything else still comes back as __PHP_Incomplete_Class. Add a class here only when
+    // a cached value must contain it (tests/Feature/Security/CacheSerializationTest).
+    'serializable_classes' => [
+        Collection::class,
+        Category::class,
+        Country::class,
+    ],
 
 ];
