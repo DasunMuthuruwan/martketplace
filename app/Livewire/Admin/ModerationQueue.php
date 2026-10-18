@@ -13,6 +13,7 @@ use App\Models\Report;
 use App\Services\Attributes\AttributeSchema;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Moderation\ListingScreener;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -126,6 +127,7 @@ class ModerationQueue extends Component
             'selected' => $selected,
             'reasons' => $selected === null ? [] : $screener->screen($selected)->flags,
             'seller' => $selected === null ? null : $this->sellerSummary($selected),
+            'ownAd' => $selected !== null && $selected->user_id === Auth::id(),
             'fields' => $selected === null ? [] : $this->fieldRows($selected, $present, $schemas),
             'present' => $present,
             'templates' => (array) __('admin.moderation.templates'),
@@ -172,6 +174,11 @@ class ModerationQueue extends Component
         } catch (ValidationException $e) {
             // Show the action's message (e.g. "already decided") on the pane.
             $this->setErrorBag($e->validator->errors());
+
+            return;
+        } catch (AuthorizationException) {
+            // Staff never decide on their own ads (CD-06): explain on the pane instead of a 403 page.
+            $this->addError('status', $listing->user_id === Auth::id() ? __('admin.moderation.own_ad') : __('staff.accounts.not_allowed'));
 
             return;
         }

@@ -147,8 +147,14 @@ class ModerationAdminTest extends TestCase
 
         $own = $this->pending(['user_id' => $this->moderator->id]);
         Livewire::actingAs($this->moderator)->test(ModerationQueue::class)
-            ->call('select', $own->id)->call('approve')
-            ->assertForbidden();
+            ->call('select', $own->id)
+            // No decision buttons on one's own ad, only the explanation (CD-06).
+            ->assertSee(__('admin.moderation.own_ad'))
+            ->assertDontSeeHtml('wire:click="approve"')
+            // Called anyway: refused with the same message on the pane, not a 403 page.
+            ->call('approve')
+            ->assertOk()
+            ->assertHasErrors(['status' => __('admin.moderation.own_ad')]);
         $this->assertSame(ListingStatus::PendingReview, $own->fresh()->status);
     }
 

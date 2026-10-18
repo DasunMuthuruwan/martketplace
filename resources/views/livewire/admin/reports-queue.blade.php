@@ -81,7 +81,9 @@
                             @endif
                         </section>
 
-                        @if ($selected->status === RS::Open)
+                        @if ($selected->status === RS::Open && $ownReport)
+                            <x-ui.alert variant="info" :title="__('admin.reports.own_title')">{{ __('admin.reports.own') }}</x-ui.alert>
+                        @elseif ($selected->status === RS::Open)
                             @foreach (['status', 'reason', 'note'] as $key)
                                 @if ($errors->has($key))<x-ui.alert variant="danger" role="alert">{{ $errors->first($key) }}</x-ui.alert>@endif
                             @endforeach

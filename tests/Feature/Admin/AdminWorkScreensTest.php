@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\ListingStatus;
+use App\Enums\ReportStatus;
 use App\Enums\StaffRole;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\ModerationQueue;
@@ -114,6 +115,23 @@ class AdminWorkScreensTest extends TestCase
             ->call('close')
             ->assertSet('selectedId', null)
             ->assertSee(__('admin.reports.choose'));
+    }
+
+    public function test_a_report_about_ones_own_ad_is_explained_not_forbidden(): void
+    {
+        $listing = Listing::factory()->create(['user_id' => $this->moderator->id]);
+        $report = new Report(['reason' => 'scam']);
+        $report->forceFill(['reporter_id' => User::factory()->create()->id, 'reportable_type' => 'listing', 'reportable_id' => $listing->id])->save();
+
+        Livewire::actingAs($this->moderator)->test(ReportsQueue::class)
+            ->call('select', $report->id)
+            ->assertSee(__('admin.reports.own'))
+            ->assertDontSeeHtml('wire:click="dismiss"')
+            ->call('dismiss')
+            ->assertOk()
+            ->assertHasErrors(['status' => __('admin.reports.own')]);
+
+        $this->assertSame(ReportStatus::Open, $report->fresh()->status);
     }
 
     public function test_dashboard_shows_tiles_and_country_names(): void

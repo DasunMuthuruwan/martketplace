@@ -37,7 +37,7 @@
                                 <span class="min-w-0 flex-1">
                                     <span class="block truncate text-ui font-medium text-fg">{{ $item->title }}</span>
                                     <span class="block truncate text-small text-fg-muted">{{ $item->category->name }} · {{ $item->country->iso2 }} · {{ $item->submitted_at?->diffForHumans(short: true) }}</span>
-                                    <span class="block truncate text-small text-fg-subtle">{{ $item->user->name }}</span>
+                                    <span class="block truncate text-small text-fg-subtle">{{ $item->user->name }}@if ($item->user_id === auth()->id()) · {{ __('admin.moderation.your_ad') }}@endif</span>
                                 </span>
                                 @if ($item->flagged)
                                     <x-ui.icon name="triangle-alert" size="16" class="mt-0.5 text-warning" /><span class="sr-only">{{ __('admin.moderation.flagged') }}</span>
@@ -53,7 +53,7 @@
                 @if ($selected)
                     <x-ui.button variant="ghost" size="sm" icon="chevron-left" wire:click="close" class="mb-2 lg:hidden">{{ __('admin.moderation.back') }}</x-ui.button>
                     <x-admin.review-pane :listing="$selected" :present="$present" :reasons="$reasons" :seller="$seller" :fields="$fields"
-                        :templates="$templates" :decision="$decision" :messages="$errors" wire:key="pane-{{ $selected->id }}" />
+                        :templates="$templates" :decision="$decision" :messages="$errors" :own="$ownAd" wire:key="pane-{{ $selected->id }}" />
                 @else
                     <x-ui.empty-state icon="shield-check" :title="__('admin.moderation.choose')" class="max-lg:hidden">{{ __('admin.moderation.choose_text') }}</x-ui.empty-state>
                 @endif

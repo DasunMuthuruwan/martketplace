@@ -10,6 +10,8 @@ use App\Enums\ReportStatus;
 use App\Livewire\Admin\Concerns\RequiresPermission;
 use App\Models\Listing;
 use App\Models\Report;
+use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -104,6 +106,10 @@ class ReportsQueue extends Component
             $this->setErrorBag($e->validator->errors());
 
             return;
+        } catch (AuthorizationException) {
+            $this->refused();
+
+            return;
         }
 
         session()->flash('status', __('admin.reports.suspended'));
@@ -123,6 +129,7 @@ class ReportsQueue extends Component
                 ->paginate(self::PER_PAGE),
             'selected' => $selected,
             'target' => $selected?->target(),
+            'ownReport' => $selected !== null && $this->concernsMe($selected),
             'canSuspend' => Auth::user()->can(Permissions::LISTINGS_SUSPEND),
         ]);
     }
@@ -137,10 +144,30 @@ class ReportsQueue extends Component
             $this->setErrorBag($e->validator->errors());
 
             return;
+        } catch (AuthorizationException) {
+            $this->refused();
+
+            return;
         }
 
         session()->flash('status', __($message));
         $this->reset('selectedId', 'note');
+    }
+
+    /** Refused by the action: explain on the pane (staff never decide on reports about themselves, CD-06). */
+    private function refused(): void
+    {
+        $report = $this->selectedId === null ? null : Report::find($this->selectedId);
+        $this->addError('status', $report !== null && $this->concernsMe($report) ? __('admin.reports.own') : __('staff.accounts.not_allowed'));
+    }
+
+    /** The report is about the signed-in staff member or one of their ads. */
+    private function concernsMe(Report $report): bool
+    {
+        $target = $report->target();
+
+        return ($target instanceof User && $target->is(Auth::user()))
+            || ($target instanceof Listing && $target->user_id === Auth::id());
     }
 
     private function selectedReport(): Report

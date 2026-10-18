@@ -6,6 +6,7 @@
     'fields' => [],      // label => value
     'templates' => [],
     'decision' => null,  // reject | changes | null
+    'own' => false,      // the moderator's own ad: no decision (CD-06)
     'messages',          // the component's error bag
 ])
 {{-- Moderation review (components §5.4 admin.review-pane): photos, fields, flags, seller summary and
@@ -88,7 +89,9 @@
         @if ($messages->has($key))<x-ui.alert variant="danger" role="alert">{{ $messages->first($key) }}</x-ui.alert>@endif
     @endforeach
 
-    @if ($decision === null)
+    @if ($own)
+        <x-ui.alert variant="info" :title="__('admin.moderation.own_ad_title')">{{ __('admin.moderation.own_ad') }}</x-ui.alert>
+    @elseif ($decision === null)
         <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
             <x-ui.button icon="check" wire:click="approve" data-shortcut="a" aria-keyshortcuts="A">
                 {{ __('admin.moderation.approve') }}<kbd class="ml-1 rounded border border-current/30 px-1 font-mono text-micro opacity-70">A</kbd>
