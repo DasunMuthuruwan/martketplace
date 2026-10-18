@@ -123,14 +123,38 @@ class CurrencyAndCountrySeedingTest extends TestCase
 
     public function test_location_labels_fall_back_to_generic_terms_until_configured(): void
     {
-        $lk = Country::where('iso2', 'LK')->firstOrFail();
+        // A country without decided levels or labels (G-3 covers LK, US, GB and IN).
+        $fr = Country::where('iso2', 'FR')->firstOrFail();
 
-        $this->assertSame(__('geo.labels.region'), $lk->label('region'));
+        $this->assertSame(1, $fr->region_levels);
+        $this->assertSame(__('geo.labels.region'), $fr->label('region'));
 
-        $lk->setTranslation('region_label', 'en', 'Province')->save();
+        $fr->setTranslation('region_label', 'en', 'Région')->save();
 
-        $this->assertSame('Province', $lk->fresh()->label('region'));
-        $this->assertSame(__('geo.labels.city'), $lk->fresh()->label('city'));
+        $this->assertSame('Région', $fr->fresh()->label('region'));
+        $this->assertSame(__('geo.labels.city'), $fr->fresh()->label('city'));
+    }
+
+    public function test_decided_location_levels_and_labels_are_seeded(): void
+    {
+        // G-3 (architecture doc 13 §12): LK Province → District → Town → Area, US State → City → Neighborhood,
+        // GB Country → County → Town → Area, IN State → City → Locality.
+        $expected = [
+            'LK' => [2, 'Province', 'District', 'Town', 'Area'],
+            'US' => [1, 'State', null, 'City', 'Neighborhood'],
+            'GB' => [2, 'Country', 'County', 'Town', 'Area'],
+            'IN' => [1, 'State', null, 'City', 'Locality'],
+        ];
+        foreach ($expected as $iso2 => [$levels, $region, $subregion, $city, $locality]) {
+            $country = Country::where('iso2', $iso2)->firstOrFail();
+            $this->assertSame($levels, $country->region_levels, $iso2);
+            $this->assertSame($region, $country->label('region'), $iso2);
+            if ($subregion !== null) {
+                $this->assertSame($subregion, $country->label('subregion'), $iso2);
+            }
+            $this->assertSame($city, $country->label('city'), $iso2);
+            $this->assertSame($locality, $country->label('locality'), $iso2);
+        }
     }
 
     public function test_unknown_label_level_is_rejected(): void

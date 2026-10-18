@@ -118,16 +118,19 @@ class DraftActionsTest extends TestCase
 
     public function test_location_chain_is_validated(): void
     {
+        // Sri Lanka has two region levels (G-3): province → district → town.
         $lk = $this->country('LK');
         $western = Region::factory()->create(['country_id' => $lk->id]);
-        $southern = Region::factory()->create(['country_id' => $lk->id]);
-        $colombo = City::factory()->inRegion($western)->create();
+        $colomboDistrict = Region::factory()->childOf($western)->create();
+        $gampaha = Region::factory()->childOf($western)->create();
+        $colombo = City::factory()->inRegion($colomboDistrict)->create();
 
-        $listing = $this->draft('cars', 'LK', ['region_id' => $western->id, 'city_id' => $colombo->id, 'locality_text' => 'Near the station']);
+        $chain = ['region_id' => $western->id, 'subregion_id' => $colomboDistrict->id, 'city_id' => $colombo->id];
+        $listing = $this->draft('cars', 'LK', $chain + ['locality_text' => 'Near the station']);
         $this->assertSame($colombo->id, $listing->city_id);
         $this->assertSame('Near the station', $listing->locality_text);
 
-        $this->assertArrayHasKey('city_id', $this->errors(fn () => $this->draft('cars', 'LK', ['region_id' => $southern->id, 'city_id' => $colombo->id])));
+        $this->assertArrayHasKey('city_id', $this->errors(fn () => $this->draft('cars', 'LK', ['subregion_id' => $gampaha->id] + $chain)));
         $this->assertArrayHasKey('country_id', $this->errors(fn () => $this->draft('cars', 'DE')), 'Inactive country');
         $this->assertArrayHasKey('locality_text', $this->errors(fn () => $this->draft('cars', 'LK', ['locality_text' => '<b>Colombo</b>'])));
     }

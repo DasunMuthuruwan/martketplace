@@ -39,6 +39,15 @@ return [
         'UM' => 'Pacific/Midway',
     ],
 
+    // Location levels and labels decided per country (G-3, architecture doc 13 §12). Applied when the
+    // country is first created; the Owner can change them in Admin → Countries until regions exist.
+    'location_overrides' => [
+        'LK' => ['region_levels' => 2, 'region_label' => 'Province', 'subregion_label' => 'District', 'city_label' => 'Town', 'locality_label' => 'Area'],
+        'US' => ['region_levels' => 1, 'region_label' => 'State', 'city_label' => 'City', 'locality_label' => 'Neighborhood'],
+        'GB' => ['region_levels' => 2, 'region_label' => 'Country', 'subregion_label' => 'County', 'city_label' => 'Town', 'locality_label' => 'Area'],
+        'IN' => ['region_levels' => 1, 'region_label' => 'State', 'city_label' => 'City', 'locality_label' => 'Locality'],
+    ],
+
     // Symbols local users expect where ICU's English symbol is just the ISO code.
     'currency_symbol_overrides' => [
         'LKR' => 'Rs',

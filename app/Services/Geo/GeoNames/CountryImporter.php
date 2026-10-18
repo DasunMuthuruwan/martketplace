@@ -21,7 +21,7 @@ use ResourceBundle;
  */
 class CountryImporter
 {
-    /** @var array{excluded: list<string>, timezone_overrides: array<string, string>, currency_symbol_overrides: array<string, string>} */
+    /** @var array{excluded: list<string>, timezone_overrides: array<string, string>, location_overrides?: array<string, array<string, int|string>>, currency_symbol_overrides: array<string, string>} */
     private array $adjustments;
 
     public function __construct(private readonly CountryInfoReader $reader)
@@ -81,7 +81,7 @@ class CountryImporter
                     'timezone' => $this->adjustments['timezone_overrides'][$row['iso2']] ?? $this->timezoneFor($row['iso2'], $row['capital']),
                     'is_active' => false,
                     'geonames_id' => $row['geonames_id'],
-                ]);
+                ] + $this->locationSettings($row['iso2']));
                 $result->created++;
             } elseif ($sync && $this->syncReferenceFields($country, $row)) {
                 $result->updated++;
@@ -161,5 +161,20 @@ class CountryImporter
         $value = $bundle['codeMap'][$code] ?? null;
 
         return $value === null ? null : str_pad((string) $value, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Decided location levels and labels (G-3), as country attributes; labels are translatable (English).
+     *
+     * @return array<string, mixed>
+     */
+    private function locationSettings(string $iso2): array
+    {
+        $settings = [];
+        foreach ($this->adjustments['location_overrides'][$iso2] ?? [] as $key => $value) {
+            $settings[$key] = str_ends_with($key, '_label') ? ['en' => $value] : $value;
+        }
+
+        return $settings;
     }
 }
