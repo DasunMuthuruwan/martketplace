@@ -67,7 +67,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 - [x] F3.2 Account area (merged fae5a52)
 - [x] F4.1 Posting wizard (part 1 merged d1e6dc8; part 2 merged 90521af; part 3 merged 4cf407b)
 - [x] F5.1 Admin UI (part 1 merged 134eadb; part 2 merged 2946b1b; part 3 merged a1a0656)
-- [~] F6.1 Accessibility, responsive, performance pass — part 1 merged (3a787bb); part 2 (Playwright + axe, Lighthouse; ADR-025) awaiting review on `feature/F6.1b-axe-lighthouse`
+- [x] F6.1 Accessibility, responsive, performance pass (part 1 merged 3a787bb; part 2 merged 7c59579)
 
 ## Phases 7–10
 - [ ] M8 QA (browser tests: D-1 Playwright vs Dusk)
