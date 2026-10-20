@@ -30,6 +30,8 @@ class DesignSystem extends Component
 
     public function toast(): void
     {
+        // Every admin action checks its permission itself, not only mount() (Q7.4).
+        $this->requirePermission(Permissions::SETTINGS_MANAGE);
         $this->dispatch('toast', message: __('admin.design.toast_sample'), variant: 'success');
     }
 
