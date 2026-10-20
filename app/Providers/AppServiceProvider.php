@@ -70,5 +70,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Reports: 10 per day per account (security doc §3).
         RateLimiter::for('report', fn (Request $request) => Limit::perDay(10)->by('report:'.($request->user()?->id ?: $request->ip())));
+
+        // New drafts and submissions: 30 per hour per IP (security doc §3, S-01). The per-account daily
+        // limit (LST-09) is enforced by SaveListingLocation; photo uploads are counted per file in
+        // ListingPhotosController.
+        RateLimiter::for('listing-submit', fn (Request $request) => Limit::perHour((int) config('marketplace.listings.submits_per_hour_ip'))->by('listing-submit:'.$request->ip()));
     }
 }

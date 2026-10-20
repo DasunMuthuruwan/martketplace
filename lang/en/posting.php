@@ -102,6 +102,7 @@ return [
         'later' => 'Move photo :n later',
         'remove' => 'Remove photo :n',
         'full' => 'You have added the maximum of :max photos. Remove one to add another.',
+        'too_many' => 'You have uploaded a lot of photos in the last hour. Try again in :minutes min.',
         'one_needed' => 'Add at least one photo to continue.',
     ],
 

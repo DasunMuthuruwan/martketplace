@@ -79,7 +79,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] Q7.6 QA report ([report](../qa/qa-report.md)) — merged 2026-10-21
 - [~] M9 Security review ([plan](../security/security-plan.md), [findings](../security/findings.md))
   - [x] S8.1 Plan and baseline — merged 2026-10-21
-  - [ ] S8.2 Rate limits and abuse (S-01)
+  - [~] S8.2 Rate limits and abuse (S-01 fixed) — awaiting review on `feature/S8.2-rate-limits`
   - [ ] S8.3 Input handling (validation, XSS, SQL injection, redirects, mass assignment)
   - [ ] S8.4 Upload abuse
   - [ ] S8.5 Authentication, sessions, CSRF

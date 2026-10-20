@@ -67,6 +67,9 @@ return [
         'sold_page_days' => 30,
         'max_active_per_user' => (int) env('MARKETPLACE_MAX_ACTIVE_LISTINGS', 50),
         'max_new_per_day' => (int) env('MARKETPLACE_MAX_NEW_LISTINGS_PER_DAY', 10),
+        // Abuse limits (security doc §3, S-01): new drafts and submissions per IP, photo files per account.
+        'submits_per_hour_ip' => 30,
+        'photos_per_hour_user' => 60,
         'per_page' => 24,
         'max_page' => 100,
     ],

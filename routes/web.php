@@ -59,11 +59,11 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
 // Posting wizard (routes doc §3.1): a verified, active account (ListingPolicy::create / update).
 Route::middleware(['auth', 'verified'])->prefix('account/listings')->name('listings.')->controller(PostListingController::class)->group(function () {
     Route::get('/create', 'create')->name('create');
-    Route::post('/', 'store')->name('store');
+    Route::post('/', 'store')->middleware('throttle:listing-submit')->name('store');
     Route::get('/{listing}/edit/{step?}', 'edit')->whereNumber('listing')->name('edit');
     Route::post('/{listing}/edit/{step}', 'update')->whereNumber('listing')->name('update');
     Route::post('/{listing}/contact-options', 'contact')->whereNumber('listing')->name('contact-options');
-    Route::post('/{listing}/submit', 'submit')->whereNumber('listing')->name('submit');
+    Route::post('/{listing}/submit', 'submit')->whereNumber('listing')->middleware('throttle:listing-submit')->name('submit');
     Route::get('/{listing}/submitted', 'submitted')->whereNumber('listing')->name('submitted');
 });
 Route::middleware(['auth', 'verified'])->prefix('account/listings/{listing}/photos')->name('listings.photos.')->controller(ListingPhotosController::class)

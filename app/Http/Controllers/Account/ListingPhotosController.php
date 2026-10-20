@@ -10,13 +10,15 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 /**
  * Photos step (layout doc §3.4, components §2 image-uploader): upload several photos at once (each
  * one checked and stored by ManageListingImages; one bad file does not stop the others), move a
  * photo earlier or later, set the cover, remove. Plain forms; resources/js/ui/posting.js adds an
- * upload progress bar and asks for JSON.
+ * upload progress bar and asks for JSON. Every file counts toward the hourly photo limit (security doc
+ * §3, S-01: each upload is decoded and re-encoded, so uploading and removing in a loop is costly).
  */
 class ListingPhotosController extends Controller
 {
@@ -32,7 +34,15 @@ class ListingPhotosController extends Controller
 
         $errors = [];
         $added = 0;
+        $limiter = 'image-upload:'.$request->user()->id;
+        $perHour = (int) config('marketplace.listings.photos_per_hour_user');
         foreach ($files as $file) {
+            if (RateLimiter::tooManyAttempts($limiter, $perHour)) {
+                $errors[] = $file->getClientOriginalName().': '.__('posting.photos.too_many', ['minutes' => (int) ceil(RateLimiter::availableIn($limiter) / 60)]);
+
+                continue;
+            }
+            RateLimiter::hit($limiter, 3600);
             try {
                 $this->images->add($request->user(), $listing, $file);
                 $added++;

@@ -6,7 +6,7 @@ Plan: [security-plan.md](security-plan.md). Severity scale in the plan.
 
 | ID | Severity | Area | Finding | Status |
 |---|---|---|---|---|
-| S-01 | Medium | Rate limits | The design (architecture 06 §3) sets `image-upload` 60/hour per user and `listing-submit` 30/hour per IP, but neither limiter exists: the photo routes (`listings.photos.*`) and ad submission have no throttle. Only the daily new-ad limit (LST-09) and the per-ad photo cap apply. One verified account can upload, remove and upload again without limit, and each upload makes the server decode an image of up to 40 MP and 8 MB, so CPU and disk can be exhausted. | Open, fix proposed for S8.2 |
+| S-01 | Medium | Rate limits | The design (architecture 06 §3) sets `image-upload` 60/hour per user and `listing-submit` 30/hour per IP, but neither limiter exists: the photo routes (`listings.photos.*`) and ad submission have no throttle. Only the daily new-ad limit (LST-09) and the per-ad photo cap apply. One verified account can upload, remove and upload again without limit, and each upload makes the server decode an image of up to 40 MP and 8 MB, so CPU and disk can be exhausted. | **Fixed in S8.2:** limiter `listing-submit` (30/hour per IP, shared by new drafts and submissions) on `listings.store` and `listings.submit`; photo uploads counted per file, 60/hour per account, in `ListingPhotosController` (a file over the limit gets a photo error with the wait time, the others in the request are unaffected). Retest: `RateLimitsTest` fails 4/4 without the fix, passes 4/4 with it. |
 | S-02 | Low | Configuration | `.env.example` holds local values (`APP_ENV=local`, `APP_DEBUG=true`, `LOG_LEVEL=debug`, `SESSION_SECURE_COOKIE=false`). A production `.env` copied from it unchanged would show stack traces and send the session cookie without `Secure` (the explicit `false` overrides the production default in `config/session.php`). Nothing checks this at deploy time. | Open, fix proposed for S8.6 (production check) and Phase 9 (production template) |
 
 ## Baseline Checks (S8.1, 2026-10-21)
@@ -23,3 +23,14 @@ Plan: [security-plan.md](security-plan.md). Severity scale in the plan.
 | Livewire file uploads | No component uses `WithFileUploads`; photos go through a plain controller (`ListingPhotosController`) behind `auth`, `verified` and the listing policy. |
 | Configuration defaults | `config/app.php` debug defaults to `false`; session cookie HttpOnly, SameSite=Lax, Secure by default in production; see S-02 for the example file. |
 | Rate limiters defined | `register`, `login`, `password-reset`, `two-factor`, `verification`, `contact-reveal`, `report`, `search`. Missing against the design: `image-upload`, `listing-submit` (S-01). |
+
+## S8.2 Rate Limits (2026-10-21)
+
+| Check | Result |
+|---|---|
+| Every limiter in architecture 06 §3 exists with the designed values | Yes, asserted per limiter (login 5/min per email+IP and 30/min per IP, two-factor 5/min, verification 6/min, register 5/hour, password reset 3/min and 10/hour, listing-submit 30/hour, contact reveal 30/hour per user, report 10/day, search 120/min, photos 60/hour per account) |
+| Every throttled route uses its limiter, nothing extra or missing | Yes: an exact route → limiter table (17 routes), including registration and reset, which are throttled by `ThrottleAuthEndpoints` by route name |
+| The new limits stop requests | Ad submission: 429 after the limit, per IP, shared by drafts and submissions. Photos: files over the limit rejected, removing a photo does not give the allowance back, other accounts unaffected |
+| Search caps | Page ≤ `max_page` (100), keyword ≤ 100 characters, ≤ 10 attribute filters, at most 10 words in the full-text query (already enforced by `SearchCriteriaFactory` / `MysqlListingSearch`) |
+| Livewire's own upload endpoint | Throttled by Livewire (60/min) and unusable without a component that uses file uploads (none does); checked again in S8.4 |
+| Not throttled, accepted | Wizard step saves, favourites, account settings and admin actions: cheap, signed-in and (admin) staff-only; the daily new-ad limit and per-ad photo cap bound the expensive parts |

@@ -45,6 +45,8 @@
 | report | 10/day per user |
 | search | 120/min per IP |
 
+> **Verified in S8.2 (2026-10-21):** all limits above are in place and tested (`tests/Feature/Security/RateLimitsTest.php`). `listing-submit` per IP is shared by new drafts and submissions; the per-user daily part is LST-09 (`max_new_per_day`). `image-upload` is counted per file in `ListingPhotosController`, not per request. Values live in `config/marketplace.php` (`listings.submits_per_hour_ip`, `listings.photos_per_hour_user`).
+
 ## 4. Image Upload Pipeline
 
 ```mermaid
