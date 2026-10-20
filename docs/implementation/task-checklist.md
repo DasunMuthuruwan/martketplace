@@ -72,8 +72,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
 ## Phases 7–10
 - [~] M8 QA ([plan](../qa/qa-plan.md); D-1 = Playwright, ADR-025)
   - [x] Q7.1 Baseline and findings log ([findings](../qa/findings.md)) (merged 10516ab)
-  - [~] Q7.2 End-to-end journeys (Playwright) — awaiting review on `feature/Q7.2-e2e-journeys`
-  - [ ] Q7.3 Global scenarios 1–15 traceability
+  - [x] Q7.2 End-to-end journeys (Playwright) (merged e61d5cd)
+  - [~] Q7.3 Global scenarios 1–15 traceability — in progress on `feature/Q7.3-global-scenarios`
   - [ ] Q7.4 Authorization boundary sweep
   - [ ] Q7.5 Performance re-check (50k listings)
   - [ ] Q7.6 QA report
