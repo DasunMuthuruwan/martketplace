@@ -1,4 +1,4 @@
-@props(['listing', 'present', 'lifecycle'])
+@props(['listing', 'present', 'lifecycle', 'public' => null]) {{-- public: known by the page (one query for all rows); else asked here --}}
 {{-- A seller's own ad in My listings (layout doc §3.5): photo, title, price, status, what happens next,
      the moderation note when rejected or suspended, and the actions that are possible now. --}}
 @use('App\Enums\ListingStatus', 'S')
@@ -31,7 +31,7 @@
     <div class="flex min-w-0 flex-1 flex-col gap-1">
         <div class="flex flex-wrap items-start justify-between gap-2">
             <h3 class="min-w-0 text-ui font-semibold text-fg">
-                @if ($listing->isPublic())
+                @if ($public ?? $listing->isPublic())
                     <a href="{{ $listing->publicUrl() }}" class="hover:underline">{{ $listing->title ?? __('account.listings.untitled') }}</a>
                 @else
                     {{ $listing->title ?? __('account.listings.untitled') }}

@@ -18,7 +18,7 @@
     @else
         <ul class="space-y-3">
             @foreach ($listings as $listing)
-                <li><x-listing.owner-row :listing="$listing" :present="$present" :lifecycle="$lifecycle" /></li>
+                <li><x-listing.owner-row :listing="$listing" :present="$present" :lifecycle="$lifecycle" :public="in_array($listing->id, $publicIds, true)" /></li>
             @endforeach
         </ul>
         <x-ui.pagination :paginator="$listings" class="mt-6" />

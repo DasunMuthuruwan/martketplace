@@ -75,7 +75,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] Q7.2 End-to-end journeys (Playwright) (merged e61d5cd)
   - [x] Q7.3 Global scenarios 1–15 traceability ([table](../qa/global-scenarios.md)) (merged eb89d76)
   - [x] Q7.4 Authorization boundary sweep (merged f8d1180)
-  - [~] Q7.5 Performance re-check (50k listings) — in progress on `feature/Q7.5-performance`
+  - [~] Q7.5 Performance re-check (50k listings) — awaiting review on `feature/Q7.5-performance`
   - [ ] Q7.6 QA report
 - [ ] M9 Security review
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)

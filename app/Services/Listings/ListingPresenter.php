@@ -128,6 +128,15 @@ class ListingPresenter
 
     public function coverUrl(Listing $listing, string $variant = 'sm'): ?string
     {
-        return ($listing->coverImage ?? $listing->images->first())?->url($variant);
+        if ($listing->coverImage !== null) {
+            return $listing->coverImage->url($variant);
+        }
+        // No cover: ads without photos are common (wanted ads, drafts). When the photo count is
+        // known, do not query the photos of each card just to find none (F-08).
+        if (! $listing->relationLoaded('images') && $listing->getAttribute('images_count') === 0) {
+            return null;
+        }
+
+        return $listing->images->first()?->url($variant);
     }
 }

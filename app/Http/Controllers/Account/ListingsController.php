@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Listing;
 use App\Services\Listings\ListingPresenter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -32,6 +33,7 @@ class ListingsController extends Controller
 
         $listings = self::tab(Listing::where('user_id', $user->id), $tab)
             ->with(['country', 'currencyModel', 'coverImage', 'category.parent', 'city', 'region', 'subregion', 'locality'])
+            ->withCount('images')
             ->latest('updated_at')->latest('id')
             ->paginate(20)->withQueryString();
 
@@ -39,9 +41,25 @@ class ListingsController extends Controller
             'tab' => $tab,
             'counts' => $counts,
             'listings' => $listings,
+            'publicIds' => self::publicIds($listings->getCollection()),
             'present' => $present,
             'lifecycle' => $this->lifecycle,
         ]);
+    }
+
+    /**
+     * Which of these ads are public, in one query (F-08: the rows asked one by one).
+     *
+     * @param  Collection<int, Listing>  $listings
+     * @return list<int>
+     */
+    public static function publicIds(Collection $listings): array
+    {
+        if ($listings->isEmpty()) {
+            return [];
+        }
+
+        return Listing::public()->whereIn('listings.id', $listings->modelKeys())->pluck('listings.id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function sold(Request $request, Listing $listing): RedirectResponse

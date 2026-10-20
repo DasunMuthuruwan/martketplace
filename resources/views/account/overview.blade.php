@@ -46,7 +46,7 @@
         @else
             <ul class="space-y-3">
                 @foreach ($expiring as $listing)
-                    <li><x-listing.owner-row :listing="$listing" :present="$present" :lifecycle="app(\App\Actions\Listings\ListingLifecycle::class)" /></li>
+                    <li><x-listing.owner-row :listing="$listing" :present="$present" :lifecycle="app(\App\Actions\Listings\ListingLifecycle::class)" :public="in_array($listing->id, $publicIds, true)" /></li>
                 @endforeach
             </ul>
         @endif

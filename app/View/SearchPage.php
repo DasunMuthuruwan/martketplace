@@ -250,14 +250,44 @@ final class SearchPage
         if ($categorySlug === null) {
             return route('ads.country', ['cc' => $cc]);
         }
-        $category = $categorySlug === $this->criteria->category?->slug ? $this->criteria->category : Category::with('parent')->where('slug', $categorySlug)->first();
-        if ($category === null) {
+        // Category links use the cached tree (one query per link otherwise, F-08); the database only
+        // for a category outside it.
+        [$parentSlug, $leafSlug] = $this->treePath($categorySlug) ?? $this->databasePath($categorySlug) ?? [null, null];
+        if ($parentSlug === null) {
             return route('ads.country', ['cc' => $cc]);
         }
 
-        return $category->parent_id === null
-            ? route('ads.category', ['cc' => $cc, 'category' => $category->slug])
-            : route('ads.category', ['cc' => $cc, 'category' => $category->parent->slug, 'subcategory' => $category->slug]);
+        return $leafSlug === null
+            ? route('ads.category', ['cc' => $cc, 'category' => $parentSlug])
+            : route('ads.category', ['cc' => $cc, 'category' => $parentSlug, 'subcategory' => $leafSlug]);
+    }
+
+    /** @return array{0: string, 1: string|null}|null [top-level slug, subcategory slug or null] from the cached tree */
+    private function treePath(string $slug): ?array
+    {
+        foreach ($this->tree as $root) {
+            if ($root->slug === $slug) {
+                return [$root->slug, null];
+            }
+            foreach ($root->children ?? [] as $child) {
+                if ($child->slug === $slug) {
+                    return [$root->slug, $child->slug];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array{0: string, 1: string|null}|null */
+    private function databasePath(string $slug): ?array
+    {
+        $category = $slug === $this->criteria->category?->slug ? $this->criteria->category : Category::with('parent')->where('slug', $slug)->first();
+        if ($category === null) {
+            return null;
+        }
+
+        return $category->parent_id === null ? [$category->slug, null] : [$category->parent->slug, $category->slug];
     }
 
     private function range(?string $min, ?string $max): string

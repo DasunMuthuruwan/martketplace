@@ -17,14 +17,17 @@ class DashboardController extends Controller
         $user = $request->user();
         $soon = (int) config('marketplace.listings.renew_window_days');
 
+        $expiring = Listing::where('user_id', $user->id)->where('status', ListingStatus::Active)
+            ->whereBetween('expires_at', [now(), now()->addDays($soon)])
+            ->with(['country', 'currencyModel', 'coverImage', 'category.parent'])->withCount('images')
+            ->orderBy('expires_at')->limit(5)->get();
+
         return view('account.overview', [
             'user' => $user,
             'counts' => ListingsController::counts($user->id),
             'saved' => $user->favourites()->count(),
-            'expiring' => Listing::where('user_id', $user->id)->where('status', ListingStatus::Active)
-                ->whereBetween('expires_at', [now(), now()->addDays($soon)])
-                ->with(['country', 'currencyModel', 'coverImage', 'category.parent'])
-                ->orderBy('expires_at')->limit(5)->get(),
+            'expiring' => $expiring,
+            'publicIds' => ListingsController::publicIds($expiring),
             'present' => $present,
         ]);
     }
