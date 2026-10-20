@@ -218,6 +218,15 @@ class RegistrationTest extends TestCase
         $this->assertSame(0, User::count());
     }
 
+    public function test_errors_name_fields_in_words_not_column_names(): void
+    {
+        // F-06: "The country id field is required." showed the column name.
+        $this->post('/register', $this->payload(['country_id' => '']))
+            ->assertSessionHasErrors(['country_id' => __('validation.required', ['attribute' => __('validation.attributes.country_id')])]);
+        $this->assertSame('country', __('validation.attributes.country_id'));
+        $this->assertSame('The country field is required.', __('validation.required', ['attribute' => __('validation.attributes.country_id')]));
+    }
+
     public function test_turnstile_widget_and_csp_are_present_only_when_configured(): void
     {
         $this->get('/register')->assertDontSee('cf-turnstile', false);

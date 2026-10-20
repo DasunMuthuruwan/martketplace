@@ -63,7 +63,7 @@ Optional, in a second window:
 No accounts are seeded. To get an Owner:
 
 1. Register at http://localhost:8001/register.
-2. Email is not really sent (`MAIL_MAILER=log`): open `storage\logs\laravel.log`, find the newest "Verify Email Address" message and open its link.
+2. Email is not really sent (`MAIL_MAILER=log`): open `storage\logs\laravel.log`, find the newest "Verify Email Address" message and open its link. Tip: `MAIL_LOG_CHANNEL=mail` in `.env` writes emails to `storage\logs\mail.log` instead, apart from errors.
 3. Make the account the Owner: `C:\php8.4\php.exe artisan marketplace:make-owner you@example.com`
 4. Open http://localhost:8001/admin. Owners and Admins set up two-factor authentication first (any authenticator app).
 

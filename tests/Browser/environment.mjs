@@ -12,6 +12,8 @@ export const port = Number(process.env.BROWSER_TEST_PORT || 8130);
 export const baseURL = `http://127.0.0.1:${port}`;
 export const password = process.env.BROWSER_TEST_PASSWORD || 'browser-test-password';
 export const database = resolve(root, 'storage/framework/testing/browser.sqlite');
+// Emails of the test server (log mailer): the journeys read verification links from here.
+export const mailLog = resolve(root, 'storage/framework/testing/browser-mail.log');
 
 // Browser: the installed Microsoft Edge by default (Chromium-based, no download); set
 // PLAYWRIGHT_CHANNEL=chromium after `npx playwright install chromium` (e.g. in CI).
@@ -53,6 +55,8 @@ export function serverEnv() {
         SESSION_DRIVER: 'file',
         QUEUE_CONNECTION: 'sync',
         MAIL_MAILER: 'log',
+        MAIL_LOG_CHANNEL: 'mail',
+        MAIL_LOG_PATH: mailLog,
         TURNSTILE_SITE_KEY: '',
         TURNSTILE_SECRET_KEY: '',
         // Indexing on, as in production, so SEO checks see the real robots tags (sign-in pages stay noindex).
@@ -69,6 +73,7 @@ export function prepare() {
     }
     mkdirSync(dirname(database), { recursive: true });
     writeFileSync(database, '');
+    writeFileSync(mailLog, '');
     execFileSync(php, ['artisan', 'migrate:fresh', '--seed', '--seeder=Database\\Seeders\\BrowserTestSeeder', '--force'], {
         cwd: root,
         env: serverEnv(),

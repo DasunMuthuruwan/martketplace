@@ -1,5 +1,5 @@
 // Browser tests (D-1: Playwright): accessibility scans with axe on the key screens, in light and
-// dark themes and at phone size. Run: `npm run build`, then `npm run test:browser`
+// dark themes and at phone size, and the end-to-end journeys (Q7.2). Run: `npm run build`, then `npm run test:browser`
 // (set PHP_BINARY when php is not on PATH). See tests/Browser/environment.mjs.
 import { defineConfig, devices } from '@playwright/test';
 import { baseURL, channel, root, serverCommand, serverEnv } from './tests/Browser/environment.mjs';
@@ -19,9 +19,12 @@ export default defineConfig({
         trace: 'retain-on-failure',
     },
     projects: [
-        { name: 'desktop-light', use: { ...devices['Desktop Chrome'], ...browser, colorScheme: 'light' } },
-        { name: 'desktop-dark', use: { ...devices['Desktop Chrome'], ...browser, colorScheme: 'dark' } },
-        { name: 'phone-light', use: { ...devices['Pixel 7'], ...browser, colorScheme: 'light' } },
+        // Accessibility scans: every screen in three looks.
+        { name: 'desktop-light', testMatch: 'accessibility.spec.mjs', use: { ...devices['Desktop Chrome'], ...browser, colorScheme: 'light' } },
+        { name: 'desktop-dark', testMatch: 'accessibility.spec.mjs', use: { ...devices['Desktop Chrome'], ...browser, colorScheme: 'dark' } },
+        { name: 'phone-light', testMatch: 'accessibility.spec.mjs', use: { ...devices['Pixel 7'], ...browser, colorScheme: 'light' } },
+        // End-to-end journeys (Q7.2): they change data, so they run once, on desktop.
+        { name: 'journeys', testMatch: 'journeys.spec.mjs', use: { ...devices['Desktop Chrome'], ...browser } },
     ],
     webServer: {
         command: serverCommand,

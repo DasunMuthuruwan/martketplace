@@ -9,20 +9,30 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\Listing;
 use App\Models\Page;
+use App\Models\Region;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\Geo\RegionChain;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
  * Data for the browser tests (tests/Browser, Playwright + axe) and the Lighthouse run: the
- * reference data, one active country, a seller with live, pending and draft ads, a moderator,
- * published help pages and an open report. Never called by DatabaseSeeder; refuses production.
+ * reference data; the default country (Sri Lanka: province → district → town) and the United
+ * States (state → city) active with a few places; a seller with live, pending and draft ads; a
+ * moderator; published help pages; an open report. Never called by DatabaseSeeder; refuses production.
  *
  * Accounts (password from BROWSER_TEST_PASSWORD): seller@browser.test, moderator@browser.test.
  */
 class BrowserTestSeeder extends Seeder
 {
+    /** Places used by the journeys: [region, subregion (2-level countries) or null, towns]. */
+    private const PLACES = [
+        'LK' => [['Western', 'Colombo', ['Nugegoda', 'Maharagama']], ['Western', 'Gampaha', ['Negombo']], ['Central', 'Kandy', ['Peradeniya']]],
+        'US' => [['California', null, ['Los Angeles', 'San Diego']], ['Texas', null, ['Austin']]],
+    ];
+
     public function run(): void
     {
         if (app()->isProduction()) {
@@ -34,6 +44,11 @@ class BrowserTestSeeder extends Seeder
         $iso2 = strtoupper((string) (config('marketplace.default_country') ?: 'LK'));
         $country = Country::where('iso2', $iso2)->firstOrFail();
         $country->update(['is_active' => true]);
+        Country::where('iso2', 'US')->update(['is_active' => true]);
+        foreach (self::PLACES as $code => $places) {
+            $this->places(Country::where('iso2', $code)->firstOrFail(), $places);
+        }
+
         $city = City::where('country_id', $country->id)->where('is_active', true)->orderBy('id')->first();
         $category = Category::whereNotNull('parent_id')->where('is_active', true)->orderBy('sort_order')->orderBy('id')->firstOrFail();
 
@@ -47,7 +62,7 @@ class BrowserTestSeeder extends Seeder
         $moderator = User::factory()->create(['name' => 'Mala Moderator', 'email' => 'moderator@browser.test', 'password' => $password]);
         $moderator->assignRole('moderator');
 
-        $place = ['category_id' => $category->id, 'city_id' => $city?->id, 'region_id' => $city?->region_id];
+        $place = ['category_id' => $category->id, 'city_id' => $city?->id] + ($city ? RegionChain::forCity($city) : []);
         $titles = ['Toyota Aqua 2015 G grade', 'Honda Vezel 2017 hybrid', 'Suzuki Wagon R 2016', 'Nissan Leaf 2018', 'Toyota Prius 2014', 'Mitsubishi Montero 2012', 'Honda Fit 2015 GP5', 'Toyota Corolla 2019'];
         foreach ($titles as $i => $title) {
             Listing::factory()->inCountry($country)->for($seller)->create($place + [
@@ -62,5 +77,21 @@ class BrowserTestSeeder extends Seeder
 
         $report = new Report(['reason' => 'scam', 'details' => 'Asked for a deposit before viewing.']);
         $report->forceFill(['reporter_id' => $moderator->id, 'reportable_type' => 'listing', 'reportable_id' => Listing::where('status', ListingStatus::Active)->value('id')])->save();
+    }
+
+    /** @param  list<array{0: string, 1: string|null, 2: list<string>}>  $places */
+    private function places(Country $country, array $places): void
+    {
+        foreach ($places as [$regionName, $subregionName, $towns]) {
+            $region = Region::where('country_id', $country->id)->where('level', 1)->get()->first(fn (Region $r) => $r->name === $regionName)
+                ?? Region::factory()->create(['country_id' => $country->id, 'name' => ['en' => $regionName], 'slug' => Str::slug($regionName), 'is_active' => true]);
+            $parent = $region;
+            if ($subregionName !== null && $country->region_levels >= 2) {
+                $parent = Region::factory()->childOf($region)->create(['name' => ['en' => $subregionName], 'slug' => Str::slug($subregionName), 'is_active' => true]);
+            }
+            foreach ($towns as $town) {
+                City::factory()->inRegion($parent)->create(['name' => ['en' => $town], 'ascii_name' => $town, 'slug' => Str::slug($town), 'is_active' => true]);
+            }
+        }
     }
 }

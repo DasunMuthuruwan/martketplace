@@ -65,6 +65,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Emails written by the `log` mailer, kept apart from errors: MAIL_LOG_CHANNEL=mail
+        // (the browser tests read verification links from it, ADR-025).
+        'mail' => [
+            'driver' => 'single',
+            'path' => env('MAIL_LOG_PATH', storage_path('logs/mail.log')),
+            'level' => 'debug',
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
