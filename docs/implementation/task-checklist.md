@@ -77,7 +77,14 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] Q7.4 Authorization boundary sweep (merged f8d1180)
   - [x] Q7.5 Performance re-check (50k listings) (merged db81a1b)
   - [x] Q7.6 QA report ([report](../qa/qa-report.md)) — merged 2026-10-21
-- [ ] M9 Security review
+- [~] M9 Security review ([plan](../security/security-plan.md), [findings](../security/findings.md))
+  - [~] S8.1 Plan and baseline — awaiting review on `feature/S8.1-security-plan`
+  - [ ] S8.2 Rate limits and abuse (S-01)
+  - [ ] S8.3 Input handling (validation, XSS, SQL injection, redirects, mass assignment)
+  - [ ] S8.4 Upload abuse
+  - [ ] S8.5 Authentication, sessions, CSRF
+  - [ ] S8.6 Secrets, privacy and errors (S-02)
+  - [ ] S8.7 Security report
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 
