@@ -76,7 +76,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] Q7.3 Global scenarios 1–15 traceability ([table](../qa/global-scenarios.md)) (merged eb89d76)
   - [x] Q7.4 Authorization boundary sweep (merged f8d1180)
   - [x] Q7.5 Performance re-check (50k listings) (merged db81a1b)
-  - [~] Q7.6 QA report ([report](../qa/qa-report.md)) — awaiting review on `feature/Q7.6-qa-report`
+  - [x] Q7.6 QA report ([report](../qa/qa-report.md)) — merged 2026-10-21
 - [ ] M9 Security review
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
