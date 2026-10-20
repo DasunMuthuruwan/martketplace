@@ -11,7 +11,7 @@ Brief: `docs/07-testing-qa.md`. Run every available test layer, test negative ca
 | Q7.3 ✓ | **Global scenarios 1–15** (architecture doc 13 §11): map each to an existing test or add the missing one (feature or browser). | [Traceability table](global-scenarios.md), `tests/Feature/Global/GlobalScenariosTest.php` |
 | Q7.4 ✓ | **Authorization boundary sweep:** every route and every admin action, as guest, member, another member, moderator, admin and owner, against an expected-status matrix generated from the route list (nothing left unlisted). | `tests/Feature/Security/AuthorizationSweepTest.php` |
 | Q7.5 ✓ | **Performance re-check** at 50,000 listings / 4 countries (`marketplace:perf-seed`, `marketplace:perf-report`) after Phase 6: indexes used, p95 within target. | Updated `docs/operations/performance.md` |
-| Q7.6 | **QA report:** results, open findings, residual risks, what the owner should test by hand (manual keyboard / screen-reader pass, real email, real phone numbers), readiness for Phase 8 (security review). | `docs/qa/qa-report.md` |
+| Q7.6 ✓ | **QA report:** results, open findings, residual risks, what the owner should test by hand (manual keyboard / screen-reader pass, real email, real phone numbers), readiness for Phase 8 (security review). | `docs/qa/qa-report.md` |
 
 ## Known Before Starting
 
