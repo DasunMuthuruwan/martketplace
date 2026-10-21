@@ -34,3 +34,18 @@ Plan: [security-plan.md](security-plan.md). Severity scale in the plan.
 | Search caps | Page ≤ `max_page` (100), keyword ≤ 100 characters, ≤ 10 attribute filters, at most 10 words in the full-text query (already enforced by `SearchCriteriaFactory` / `MysqlListingSearch`) |
 | Livewire's own upload endpoint | Throttled by Livewire (60/min) and unusable without a component that uses file uploads (none does); checked again in S8.4 |
 | Not throttled, accepted | Wizard step saves, favourites, account settings and admin actions: cheap, signed-in and (admin) staff-only; the daily new-ad limit and per-ad photo cap bound the expensive parts |
+
+## S8.3 Input Handling (2026-10-21)
+
+No new findings. Evidence:
+
+| Check | How | Result |
+|---|---|---|
+| Stored XSS | `StoredXssTest`: a payload with a script tag, an image error handler, an attribute break-out, `javascript:` / `data:` links and Markdown links, written straight to the database (bypassing input validation) into user name, status reason, ad title, description, area text, moderator note, report details, region and town names; then the listing, seller, country home, search, category and global pages, the account pages and the posting review step, the moderation, reports and users admin screens, and 7 emails | Always escaped; the test first checks the payload is actually on the page, so a passing check cannot be a page that simply omits it |
+| Reflected XSS | Payload in `q`, `sort`, `view`, `region` on global and country search | Escaped; any redirect stays on the site |
+| Static pages | Markdown with raw HTML, `javascript:` and `data:` links | HTML stripped, unsafe links dropped, `https:` links kept |
+| SQL injection | `SqlInjectionTest`: 11 probes (tautologies, comments, `UNION`, stacked `DROP`, `SLEEP`, LIKE wildcards, full-text boolean operators, a null byte) in 14 search parameters and attribute filter keys and values on 3 search pages, and in every admin search and `#[Url]` filter (users, blocklist, countries, attributes, audit log, moderation, reports); runs on SQLite and MariaDB (full-text boolean mode) | No error, no extra rows (a keyword tautology finds nothing, `%` in user search matches nobody), tables intact |
+| Code review | Raw SQL inventory (S8.1); `LIKE` searches escape `%`, `_`, `\`; sort columns are fixed choices, never input | Bound parameters throughout |
+| Mass assignment | `MassAssignmentTest`: registration with status, verification date, roles, 2FA, legal hold; posting details and price steps with owner, status, publication, moderation, country, currency, cover | All ignored; the forms themselves still saved. Controllers pass `$request->only([...])`; the two unguarded pivot models are written only from validated admin input (`AttributesAdmin::saveLink`) |
+| Open redirects | Code review of every `redirect()->to()` | Targets are built from routes, the matched country or the listing's own URL; `back()` and `intended()` are Laravel's same-site values |
+| Server validation | Inventory: no `$request->all()`; actions validate with explicit rules; Livewire admin actions validate and check permissions (Q7.4 sweep) | Covered |
