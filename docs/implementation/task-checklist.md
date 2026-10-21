@@ -87,7 +87,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] S8.7 Security report ([report](../security/security-report.md)) — merged 2026-10-21
 - [~] M9b Paid boosts before deployment (owner 2026-10-21; [proposal](../proposals/paid-boosts.md), ADR-026; selling off until D6/D2)
   - [x] B1 Foundations (sort time, boosts, daily views) — merged 2026-10-21
-  - [~] B2 Top ads and bumps in results — awaiting review on `feature/B2-top-ads-bumps`
+  - [x] B2 Top ads and bumps in results — merged 2026-10-21
   - [ ] B3 Admin grant and seller view
   - [ ] B4 Products, prices and bank details per country
   - [ ] B5 Orders by bank transfer
