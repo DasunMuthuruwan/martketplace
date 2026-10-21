@@ -84,7 +84,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] S8.4 Upload abuse (no exploitable findings; S-03 upload feedback fixed) — merged 2026-10-21
   - [x] S8.5 Authentication, sessions, CSRF (S-04 sessions after reset, S-05 security emails: fixed) — merged 2026-10-21
   - [x] S8.6 Secrets, privacy and errors (S-02 fixed: `marketplace:check-production`) — merged 2026-10-21
-  - [ ] S8.7 Security report
+  - [~] S8.7 Security report ([report](../security/security-report.md)) — awaiting review on `feature/S8.7-security-report`
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 
