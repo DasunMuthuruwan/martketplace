@@ -87,7 +87,7 @@ class HomeController extends Controller
             ->when($country !== null, fn ($q) => $q->where('country_id', $country->id))
             ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
             ->withCount('images')
-            ->orderByDesc('published_at')->orderByDesc('id')
+            ->orderByDesc('sorted_at')->orderByDesc('id')
             ->limit(self::LATEST)
             ->get();
     }

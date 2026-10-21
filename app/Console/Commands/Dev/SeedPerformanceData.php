@@ -161,6 +161,7 @@ class SeedPerformanceData extends Command
             'subregion_id' => $place[1],
             'city_id' => $place[2],
             'published_at' => $status === ListingStatus::PendingReview ? null : $published,
+            'sorted_at' => $status === ListingStatus::PendingReview ? null : $published,
             'submitted_at' => $published,
             'expires_at' => $status === ListingStatus::Expired ? $published->copy()->subDay() : $published->copy()->addDays(60),
             'created_at' => $published,

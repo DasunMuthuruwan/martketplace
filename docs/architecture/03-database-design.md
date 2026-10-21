@@ -376,3 +376,9 @@ Indexes: `(listing_id)`, `(attribute_id, value_option_id, listing_id)`, `(attrib
 - Timestamps: stored in UTC, displayed in `Asia/Colombo`.
 - Enums: PHP backed enums. DB columns are `varchar(20)` (not native ENUM) so values can be added without an `ALTER`. Valid values are enforced by casts and validation.
 - Slugs: ASCII. A Sinhala or Tamil title produces a transliteration-free fallback slug (`listing`), and the id keeps the URL unique.
+
+## Paid Boosts (B1, 2026-10-21, ADR-026)
+
+- `listings.sorted_at`: the "newest" order (search, category, country home, seller page, similar ads). Equal to `published_at` until a Bump moves it; renewal leaves it alone. The six browse indexes `(status, …, published_at)` now end with `sorted_at`.
+- `listing_boosts`: `listing_id` (cascade), `type` (`bump`, `top`), `order_id` (B5, nullable), `granted_by` (staff, nullable), `starts_at`, `ends_at` (null for a Bump), `ended_at` (ended early), `last_shown_at` (top-ad rotation). Indexes `(type, ends_at)`, `(listing_id, type)`, `order_id`.
+- `listing_daily_views`: `(listing_id, date)` primary key, `views`. One view per visitor session, ad and day; owner, staff and bots not counted (`ListingViews`). `listings.view_count` is the running total.

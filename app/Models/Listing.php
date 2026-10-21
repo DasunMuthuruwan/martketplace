@@ -52,6 +52,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $moderated_at
  * @property Carbon|null $submitted_at
  * @property Carbon|null $published_at
+ * @property Carbon|null $sorted_at the "newest" order: publication time, moved by a Bump (ADR-026)
  * @property Carbon|null $expires_at
  * @property Carbon|null $expiry_reminder_sent_at
  * @property Carbon|null $sold_at
@@ -99,6 +100,7 @@ class Listing extends Model
             'moderated_at' => 'datetime',
             'submitted_at' => 'datetime',
             'published_at' => 'datetime',
+            'sorted_at' => 'datetime',
             'expires_at' => 'datetime',
             'expiry_reminder_sent_at' => 'datetime',
             'sold_at' => 'datetime',
@@ -114,6 +116,10 @@ class Listing extends Model
         static::saving(function (Listing $listing): void {
             if ($listing->isDirty('title') || blank($listing->getAttribute('slug'))) {
                 $listing->slug = Str::limit(Str::slug((string) $listing->title), self::SLUG_MAX_LENGTH, '') ?: 'listing';
+            }
+            // A published ad always has a place in the newest order (ListingPublisher sets both).
+            if ($listing->published_at !== null && $listing->sorted_at === null) {
+                $listing->sorted_at = $listing->published_at;
             }
         });
     }
@@ -215,6 +221,12 @@ class Listing extends Model
     public function attributeValues(): HasMany
     {
         return $this->hasMany(ListingAttributeValue::class);
+    }
+
+    /** @return HasMany<ListingBoost, $this> */
+    public function boosts(): HasMany
+    {
+        return $this->hasMany(ListingBoost::class);
     }
 
     /** @return HasMany<ListingImage, $this> */

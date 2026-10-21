@@ -184,6 +184,19 @@ Remaining hosting checks (SSH, symlinks, cron interval, inodes, mail limit, outb
 | **M10 Deployment (Phase 9)** | Hosting verification script (approved upload), account decision (CD-03), staging subdomain, release packaging (vendor included, prebuilt assets), migrations via SSH or one-off cron, DNS/SSL (**approval**), production launch with Sri Lanka active, smoke tests, rollback rehearsal. |
 | **M11 Operations (Phase 10)** | Backups + restore drill, monitoring (logs, disk/inodes, queue backlog), runbooks (2FA break-glass, location curation, country activation checklist, domain migration), update cadence. |
 
+## 7a. Paid Boosts (M9b, Before Deployment)
+
+Owner decision 2026-10-21: build the paid boosts of `docs/proposals/paid-boosts.md` (ADR-026) **before deployment** (D7 changed). Scope: proposal steps 1–2 (Bump and Top ad, products and prices per country, manual bank transfer). **Selling stays switched off** (`boosts.sales_enabled`, default off) until the accountant review (D6) and the owner's prices (D2); admin-granted boosts work without it. Urgent and payment gateways stay later (D1, D3).
+
+| ID | Task | Size | Output |
+|---|---|---|---|
+| B1 | **Foundations:** `listings.sorted_at` (the "newest" order; equals publication until a Bump; renewal leaves it alone), indexes moved to it; `listing_boosts` (type, starts, ends, order, granted by); `listing_daily_views` and view counting on the ad page (once per visitor session per day; owner, staff and bots not counted) | M | Migrations, models, ordering on `sorted_at`, view counter, tests |
+| B2 | **Top ads and bumps in results:** labelled top-ad block above results (max 2, setting; only the default order; country, category subtree and active filters must match; rotation by last shown), "Why am I seeing this?", Bump moves `sorted_at`; boosts end when the ad stops being public; scheduler ends expired boosts | M | Search and category pages, card label, tests incl. trust rules |
+| B3 | **Admin grant and seller view:** admin grants or ends a Bump / Top ad on an ad (audited); My ads shows the active boost and views per day before and during | M | Admin action, account UI, tests |
+| B4 | **Products and prices:** `boost_products`, `boost_prices` per country (admin), per-country bank transfer details (admin), `boosts.sales_enabled` switch | M | Admin screens, seeds (no prices), tests |
+| B5 | **Orders by bank transfer:** seller "Promote" flow (live own ads only; price from the server), order with reference and instructions (page + email), admin orders (mark paid → boost starts, cancel, refund → boost ends), unpaid orders expire, emails (receipt, started, ending soon, ended), rate limit | L | Flow, admin, emails, tests |
+| B6 | **Rules, QA and docs:** boost rules and refund page (owner text, D4), browser journey (order → admin paid → top ad visible), security checks (others' ads, non-live ads, tampered amounts), docs | M | Journey, security tests, docs |
+
 ## 8. Owner Content Tasks (Parallel, Not Code)
 
 | ID | Content | Needed by |

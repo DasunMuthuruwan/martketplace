@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Direction accepted, owner decisions D1–D7 recorded 2026-10-21 (§11, ADR-026).** Implementation after launch; no code before then. |
+| Status | **Accepted; being built before deployment** (owner, 2026-10-21: D7 changed). Steps 1–2 now (implementation plan §7a, B1–B6); selling stays switched off until the accountant review (D6) and prices (D2). |
 | Date | 2026-10-21 (agreed in principle by the owner the same day) |
 | Timing | Implementation is a Phase 10 enhancement, **after launch**: boosts are worth paying for only once there are buyers. |
 | Builds on | Requirements §"Later phases" (featured listings, dealer subscriptions), SRCH-01 (home featured slot placeholder), the renewal cool-down (renewing is not free bumping), architecture 02 (reserved `Billing/` module), database design (reserved `featured_listings` / `orders` / `subscriptions`), global marketplace rules (prices and gateways per country, never hardcoded) |
@@ -109,7 +109,7 @@ Search: the top-ad block is a separate small query (country, category subtree, f
 | D4 | Refunds | Refund when the marketplace fails to deliver the boost; publish clear exceptions (rule-breaking removal, early sale or deletion by the seller) |
 | D5 | Top-ad slots | Maximum **2 per results page** |
 | D6 | Tax and invoices | **Accountant review before accepting payments** (a gate before step 2 goes live) |
-| D7 | Timing | **After launch**, when buyer activity supports paid visibility |
+| D7 | Timing | ~~After launch~~ **Changed 2026-10-21: build before deployment**; selling switched on after D6 and D2 |
 
 ## 12. Phasing
 

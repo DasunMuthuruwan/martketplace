@@ -182,8 +182,9 @@ class ListingSchemaTest extends TestCase
         $indexes = collect(Schema::getIndexes('listings'))->map(fn (array $index) => implode(',', $index['columns']))->all();
 
         foreach ([
-            'status,category_id,published_at', 'status,country_id,published_at', 'status,country_id,category_id,published_at',
-            'status,region_id,published_at', 'status,subregion_id,published_at', 'status,city_id,published_at',
+            // The "newest" order is sorted_at since B1 (a Bump moves it; ADR-026).
+            'status,category_id,sorted_at', 'status,country_id,sorted_at', 'status,country_id,category_id,sorted_at',
+            'status,region_id,sorted_at', 'status,subregion_id,sorted_at', 'status,city_id,sorted_at',
             'status,country_id,currency,price', 'status,category_id,currency,price', 'status,expires_at',
             'status,submitted_at', 'user_id,status,updated_at',
         ] as $columns) {
@@ -193,6 +194,12 @@ class ListingSchemaTest extends TestCase
         if (in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
             $this->assertContains('title,description', $indexes, 'FULLTEXT for keyword search');
         }
+
+        $boostIndexes = collect(Schema::getIndexes('listing_boosts'))->map(fn (array $index) => implode(',', $index['columns']))->all();
+        foreach (['type,ends_at', 'listing_id,type', 'order_id'] as $columns) {
+            $this->assertContains($columns, $boostIndexes);
+        }
+        $this->assertContains('listing_id,date', collect(Schema::getIndexes('listing_daily_views'))->map(fn (array $index) => implode(',', $index['columns']))->all());
 
         $valueIndexes = collect(Schema::getIndexes('listing_attribute_values'))->map(fn (array $index) => implode(',', $index['columns']))->all();
         foreach (['attribute_id,value_option_id,listing_id', 'attribute_id,value_number,listing_id', 'attribute_id,value_bool,listing_id'] as $columns) {

@@ -30,7 +30,7 @@ class SellerController extends Controller
         $listings = Listing::public()->where('user_id', $seller->id)
             ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
             ->withCount('images')
-            ->orderByDesc('published_at')->orderByDesc('id')
+            ->orderByDesc('sorted_at')->orderByDesc('id')
             ->paginate((int) config('marketplace.listings.per_page'));
 
         return view('public.seller', [

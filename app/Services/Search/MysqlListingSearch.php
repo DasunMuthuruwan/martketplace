@@ -149,6 +149,6 @@ class MysqlListingSearch implements ListingSearch
                 ->orderBy('listings.price', $c->sort === SearchCriteria::SORT_PRICE_ASC ? 'asc' : 'desc');
         }
 
-        $query->orderByDesc('listings.published_at')->orderByDesc('listings.id');
+        $query->orderByDesc('listings.sorted_at')->orderByDesc('listings.id');
     }
 }

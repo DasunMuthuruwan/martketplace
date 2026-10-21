@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Services\Attributes\AttributeSchema;
 use App\Services\Contact\ContactResolver;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Listings\ListingViews;
 use App\Services\Security\Turnstile;
 use App\Services\Seo\PageSeo;
 use App\Services\Seo\StructuredData;
@@ -32,6 +33,7 @@ class ListingController extends Controller
         private readonly ContactResolver $contact,
         private readonly AttributeSchema $schemas,
         private readonly StructuredData $structured,
+        private readonly ListingViews $views,
     ) {}
 
     public function show(Request $request, string $slugId): Response|RedirectResponse
@@ -46,6 +48,8 @@ class ListingController extends Controller
             if ($slugId !== $listing->slug.'-'.$listing->id) {
                 return redirect()->to($listing->publicUrl(), 301);
             }
+
+            $this->views->record($request, $listing);
 
             return response()->view('public.listing', $this->viewData($request, $listing) + ['ownerView' => $this->ownedBy($request, $listing)]);
         }
@@ -137,7 +141,7 @@ class ListingController extends Controller
             ->whereKeyNot($listing->id)
             ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
             ->withCount('images')
-            ->orderByDesc('published_at')->limit(self::SIMILAR)->get();
+            ->orderByDesc('sorted_at')->limit(self::SIMILAR)->get();
     }
 
     private function ownedBy(Request $request, Listing $listing): bool
