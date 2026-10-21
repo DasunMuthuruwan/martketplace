@@ -16,8 +16,9 @@ use Illuminate\Validation\ValidationException;
 /**
  * Photos step (layout doc §3.4, components §2 image-uploader): upload several photos at once (each
  * one checked and stored by ManageListingImages; one bad file does not stop the others), move a
- * photo earlier or later, set the cover, remove. Plain forms; resources/js/ui/posting.js adds an
- * upload progress bar and asks for JSON. Every file counts toward the hourly photo limit (security doc
+ * photo earlier or later, set the cover, remove. Plain forms; resources/js/ui/posting.js sends the
+ * photos one per request (so several large phone photos never exceed post_max_size, S-03) with a
+ * progress bar, asking for JSON. Every file counts toward the hourly photo limit (security doc
  * §3, S-01: each upload is decoded and re-encoded, so uploading and removing in a loop is costly).
  */
 class ListingPhotosController extends Controller
@@ -87,14 +88,23 @@ class ListingPhotosController extends Controller
     /** @param  list<string>  $errors */
     private function done(Request $request, Listing $listing, array $errors, int $added): RedirectResponse|JsonResponse
     {
-        $status = $added > 0 ? trans_choice('posting.photos.added', $added, ['count' => $added]) : null;
         if ($request->expectsJson()) {
-            // The page reloads after the upload: flash the outcome so it is shown there too.
-            session()->flash('photo_errors', $errors);
+            // The page reloads after the upload: flash the outcome so it is shown there. Later requests
+            // of a one-photo-per-request batch add to what the earlier ones flashed.
+            $shownErrors = $errors;
+            $shownAdded = $added;
+            if ($request->boolean('batch_continue')) {
+                $shownErrors = array_merge(array_values((array) session('photo_errors', [])), $errors);
+                $shownAdded += (int) session('photo_added', 0);
+            }
+            $status = $shownAdded > 0 ? trans_choice('posting.photos.added', $shownAdded, ['count' => $shownAdded]) : null;
+            session()->flash('photo_errors', $shownErrors);
+            session()->flash('photo_added', $shownAdded);
             session()->flash('status', $status);
 
             return response()->json(['added' => $added, 'errors' => $errors, 'status' => $status], $added > 0 ? 200 : 422);
         }
+        $status = $added > 0 ? trans_choice('posting.photos.added', $added, ['count' => $added]) : null;
 
         return redirect()->route('listings.edit', [$listing, 'photos'])
             ->with('photo_errors', $errors)

@@ -97,7 +97,12 @@ document.addEventListener('change', (event) => {
     }
 });
 
-// ---- Photos: upload with a progress bar, then reload to show the result -----------------------
+// ---- Photos: upload one per request with a progress bar, then reload to show the result ---------
+// One photo per request keeps every request under the server's post_max_size (several phone photos
+// together easily exceed it, S-03). Photos that cannot be sent (too large, connection lost) are
+// listed after the reload; the server flashes its own outcome for the others.
+
+const CLIENT_ERRORS_KEY = 'photo-client-errors';
 
 document.addEventListener('change', (event) => {
     const input = event.target;
@@ -107,9 +112,34 @@ document.addEventListener('change', (event) => {
     }
 });
 
-document.addEventListener('submit', (event) => {
+function sendPhoto(form, file, continuing, onProgress) {
+    return new Promise((resolve) => {
+        const data = new FormData();
+        data.append('_token', form.querySelector('input[name="_token"]')?.value ?? '');
+        data.append('photos[]', file);
+        if (continuing) {
+            data.append('batch_continue', '1');
+        }
+        const request = new XMLHttpRequest();
+        request.open('POST', form.action);
+        request.setRequestHeader('Accept', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        request.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                onProgress(e.loaded / e.total);
+            }
+        });
+        // 200/422 carry the server's own per-file messages (flashed for the reload); anything else
+        // (413, 5xx, network) means the photo did not get through.
+        request.addEventListener('loadend', () => resolve(request.status === 200 || request.status === 422));
+        request.send(data);
+    });
+}
+
+document.addEventListener('submit', async (event) => {
     const form = event.target.closest?.('form[data-photo-upload]');
-    if (!form || typeof XMLHttpRequest === 'undefined') {
+    const input = form?.querySelector('input[type="file"]');
+    if (!form || !input || input.files.length === 0 || typeof XMLHttpRequest === 'undefined' || typeof Promise === 'undefined') {
         return;
     }
     event.preventDefault();
@@ -117,24 +147,76 @@ document.addEventListener('submit', (event) => {
     const progress = form.querySelector('[data-upload-progress]');
     const bar = form.querySelector('[data-upload-bar]');
     const text = form.querySelector('[data-upload-text]');
-    const button = form.querySelector('[data-upload-submit]');
+    form.querySelector('[data-upload-submit]')?.setAttribute('disabled', '');
+    input.setAttribute('disabled', '');
     progress?.classList.remove('hidden');
-    button?.setAttribute('disabled', '');
 
-    const request = new XMLHttpRequest();
-    request.open('POST', form.action);
-    request.setRequestHeader('Accept', 'application/json');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    request.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable && bar) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            bar.style.width = `${percent}%`;
-            if (text) {
-                text.textContent = `${percent}%`;
+    const files = Array.from(input.files);
+    const maxBytes = Number(form.dataset.maxBytes) || Infinity;
+    const label = form.dataset.msgProgress ?? '';
+    const failed = [];
+    let sent = 0;
+
+    for (const [index, file] of files.entries()) {
+        const show = (fraction) => {
+            const percent = Math.round(((index + fraction) / files.length) * 100);
+            if (bar) {
+                bar.style.width = `${percent}%`;
             }
+            if (text) {
+                text.textContent = `${label.replace(':n', index + 1).replace(':total', files.length)} · ${percent}%`;
+            }
+        };
+        show(0);
+        if (file.size > maxBytes) {
+            failed.push(`${file.name}: ${form.dataset.msgTooLarge ?? ''}`);
+            continue;
         }
-    });
-    // Whatever happened (some files may have been refused), the page shows the current photos and messages.
-    request.addEventListener('loadend', () => window.location.reload());
-    request.send(new FormData(form));
+        // One at a time, in the chosen order.
+        const ok = await sendPhoto(form, file, sent > 0, show);
+        if (ok) {
+            sent += 1;
+        } else {
+            failed.push(`${file.name}: ${form.dataset.msgFailed ?? ''}`);
+        }
+    }
+
+    try {
+        if (failed.length > 0) {
+            window.sessionStorage.setItem(CLIENT_ERRORS_KEY, JSON.stringify(failed));
+        }
+    } catch {
+        // Storage unavailable: the page still shows what the server accepted.
+    }
+    window.location.reload();
 });
+
+function showClientErrors() {
+    const box = document.querySelector('[data-photo-client-errors]');
+    if (!box) {
+        return;
+    }
+    let messages = [];
+    try {
+        messages = JSON.parse(window.sessionStorage.getItem(CLIENT_ERRORS_KEY) ?? '[]');
+        window.sessionStorage.removeItem(CLIENT_ERRORS_KEY);
+    } catch {
+        return;
+    }
+    if (!Array.isArray(messages) || messages.length === 0) {
+        return;
+    }
+    const list = box.querySelector('[data-photo-client-list]');
+    for (const message of messages) {
+        const item = document.createElement('li');
+        item.textContent = String(message);
+        list?.append(item);
+    }
+    box.classList.remove('hidden');
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showClientErrors);
+} else {
+    showClientErrors();
+}

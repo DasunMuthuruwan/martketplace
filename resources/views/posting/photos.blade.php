@@ -16,6 +16,10 @@
             <ul class="list-disc pl-4">@foreach (session('photo_errors') as $message)<li>{{ $message }}</li>@endforeach</ul>
         </x-ui.alert>
     @endif
+    {{-- Filled by posting.js after a reload: photos it could not send (too large, connection lost). --}}
+    <x-ui.alert variant="danger" :title="__('posting.photos.some_failed')" class="mb-4 hidden" data-photo-client-errors>
+        <ul class="list-disc pl-4" data-photo-client-list></ul>
+    </x-ui.alert>
 
     <p class="mb-3 text-ui text-fg-muted" aria-live="polite"><span class="tabular font-semibold text-fg">{{ $images->count() }} / {{ $max }}</span> {{ __('posting.photos.count') }}</p>
 
@@ -46,7 +50,9 @@
     @endif
 
     @unless ($full)
-        <form method="POST" action="{{ route('listings.photos.store', $listing) }}" enctype="multipart/form-data" class="mb-6" data-photo-upload>
+        <form method="POST" action="{{ route('listings.photos.store', $listing) }}" enctype="multipart/form-data" class="mb-6" data-photo-upload
+              data-max-bytes="{{ $maxMb * 1024 * 1024 }}" data-msg-too-large="{{ __('posting.photos.too_large', ['mb' => $maxMb]) }}"
+              data-msg-failed="{{ __('posting.photos.failed') }}" data-msg-progress="{{ __('posting.photos.progress') }}">
             @csrf
             <label for="photos" class="flex cursor-pointer flex-col items-center gap-2 rounded-card border-2 border-dashed border-control px-4 py-8 text-center hover:bg-surface-hover focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary">
                 <x-ui.icon name="camera" size="24" class="text-fg-muted" />

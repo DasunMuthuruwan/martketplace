@@ -8,6 +8,7 @@ Plan: [security-plan.md](security-plan.md). Severity scale in the plan.
 |---|---|---|---|---|
 | S-01 | Medium | Rate limits | The design (architecture 06 §3) sets `image-upload` 60/hour per user and `listing-submit` 30/hour per IP, but neither limiter exists: the photo routes (`listings.photos.*`) and ad submission have no throttle. Only the daily new-ad limit (LST-09) and the per-ad photo cap apply. One verified account can upload, remove and upload again without limit, and each upload makes the server decode an image of up to 40 MP and 8 MB, so CPU and disk can be exhausted. | **Fixed in S8.2:** limiter `listing-submit` (30/hour per IP, shared by new drafts and submissions) on `listings.store` and `listings.submit`; photo uploads counted per file, 60/hour per account, in `ListingPhotosController` (a file over the limit gets a photo error with the wait time, the others in the request are unaffected). Retest: `RateLimitsTest` fails 4/4 without the fix, passes 4/4 with it. |
 | S-02 | Low | Configuration | `.env.example` holds local values (`APP_ENV=local`, `APP_DEBUG=true`, `LOG_LEVEL=debug`, `SESSION_SECURE_COOKIE=false`). A production `.env` copied from it unchanged would show stack traces and send the session cookie without `Secure` (the explicit `false` overrides the production default in `config/session.php`). Nothing checks this at deploy time. | Open, fix proposed for S8.6 (production check) and Phase 9 (production template) |
+| S-03 | Low | Uploads (robustness) | Several photos chosen at once can exceed PHP's request limit (`post_max_size`, 12 MB required by the hosting doc; three 5 MB phone photos are 15 MB). PHP then drops the whole request and Laravel answers 413 with a generic page; the upload script reloads the page, so the photos silently do not appear and the seller gets no message. Not exploitable (nothing is processed), but a likely real-world failure. | **Fixed in S8.4 (owner approved 2026-10-21):** `posting.js` sends the photos one per request, in order, with "Photo 2 of 5" progress; a photo over the 8 MB limit is not sent and is listed after the reload (as is any request that fails: 413, server error, connection lost); the server combines the outcome of one batch (`batch_continue`) so the reloaded page shows every photo's result; a too-large plain form gets a 413 page. Retest: `UploadAbuseTest` (combined batch outcome, 413 page), `PostingPhotosSubmitTest` (limits and messages handed to the script), browser journey with two photos and a 9 MB file. |
 
 ## Baseline Checks (S8.1, 2026-10-21)
 
@@ -49,3 +50,21 @@ No new findings. Evidence:
 | Mass assignment | `MassAssignmentTest`: registration with status, verification date, roles, 2FA, legal hold; posting details and price steps with owner, status, publication, moderation, country, currency, cover | All ignored; the forms themselves still saved. Controllers pass `$request->only([...])`; the two unguarded pivot models are written only from validated admin input (`AttributesAdmin::saveLink`) |
 | Open redirects | Code review of every `redirect()->to()` | Targets are built from routes, the matched country or the listing's own URL; `back()` and `intended()` are Laravel's same-site values |
 | Server validation | Inventory: no `$request->all()`; actions validate with explicit rules; Livewire admin actions validate and check permissions (Q7.4 sweep) | Covered |
+
+## S8.4 Upload Abuse (2026-10-21)
+
+Through the real endpoint (`UploadAbuseTest`, signed-in seller, JSON like the upload script):
+
+| Attack | Result |
+|---|---|
+| Decompression bomb: a valid 70-byte PNG whose header claims 30,000 × 30,000 (900 MP) | Rejected from the header before decoding (peak memory grows < 64 MB); nothing stored |
+| Path traversal in the file name (`../../../public/evil.php.jpg`) | Stored as `YYYY/MM/{listing}/{32 hex}-lg/sm.webp`; the client name is never used |
+| PHP file, PHP renamed `.jpg`, real JPEG named `.phtml`, SVG with `onload`, HTML page | All 5 rejected |
+| JPEG with PHP appended (polyglot) | Accepted as a photo; the stored variants are re-encoded and contain no `<?php` |
+| 12 files in one request, category limit 3 | 3 processed, 9 refused before processing |
+| Odd shapes: a string, nested arrays, empty list, a single file instead of a list | Handled (422 or redirect), nothing unexpected stored |
+| Someone else's draft / guest / unverified account | 403 / login / verification notice; nothing stored |
+| Livewire's upload endpoint without a signed URL | 401/403 (no component uses file uploads, so no signed URL is ever issued) |
+| Request over `post_max_size` | 413, no processing; was a silent failure for sellers (**S-03**, fixed: one photo per request, clear messages, 413 page) |
+
+Covered earlier and still valid: EXIF/GPS stripped, GIF/SVG/double extensions, content-type mismatch, size and dimension limits, corrupt files leave nothing behind, per-category photo limit under a row lock, script guard `.htaccess` in `uploads` mode (ListingImageTest, T4.3); hourly photo limit (S8.2). To verify on the host (Phase 9): the guard actually blocks execution under LiteSpeed, and `upload_max_filesize` ≥ 10M, `post_max_size` ≥ 12M, `memory_limit` ≥ 256M (local: 10M, 12M, 512M).

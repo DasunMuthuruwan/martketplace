@@ -81,7 +81,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] S8.1 Plan and baseline — merged 2026-10-21
   - [x] S8.2 Rate limits and abuse (S-01 fixed) — merged 2026-10-21
   - [x] S8.3 Input handling (validation, XSS, SQL injection, redirects, mass assignment; no findings) — merged 2026-10-21
-  - [ ] S8.4 Upload abuse
+  - [~] S8.4 Upload abuse (no exploitable findings; S-03 upload feedback fixed) — awaiting review on `feature/S8.4-upload-abuse`
   - [ ] S8.5 Authentication, sessions, CSRF
   - [ ] S8.6 Secrets, privacy and errors (S-02)
   - [ ] S8.7 Security report

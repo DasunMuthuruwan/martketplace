@@ -120,8 +120,8 @@ async function fillCategoryFields(page) {
     }
 }
 
-/** Post an ad from the category step to "sent for review". */
-async function postAd(page, { categoryPath, country, region, subregion, town, title, price }) {
+/** Fill an ad from the category step up to the photos step. */
+async function toPhotosStep(page, { categoryPath, country, region, subregion, town, title, price }) {
     await page.goto('/account/listings/create');
     for (const name of categoryPath) {
         await Promise.all([page.waitForLoadState('networkidle'), page.getByRole('link', { name, exact: true }).first().click()]);
@@ -157,8 +157,12 @@ async function postAd(page, { categoryPath, country, region, subregion, town, ti
     await page.locator('input[name="price"]').fill(price);
     await continueStep(page);
 
-    // Photos.
     await expect(page).toHaveURL(/\/edit\/photos/);
+}
+
+/** Post an ad from the category step to "sent for review". */
+async function postAd(page, ad) {
+    await toPhotosStep(page, ad);
     // Choosing files uploads them with a progress bar, then the step reloads with the photo.
     await page.locator('input[name="photos[]"]').first().setInputFiles(photo);
     await expect(page.locator('img[alt="Photo 1"]')).toBeVisible({ timeout: 30_000 });
@@ -324,3 +328,18 @@ test('a rejected ad shows the reason, and the fixed ad goes back to review', asy
     await expect(page.getByRole('heading', { name: /sent for review/i })).toBeVisible();
 });
 
+test('several photos upload one by one; a photo over the size limit is named, not lost silently', async ({ page }) => {
+    await logIn(page, seller.email);
+    await toPhotosStep(page, { categoryPath: ['Vehicles', 'Cars'], country: 'Sri Lanka', region: 'Western', subregion: 'Colombo', town: 'Nugegoda', title: `Honda Fit 2016 photos ${run}`, price: '4,100,000' });
+
+    // S-03: together these are far over post_max_size; one per request they all get a clear outcome.
+    await page.locator('input[name="photos[]"]').first().setInputFiles([
+        { name: 'first.jpg', mimeType: 'image/jpeg', buffer: readFileSync(photo) },
+        { name: 'second.jpg', mimeType: 'image/jpeg', buffer: readFileSync(photo) },
+        { name: 'huge.jpg', mimeType: 'image/jpeg', buffer: Buffer.alloc(9 * 1024 * 1024, 1) },
+    ]);
+
+    await expect(page.locator('img[alt="Photo 2"]')).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText(/2 photos added/).first()).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'huge.jpg' })).toContainText(/larger than 8 MB/);
+});

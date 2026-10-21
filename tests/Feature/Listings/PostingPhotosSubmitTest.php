@@ -52,6 +52,19 @@ class PostingPhotosSubmitTest extends TestCase
         $this->assertStringContainsString(__('posting.photos.remove', ['n' => 1]), $html);
     }
 
+    public function test_photos_step_gives_the_upload_script_its_limits_and_messages(): void
+    {
+        $listing = $this->completeDraft($this->seller);
+
+        $html = $this->actingAs($this->seller)->get(route('listings.edit', [$listing, 'photos']))->assertOk()->getContent();
+
+        $mb = intdiv((int) config('marketplace.images.max_upload_kb'), 1024);
+        $this->assertStringContainsString('data-max-bytes="'.($mb * 1024 * 1024).'"', $html);
+        $this->assertStringContainsString(e(__('posting.photos.too_large', ['mb' => $mb])), $html);
+        $this->assertStringContainsString(e(__('posting.photos.progress')), $html);
+        $this->assertStringContainsString('data-photo-client-errors', $html);
+    }
+
     public function test_upload_several_photos_with_an_error_per_bad_file(): void
     {
         $listing = $this->completeDraft($this->seller);
