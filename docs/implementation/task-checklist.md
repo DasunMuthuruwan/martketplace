@@ -77,14 +77,14 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] Q7.4 Authorization boundary sweep (merged f8d1180)
   - [x] Q7.5 Performance re-check (50k listings) (merged db81a1b)
   - [x] Q7.6 QA report ([report](../qa/qa-report.md)) — merged 2026-10-21
-- [~] M9 Security review ([plan](../security/security-plan.md), [findings](../security/findings.md))
+- [x] M9 Security review ([plan](../security/security-plan.md), [findings](../security/findings.md))
   - [x] S8.1 Plan and baseline — merged 2026-10-21
   - [x] S8.2 Rate limits and abuse (S-01 fixed) — merged 2026-10-21
   - [x] S8.3 Input handling (validation, XSS, SQL injection, redirects, mass assignment; no findings) — merged 2026-10-21
   - [x] S8.4 Upload abuse (no exploitable findings; S-03 upload feedback fixed) — merged 2026-10-21
   - [x] S8.5 Authentication, sessions, CSRF (S-04 sessions after reset, S-05 security emails: fixed) — merged 2026-10-21
   - [x] S8.6 Secrets, privacy and errors (S-02 fixed: `marketplace:check-production`) — merged 2026-10-21
-  - [~] S8.7 Security report ([report](../security/security-report.md)) — awaiting review on `feature/S8.7-security-report`
+  - [x] S8.7 Security report ([report](../security/security-report.md)) — merged 2026-10-21
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 
