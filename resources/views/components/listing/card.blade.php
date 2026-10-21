@@ -4,6 +4,7 @@
     'withCode' => false,  // pages that mix countries: ISO code after ambiguous symbols, country in the place
     'variant' => 'grid',  // grid | row (list view: photo left)
     'eager' => false,     // first cards of a page (likely above the fold): load at once, not lazily (LCP)
+    'promoted' => false,  // shown in the top-ad block: carries the visible "Top ad" label (ADR-026)
 ])
 {{-- Listing card (components §5.1): 4:3 photo, full price (Q-UX-4), title (2 lines), up to three key
      facts, place · time. The whole card is one link (the title, stretched). Photo count needs
@@ -40,6 +41,8 @@
         @endif
         @if ($sold)
             <x-ui.badge variant="neutral" class="absolute left-2 top-2">{{ __('public.card.sold') }}</x-ui.badge>
+        @elseif ($promoted)
+            <x-ui.badge variant="neutral" class="absolute left-2 top-2" data-top-ad-badge>{{ __('boosts.top.badge') }}</x-ui.badge>
         @endif
     </div>
     <div class="flex min-w-0 flex-1 flex-col gap-1 p-3">

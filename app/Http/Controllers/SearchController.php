@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\Region;
 use App\Services\Attributes\AttributeSchema;
+use App\Services\Boosts\TopAds;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
 use App\Services\Listings\ListingPresenter;
@@ -41,6 +42,7 @@ class SearchController extends Controller
         private readonly CategoryTree $tree,
         private readonly AttributeSchema $schemas,
         private readonly ListingPresenter $present,
+        private readonly TopAds $topAds,
     ) {}
 
     public function country(Request $request, CountryContext $context): View|RedirectResponse
@@ -103,6 +105,7 @@ class SearchController extends Controller
             'currentCountry' => $country,
             'criteria' => $criteria,
             'results' => $results,
+            'topAds' => $this->topAds->for($criteria),
             'categories' => $categories,
             'filters' => $filters,
             'page' => new SearchPage($request, $criteria, $country, $filters, $categories),

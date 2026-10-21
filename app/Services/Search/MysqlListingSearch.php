@@ -5,6 +5,7 @@ namespace App\Services\Search;
 use App\Models\Listing;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Facades\DB;
 
@@ -20,13 +21,16 @@ class MysqlListingSearch implements ListingSearch
     /** InnoDB / MariaDB default innodb_ft_min_token_size. */
     public const FULLTEXT_MIN_WORD = 3;
 
+    /** Relations a listing card needs (search results, top ads). */
+    public const CARD_RELATIONS = ['category.parent', 'country', 'currencyModel', 'coverImage', 'region', 'subregion', 'city', 'locality'];
+
     public function search(SearchCriteria $criteria): LengthAwarePaginator
     {
         $query = $this->query($criteria);
         $perPage = (int) config('marketplace.listings.per_page');
 
         $items = (clone $query)
-            ->with(['category.parent', 'country', 'currencyModel', 'coverImage', 'region', 'subregion', 'city', 'locality'])
+            ->with(self::CARD_RELATIONS)
             ->withCount('images')
             ->forPage($criteria->page, $perPage)
             ->get(['listings.*']);
@@ -35,6 +39,20 @@ class MysqlListingSearch implements ListingSearch
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => 'page',
         ]))->withQueryString();
+    }
+
+    public function among(SearchCriteria $criteria, array $ids): EloquentCollection
+    {
+        if ($ids === []) {
+            return new EloquentCollection;
+        }
+
+        return $this->query($criteria)
+            ->whereIn('listings.id', $ids)
+            ->with(self::CARD_RELATIONS)
+            ->withCount('images')
+            ->get(['listings.*'])
+            ->keyBy('id');
     }
 
     /**

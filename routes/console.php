@@ -11,6 +11,8 @@ Artisan::command('inspire', function () {
 // Housekeeping (security doc §4). Runs from `schedule:run` at whatever interval the host allows.
 Schedule::command('marketplace:prune-images')->daily()->withoutOverlapping();
 Schedule::command('marketplace:expire-listings')->hourly()->withoutOverlapping();
+// Paid boosts end with their ad (ADR-026).
+Schedule::command('marketplace:end-boosts')->hourly()->withoutOverlapping();
 // Retention (docs/architecture/09-data-retention.md): Prunable models, e.g. contact reveals after 90 days.
 Schedule::command('model:prune')->daily()->withoutOverlapping();
 Schedule::command('marketplace:prune')->dailyAt('03:00')->withoutOverlapping();

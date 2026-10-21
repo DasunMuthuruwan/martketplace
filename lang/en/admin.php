@@ -147,6 +147,8 @@ return [
         'max_new_per_day' => 'New ads per seller per day',
         'max_images' => 'Photos per ad (default)',
         'max_images_help' => 'Categories can set their own limit.',
+        'top_ad_slots' => 'Top ads per results page',
+        'top_ad_slots_help' => 'Paid placements above the results. 0 hides them.',
         'contact' => 'Contact buttons',
         'contact_call' => 'Show the call button',
         'contact_whatsapp' => 'Show the WhatsApp button',

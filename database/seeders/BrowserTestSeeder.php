@@ -12,6 +12,7 @@ use App\Models\Page;
 use App\Models\Region;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\Boosts\BoostManager;
 use App\Services\Geo\RegionChain;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -69,6 +70,8 @@ class BrowserTestSeeder extends Seeder
                 'title' => $title, 'published_at' => now()->subHours($i + 1), 'expires_at' => now()->addDays(30),
             ]);
         }
+        // One top ad, so the accessibility scans cover the labelled top-ad block (ADR-026).
+        app(BoostManager::class)->top(Listing::where('title', 'Mitsubishi Montero 2012')->firstOrFail(), 7);
         Listing::factory()->inCountry($country)->for($seller)->status(ListingStatus::PendingReview)
             ->create($place + ['title' => 'Daihatsu Hijet 2014 van', 'published_at' => null, 'submitted_at' => now()->subMinutes(20)]);
         Listing::factory()->inCountry($country)->for($seller)->draft()->create($place + ['title' => 'Draft: Mazda Axela 2016']);

@@ -35,6 +35,7 @@ final class Settings
             'max_active_per_user' => ['config' => 'marketplace.listings.max_active_per_user', 'type' => 'int', 'rules' => ['required', 'integer', 'min:1', 'max:1000']],
             'max_new_per_day' => ['config' => 'marketplace.listings.max_new_per_day', 'type' => 'int', 'rules' => ['required', 'integer', 'min:1', 'max:200']],
             'max_images' => ['config' => 'marketplace.images.default_max_per_listing', 'type' => 'int', 'rules' => ['required', 'integer', 'min:1', 'max:20']],
+            'top_ad_slots' => ['config' => 'marketplace.boosts.top_slots', 'type' => 'int', 'rules' => ['required', 'integer', 'min:0', 'max:4']],
             'contact_call' => ['config' => 'marketplace.contact.call_enabled', 'type' => 'bool', 'rules' => ['boolean']],
             'contact_whatsapp' => ['config' => 'marketplace.contact.whatsapp_enabled', 'type' => 'bool', 'rules' => ['boolean']],
         ];

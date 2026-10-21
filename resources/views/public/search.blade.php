@@ -77,6 +77,30 @@
                 </div>
             @endif
 
+            {{-- Paid placements (ADR-026, D5): labelled, at most a few, matching this search; the same
+                 ads also keep their usual place in the results below. --}}
+            @if ($topAds->isNotEmpty())
+                <section aria-labelledby="top-ads" class="mb-6 rounded-card border border-line bg-surface-muted p-3 sm:p-4" data-top-ads>
+                    <div class="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                        <h2 id="top-ads" class="text-h3 font-semibold">{{ __('boosts.top.heading') }}</h2>
+                        <p class="text-small text-fg-subtle">{{ __('boosts.top.why') }}</p>
+                    </div>
+                    @if ($view === 'list')
+                        <ul class="space-y-3">
+                            @foreach ($topAds as $listing)
+                                <li><x-listing.card :listing="$listing" :present="$present" variant="row" :promoted="true" /></li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <ul class="listing-grid">
+                            @foreach ($topAds as $listing)
+                                <li><x-listing.card :listing="$listing" :present="$present" class="h-full" :promoted="true" /></li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </section>
+            @endif
+
             <h2 class="sr-only">{{ __('search.results') }}</h2>
             @if ($results->isEmpty())
                 <x-ui.empty-state icon="search" :title="__('search.empty_title')">

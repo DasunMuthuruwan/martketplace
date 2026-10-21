@@ -92,6 +92,13 @@ return [
         'orphan_ttl_hours' => 24,
     ],
 
+    // Paid boosts (ADR-026). Top ads per results page (owner setting, D5). Selling stays off until the
+    // accountant review (D6) and prices per country (D2); staff can grant boosts meanwhile.
+    'boosts' => [
+        'top_slots' => 2,
+        'sales_enabled' => (bool) env('BOOSTS_SALES_ENABLED', false),
+    ],
+
     'mail' => [
         'sending_enabled' => (bool) env('MAIL_SENDING_ENABLED', false),
         'hourly_limit' => (int) env('MAIL_HOURLY_LIMIT', 80),

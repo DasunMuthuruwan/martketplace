@@ -30,6 +30,7 @@
                 <x-ui.input type="number" :label="__('admin.settings.max_images')" id="s-images" wire:model="values.max_images" min="1" max="20" :hint="__('admin.settings.max_images_help')" :error="$errors->first('values.max_images')" />
                 <x-ui.input type="number" :label="__('admin.settings.max_active_per_user')" id="s-active" wire:model="values.max_active_per_user" min="1" max="1000" :error="$errors->first('values.max_active_per_user')" />
                 <x-ui.input type="number" :label="__('admin.settings.max_new_per_day')" id="s-daily" wire:model="values.max_new_per_day" min="1" max="200" :error="$errors->first('values.max_new_per_day')" />
+                <x-ui.input type="number" :label="__('admin.settings.top_ad_slots')" id="s-top" wire:model="values.top_ad_slots" min="0" max="4" :hint="__('admin.settings.top_ad_slots_help')" :error="$errors->first('values.top_ad_slots')" />
             </div>
         </section>
 
