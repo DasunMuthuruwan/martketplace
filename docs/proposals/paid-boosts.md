@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Proposal, awaiting the owner's decisions (§11).** No code until approved. |
+| Status | **Direction accepted, owner decisions D1–D7 recorded 2026-10-21 (§11, ADR-026).** Implementation after launch; no code before then. |
 | Date | 2026-10-21 (agreed in principle by the owner the same day) |
 | Timing | Implementation is a Phase 10 enhancement, **after launch**: boosts are worth paying for only once there are buyers. |
 | Builds on | Requirements §"Later phases" (featured listings, dealer subscriptions), SRCH-01 (home featured slot placeholder), the renewal cool-down (renewing is not free bumping), architecture 02 (reserved `Billing/` module), database design (reserved `featured_listings` / `orders` / `subscriptions`), global marketplace rules (prices and gateways per country, never hardcoded) |
@@ -22,13 +22,13 @@ Sellers pay to make an ad more visible: move it back to the top, pin it above th
 
 ## 3. Products
 
-Recommended first set (**bold**), later additions in normal text.
+First set decided by the owner (**bold**, D1), later additions in normal text.
 
 | Product | What the seller gets | Duration | Notes |
 |---|---|---|---|
 | **Bump** | The ad moves back to the top of the "newest" order once | One-off | Cheapest; uses a separate sort time, so the original publication date stays honest |
 | **Top ad** | Shown in a labelled block above the normal results of its category (and parent category) in its country, rotating with other top ads; also keeps its normal place | 3, 7 or 15 days | The main product |
-| **Urgent** | "Urgent" badge on the card and the ad page | 7 days | Cheap add-on |
+| Urgent | "Urgent" badge on the card and the ad page | 7 days | Cheap add-on; follows the first set (D1) |
 | Home page featured | One of a few slots on the country home page (the SRCH-01 placeholder) | 7 days | Limited slots; later |
 | Bundles | e.g. Top ad 7 days + Urgent + one Bump, discounted | — | Later |
 | Dealer / agent plans | Monthly: more active ads, included bumps, a shop page with logo | Monthly | Recurring revenue; needs subscriptions; later |
@@ -40,7 +40,7 @@ Recommended first set (**bold**), later additions in normal text.
 3. **Relevant:** a top ad appears only in its own country and its category or parent category, and only when it matches the active filters (location, price, attributes).
 4. **Rotating:** when more top ads exist than slots, the least recently shown go first, so every paying seller is seen.
 5. **Moderation first:** only live (approved, public) ads can be boosted. Payment never skips review; a pending ad cannot be boosted yet.
-6. **Ends with the ad:** if the ad is sold, deleted, expires or is removed by a moderator, the boost ends. Rule-breaking removals get no refund; this is stated before purchase. A boost cannot run past the ad's expiry unless the ad is renewed first.
+6. **Ends with the ad:** if the ad is sold, deleted, expires or is removed by a moderator, the boost ends. Refunds follow D4: a refund when the marketplace fails to deliver the boost; the published exceptions (rule-breaking removal, the seller selling or deleting the ad early) are shown before purchase. A boost cannot run past the ad's expiry unless the ad is renewed first.
 7. **Staff rules unchanged:** moderators still cannot decide on their own ads (CD-06); a boost does not change how an ad is moderated or reported.
 
 ## 5. Prices and Countries
@@ -99,25 +99,25 @@ Search: the top-ad block is a separate small query (country, category subtree, f
 - Boosted ads are moderated and reportable like any other; a report-driven removal ends the boost.
 - New rules in the Terms (paid services, refunds) and the Privacy Policy (the payment provider as a processor) need the owner's legal review.
 
-## 11. Decisions for the Owner
+## 11. Owner Decisions (2026-10-21)
 
-| # | Decision | Recommendation |
+| # | Decision | Owner's decision |
 |---|---|---|
-| D1 | Which products first | Bump, Top ad, Urgent |
-| D2 | Prices per country | Survey local classifieds, then set in the admin area |
-| D3 | Sri Lanka payment method | Start with bank transfer + manual confirmation, add a local gateway once demand is shown; or go straight to a gateway after checking its terms |
-| D4 | Refund policy | No refund for rule-breaking removals or early sale; full refund if the marketplace fails to show the boost |
-| D5 | Top-ad slots per page | 2 |
-| D6 | Tax and invoices | Ask an accountant per country before the first sale |
-| D7 | When to start | After launch, once there is steady buyer traffic (e.g. a few weeks of real usage data) |
+| D1 | Initial products | **Bump and Top ad**; Urgent can follow |
+| D2 | Pricing | Research competitors, then configure per country in the admin area |
+| D3 | Payments | **Manual bank transfer first**, a gateway later |
+| D4 | Refunds | Refund when the marketplace fails to deliver the boost; publish clear exceptions (rule-breaking removal, early sale or deletion by the seller) |
+| D5 | Top-ad slots | Maximum **2 per results page** |
+| D6 | Tax and invoices | **Accountant review before accepting payments** (a gate before step 2 goes live) |
+| D7 | Timing | **After launch**, when buyer activity supports paid visibility |
 
 ## 12. Phasing
 
 | Step | Content | Size |
 |---|---|---|
-| 1 | Admin-granted boosts (no payments): `listing_boosts`, top-ad block, badges, bump sort time, admin grant, statistics table | M |
-| 2 | Products and prices per country, orders, bank transfer with manual confirmation, seller "Promote" flow, receipts and boost emails | L |
-| 3 | First payment gateway (callbacks, signatures, refunds), revenue report | M–L per gateway |
+| 1 | Admin-granted Bump and Top ad (no payments): `listing_boosts`, top-ad block (2 slots), bump sort time, admin grant, statistics table | M |
+| 2 | Products and prices per country, orders, **bank transfer with manual confirmation**, seller "Promote" flow, receipts and boost emails, published refund rules. **Goes live only after the accountant review (D6)** and the owner's competitor price research (D2) | L |
+| 3 | Urgent badge; first payment gateway (callbacks, signatures, refunds), revenue report | M–L per gateway |
 | 4 | Home featured slots, bundles | S–M |
 | 5 | Dealer plans (subscriptions, shop pages, limits) | L |
 
