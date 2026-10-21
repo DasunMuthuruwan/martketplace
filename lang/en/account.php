@@ -68,6 +68,23 @@ return [
     ],
     'deleted_user' => 'Deleted user',
 
+    // Security notices (S-05). :date is the time of the change.
+    'security_mail' => [
+        'password_changed_subject' => 'Your password was changed',
+        'password_changed_line' => 'The password of your account was changed on :date. You were signed out on your other devices.',
+        'password_reset_subject' => 'Your password was reset',
+        'password_reset_line' => 'The password of your account was reset with an email link on :date. You were signed out everywhere.',
+        'email_changed_subject' => 'The email address of your account was changed',
+        'email_changed_line' => 'On :date the email address of your account was changed from this address to :email. We will not send account emails here any more.',
+        'two_factor_disabled_subject' => 'Two-factor authentication was turned off',
+        'two_factor_disabled_line' => 'Two-factor authentication for your account was turned off on :date.',
+        'recovery_codes_subject' => 'New recovery codes were created',
+        'recovery_codes_line' => 'New two-factor recovery codes were created for your account on :date. The old ones no longer work.',
+        'if_you' => 'If this was you, you do not need to do anything.',
+        'if_not' => 'If it was not you, reset your password now and contact us by replying to this email.',
+        'reset' => 'Reset your password',
+    ],
+
     // Retention §1: inactive accounts.
     'inactive' => [
         'mail_subject' => 'Your account will be deleted',

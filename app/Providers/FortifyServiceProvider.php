@@ -9,6 +9,7 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\GenericPasswordResetLinkResponse;
 use App\Models\Country;
 use App\Models\User;
+use App\Notifications\SecurityChange;
 use App\Rules\HumanTiming;
 use App\Services\Security\Turnstile;
 use Illuminate\Auth\Events\Login;
@@ -23,6 +24,8 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Contracts\FailedPasswordResetLinkRequestResponse;
 use Laravel\Fortify\Contracts\SuccessfulPasswordResetLinkRequestResponse;
+use Laravel\Fortify\Events\RecoveryCodesGenerated;
+use Laravel\Fortify\Events\TwoFactorAuthenticationDisabled;
 use Laravel\Fortify\Fortify;
 
 /**
@@ -49,6 +52,10 @@ class FortifyServiceProvider extends ServiceProvider
 
         $this->registerViews();
         $this->registerRateLimiters();
+
+        // Security notices (S-05) for changes made through Fortify's two-factor endpoints.
+        Event::listen(TwoFactorAuthenticationDisabled::class, fn (TwoFactorAuthenticationDisabled $event) => $event->user->notify(new SecurityChange(SecurityChange::TWO_FACTOR_DISABLED)));
+        Event::listen(RecoveryCodesGenerated::class, fn (RecoveryCodesGenerated $event) => $event->user->notify(new SecurityChange(SecurityChange::RECOVERY_CODES)));
 
         Event::listen(Login::class, function (Login $event): void {
             if ($event->user instanceof User) {

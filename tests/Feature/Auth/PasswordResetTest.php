@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -62,6 +63,30 @@ class PasswordResetTest extends TestCase
         });
 
         $this->assertTrue(Hash::check('a-brand-new-password', $user->fresh()->password));
+    }
+
+    public function test_a_reset_signs_the_account_out_everywhere(): void
+    {
+        // S-04: whoever may be using the account (the reason for a reset) loses access.
+        $user = User::factory()->create(['email' => 'seller@example.com', 'remember_token' => 'old-remember-token']);
+        $other = User::factory()->create();
+        foreach (['laptop' => $user->id, 'stolen' => $user->id, 'someone-else' => $other->id] as $id => $owner) {
+            DB::table('sessions')->insert(['id' => $id, 'user_id' => $owner, 'payload' => '', 'last_activity' => time()]);
+        }
+        $this->post('/forgot-password', ['email' => 'seller@example.com']);
+
+        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user) {
+            $this->post('/reset-password', [
+                'token' => $notification->token, 'email' => $user->email,
+                'password' => 'a-brand-new-password', 'password_confirmation' => 'a-brand-new-password',
+            ])->assertSessionHasNoErrors();
+
+            return true;
+        });
+
+        $this->assertSame(0, DB::table('sessions')->where('user_id', $user->id)->count());
+        $this->assertSame(1, DB::table('sessions')->where('user_id', $other->id)->count());
+        $this->assertNotSame('old-remember-token', $user->fresh()->remember_token);
     }
 
     public function test_reset_with_an_invalid_token_fails(): void

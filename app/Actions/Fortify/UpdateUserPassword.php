@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Notifications\SecurityChange;
 use App\Support\UserSessions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -37,5 +38,6 @@ class UpdateUserPassword implements UpdatesUserPasswords
         ])->save();
 
         UserSessions::endOthers($user, request()->hasSession() ? request()->session()->getId() : null);
+        $user->notify(new SecurityChange(SecurityChange::PASSWORD_CHANGED));
     }
 }

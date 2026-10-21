@@ -5,7 +5,9 @@ namespace App\Actions\Fortify;
 use App\Enums\ContactVisibility;
 use App\Models\Country;
 use App\Models\User;
+use App\Notifications\SecurityChange;
 use App\Services\Security\BannedIdentities;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -28,6 +30,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
+        $oldEmail = $user->email;
         $emailChanged = mb_strtolower(trim((string) ($input['email'] ?? ''))) !== $user->email;
         // ISO codes are stored upper-case; SQLite compares case-sensitively.
         $input['phone_country'] = strtoupper(trim((string) ($input['phone_country'] ?? '')));
@@ -82,6 +85,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
         if ($emailChanged) {
             $user->sendEmailVerificationNotification();
+            // The old address hears about it (S-05): an attacker cannot take the account over quietly.
+            Notification::route('mail', $oldEmail)->notify(new SecurityChange(SecurityChange::EMAIL_CHANGED, $user->email));
         }
     }
 }
