@@ -70,6 +70,16 @@ class SecurityHeadersTest extends TestCase
         $this->get('/')->assertHeaderMissing('Strict-Transport-Security');
     }
 
+    public function test_hsts_is_sent_in_production_over_https_without_subdomains(): void
+    {
+        $this->app['env'] = 'production';
+        $host = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        $hsts = (string) $this->get('https://'.$host.'/')->headers->get('Strict-Transport-Security');
+
+        $this->assertSame('max-age=31536000', $hsts, 'no includeSubDomains: other sites on the parent domain are not affected');
+    }
+
     public function test_headers_are_also_sent_on_error_pages(): void
     {
         $this->get('/this-page-does-not-exist')

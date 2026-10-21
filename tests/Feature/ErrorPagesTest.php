@@ -44,4 +44,14 @@ class ErrorPagesTest extends TestCase
             ->assertDontSee('Secret internal detail')
             ->assertSee(__('errors.title.500'));
     }
+
+    public function test_json_errors_never_show_exception_details_when_debug_is_off(): void
+    {
+        config(['app.debug' => false]);
+        Route::get('/_test/crash-json', fn () => throw new \RuntimeException('Secret internal detail'));
+
+        $response = $this->getJson('/_test/crash-json')->assertStatus(500);
+
+        $this->assertSame(['message' => 'Server Error'], $response->json());
+    }
 }

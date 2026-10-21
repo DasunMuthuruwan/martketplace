@@ -96,7 +96,9 @@ Option B uses the same layout under the new account's home directory.
 
 ### 5.2 Deploy — With SSH [preferred]
 
-`php artisan down --secret=…` → extract into a new release folder → swap (or overwrite) → `php artisan migrate --force` → `php artisan optimize` → `php artisan up`. Back up the DB first.
+`php artisan down --secret=…` → extract into a new release folder → swap (or overwrite) → `php artisan marketplace:check-production` (stop if it fails) → `php artisan migrate --force` → `php artisan optimize` → `php artisan up`. Back up the DB first.
+
+**Production configuration check (S8.6, S-02):** `marketplace:check-production` fails on debug on, a non-production `APP_ENV`, a missing `APP_KEY`, a non-HTTPS or local `APP_URL`, a session cookie that is not Secure / HttpOnly / SameSite lax / host-only, array sessions or cache, mail to a log, and CSP in report-only mode; it warns about debug log level, missing Turnstile keys, sync queue, mail sending off, a placeholder from-address and `TRUSTED_PROXIES=*`. It prints no secret values. Run it after every `.env` change on the host.
 
 ### 5.3 Deploy — Without SSH or Composer (Alternatives)
 
