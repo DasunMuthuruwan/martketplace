@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Proposal, awaiting the owner's decisions (§7).** No code until approved. |
+| Status | **Accepted (owner, 2026-10-22: recommendations E1–E7, ratings included before deployment as originally requested).** Plan: implementation plan §7b (G1–G6), ADR-027. |
 | Date | 2026-10-22 (requested by the owner before the deployment plan) |
 | Builds on | Requirements (SRCH-09 saved searches, MSG-08 messaging, NFR-U5 Sinhala/Tamil ready, GLB-20 translations), global marketplace rules (everything per country, nothing hardcoded), paid boosts (ADR-026: view counts per ad and day already exist) |
 
@@ -91,7 +91,7 @@ Launching sooner builds the audience that ratings and trending need; their data 
 | **Soon after launch** | Seller ratings and trust badges (§2), saved searches with alerts (5.2), price drop alerts (5.5), Sinhala and Tamil (5.1) | Ratings need real contacts to exist; translations need the owner's translators |
 | **Later** | Price guide, PWA/push, SMS verification, messaging, compare, calculator, dealer pages, digest, analytics | By demand and budget |
 
-## 7. Decisions for the Owner
+## 7. Owner Decisions (2026-10-22: recommendations accepted)
 
 | # | Decision | Recommendation |
 |---|---|---|

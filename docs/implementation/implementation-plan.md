@@ -197,6 +197,19 @@ Owner decision 2026-10-21: build the paid boosts of `docs/proposals/paid-boosts.
 | B5 | **Orders by bank transfer:** seller "Promote" flow (live own ads only; price from the server), order with reference and instructions (page + email), admin orders (mark paid → boost starts, cancel, refund → boost ends), unpaid orders expire, emails (receipt, started, ending soon, ended), rate limit | L | Flow, admin, emails, tests |
 | B6 | **Rules, QA and docs:** boost rules and refund page (owner text, D4), browser journey (order → admin paid → top ad visible), security checks (others' ads, non-live ads, tampered amounts), docs | M | Journey, security tests, docs |
 
+## 7b. Audience Features (M9c, Before Deployment)
+
+Owner decision 2026-10-22 (ADR-027, proposal `docs/proposals/engagement-features.md`).
+
+| ID | Task | Size | Output |
+|---|---|---|---|
+| G1 | **Search terms and live search:** counted search terms per country and day (no user or IP); suggestion endpoint (categories, makes/models, places, popular searches, with counts; cached, rate-limited); suggestions under the header and search-page search boxes (accessible combobox) | M | Table, endpoint, UI, tests |
+| G2 | **Popular, trending, most marked as sold:** per-country blocks on the country home and category pages (popular ads this week, trending searches, trending makes/models, most marked as sold in 90 days) from scheduled, cached aggregates with minimum counts; never paid placements | M | Aggregates, blocks, tests |
+| G3 | **Share:** WhatsApp and Facebook share links on the ad page beside the existing share button; good link previews (Open Graph already present: checked) | S | Links, tests |
+| G4 | **Make/model pages and price guide:** `/{cc}/ads/{category}/{subcategory}/make/{make}[/{model}]` style landing pages listing matching ads with a price guide (median and range from enough ads, outliers removed), linked from ads and in the sitemap | M | Routes, pages, sitemap, tests |
+| G5 | **Seller ratings and trust badges:** eligibility from contact reveals, reviews with moderated comments, seller reply, report, admin moderation queue, averages from 3, trusted-seller badge rules in settings; seller page and ad seller card | L | Tables, flows, admin, tests |
+| G6 | **QA and docs:** browser journeys (live search, rating), accessibility scans, security checks (eligibility, XSS, rate limits), docs and owner guide (Terms text for reviews) | M | Tests, docs |
+
 ## 8. Owner Content Tasks (Parallel, Not Code)
 
 | ID | Content | Needed by |

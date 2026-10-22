@@ -92,6 +92,13 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] B4 Products, prices and bank details per country — merged 2026-10-22
   - [x] B5 Orders by bank transfer — merged 2026-10-22
   - [x] B6 Rules, QA and docs — merged 2026-10-22
+- [~] M9c Audience features before deployment (owner 2026-10-22; [proposal](../proposals/engagement-features.md), ADR-027)
+  - [ ] G1 Search terms and live search
+  - [ ] G2 Popular, trending, most marked as sold
+  - [ ] G3 Share to WhatsApp and Facebook
+  - [ ] G4 Make/model pages and price guide
+  - [ ] G5 Seller ratings and trust badges
+  - [ ] G6 QA and docs
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 
