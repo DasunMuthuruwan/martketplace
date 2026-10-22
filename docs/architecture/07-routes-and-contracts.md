@@ -195,3 +195,11 @@ Each component checks its permission in `mount()` **and** inside every action (`
 | AccountSuspended / Reinstated | reason, until |
 
 All text comes from `lang/en`.
+
+## Audience Features (ADR-027)
+
+| Route | Name | Notes |
+|---|---|---|
+| `GET /search/suggest?q=&cc=` | `search.suggest` | G1: live search suggestions (JSON `{items: [{type, label, url}]}`), cached, 180/min per IP |
+| `GET /{cc}/ads/{category}/{subcategory}/make/{make}/{model?}` | `ads.make` | G4: make/model landing page with price guide; indexable without a query string; in the sitemap |
+

@@ -96,7 +96,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] G1 Search terms and live search — merged 2026-10-22
   - [x] G2 Popular, trending, most marked as sold — merged 2026-10-22
   - [x] G3 Share to WhatsApp and Facebook — merged 2026-10-22
-  - [ ] G4 Make/model pages and price guide
+  - [~] G4 Make/model pages and price guide — awaiting review on `feature/G4-model-pages`
   - [ ] G5 Seller ratings and trust badges
   - [ ] G6 QA and docs
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)

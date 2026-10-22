@@ -48,6 +48,7 @@ class RateLimitsTest extends TestCase
         'ads.category.location' => 'search',
         'ads.subcategory.location' => 'search',
         'search.suggest' => 'suggest',
+        'ads.make' => 'search',
     ];
 
     /** Limiter => list of [max attempts, decay seconds] for a signed-in request (security doc §3). */

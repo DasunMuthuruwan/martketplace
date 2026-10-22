@@ -162,6 +162,8 @@ Route::prefix('{cc}')->where(['cc' => '[A-Za-z]{2}'])->middleware('country')->gr
         Route::get('/ads/in/{region}/{city?}', 'country')->where(['region' => '[a-z0-9-]+', 'city' => '[a-z0-9-]+'])->name('ads.location');
         Route::get('/ads/{category}/in/{region}/{city?}', 'country')->where(['category' => $slug, 'region' => '[a-z0-9-]+', 'city' => '[a-z0-9-]+'])->name('ads.category.location');
         Route::get('/ads/{category}/{subcategory}/in/{region}/{city?}', 'country')->where(['category' => $slug, 'subcategory' => $slug, 'region' => '[a-z0-9-]+', 'city' => '[a-z0-9-]+'])->name('ads.subcategory.location');
+        // Make and model landing pages with a price guide (G4, ADR-027).
+        Route::get('/ads/{category}/{subcategory}/make/{make}/{model?}', 'make')->where(['category' => $slug, 'subcategory' => $slug, 'make' => '[a-z0-9-]+', 'model' => '[a-z0-9-]+'])->name('ads.make');
         Route::get('/ads/{category}/{subcategory?}', 'country')->where(['category' => $slug, 'subcategory' => $slug])->name('ads.category');
     });
 });

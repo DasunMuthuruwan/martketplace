@@ -6,6 +6,7 @@ use App\Enums\ListingStatus;
 use App\Models\Listing;
 use App\Services\Attributes\AttributeSchema;
 use App\Services\Contact\ContactResolver;
+use App\Services\Insights\MakePages;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Listings\ListingViews;
 use App\Services\Security\Turnstile;
@@ -88,6 +89,7 @@ class ListingController extends Controller
             'buttons' => $this->contact->buttons($listing, $request->user()),
             'favourited' => $request->user()?->favourites()->whereKey($listing->id)->exists() ?? false,
             'similar' => $this->similar($listing),
+            'makePage' => app(MakePages::class)->forListing($listing), // "More Toyota Aqua ads" (G4)
             'sellerAds' => Listing::public()->where('listings.user_id', $listing->user_id)->count(),
             'turnstileSiteKey' => app(Turnstile::class)->enabled() ? app(Turnstile::class)->siteKey() : null,
             'currentCountry' => $listing->country,

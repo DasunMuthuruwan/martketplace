@@ -99,4 +99,18 @@ return [
         'sold_count' => '{1} 1 sold|[2,*] :count sold',
         'in_category' => 'Trending in :category',
     ],
+
+    // Make and model pages (G4, ADR-027).
+    'make_page' => [
+        'title' => ':what for sale in :place',
+        'description' => ':count for :what in :place. Compare prices and contact sellers directly.',
+        'description_prices' => ':count for :what in :place, most asking between :low and :high. Compare and contact sellers directly.',
+        'guide_title' => ':what price guide',
+        'guide_median' => 'Typical asking price',
+        'guide_range' => 'Most ads between',
+        'guide_based_on' => 'Based on',
+        'guide_count' => '{1} 1 ad for sale|[2,*] :count ads for sale',
+        'guide_note' => 'Asking prices of current ads, not confirmed sale prices.',
+        'more' => 'More :what ads',
+    ],
 ];

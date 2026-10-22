@@ -6,6 +6,7 @@ use App\Models\Country;
 use App\Models\Listing;
 use App\Models\Region;
 use App\Services\Catalogue\CategoryTree;
+use App\Services\Insights\MakePages;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\File;
 
@@ -23,7 +24,7 @@ class SitemapBuilder
 {
     public const DIRECTORY = 'sitemaps';
 
-    public function __construct(private readonly CategoryTree $tree) {}
+    public function __construct(private readonly CategoryTree $tree, private readonly MakePages $makePages) {}
 
     /** @return list<string> written file names, relative to the public directory */
     public function build(?string $root = null): array
@@ -72,6 +73,11 @@ class SitemapBuilder
             ->flatMap(fn ($row) => [$row->region_id, $row->subregion_id])->filter()->unique()->all();
         foreach (Region::whereIn('id', $regionIds)->where('is_active', true)->orderBy('level')->orderBy('slug')->get() as $region) {
             $urls[] = [route('ads.location', ['cc' => $cc, 'region' => $region->slug]), null];
+        }
+
+        // Make and model pages that have ads (G4, ADR-027).
+        foreach ($this->makePages->urlsFor($country) as $url) {
+            $urls[] = [$url, null];
         }
 
         return $urls;

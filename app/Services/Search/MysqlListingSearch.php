@@ -2,6 +2,7 @@
 
 namespace App\Services\Search;
 
+use App\Enums\ListingType;
 use App\Models\Listing;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,6 +54,19 @@ class MysqlListingSearch implements ListingSearch
             ->withCount('images')
             ->get(['listings.*'])
             ->keyBy('id');
+    }
+
+    public function priceSample(SearchCriteria $criteria, string $currency, int $limit): array
+    {
+        return $this->query($criteria)
+            ->whereNotNull('listings.price')
+            ->where('listings.currency', $currency)
+            ->where('listings.type', ListingType::Sale->value)
+            ->reorder()->orderByDesc('listings.sorted_at')
+            ->limit($limit)
+            ->pluck('listings.price')
+            ->map(fn ($price) => (string) $price)
+            ->values()->all();
     }
 
     /**

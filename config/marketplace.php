@@ -114,6 +114,11 @@ return [
         'cache_minutes' => 60,
     ],
 
+    // Price guide on make/model pages (G4): shown from this many ads for sale.
+    'price_guide' => [
+        'min_ads' => 5,
+    ],
+
     'boosts' => [
         'top_slots' => 2,
         'sales_enabled' => (bool) env('BOOSTS_SALES_ENABLED', false),

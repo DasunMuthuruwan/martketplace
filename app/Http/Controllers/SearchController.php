@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttributeOption;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
@@ -10,8 +11,10 @@ use App\Services\Attributes\AttributeSchema;
 use App\Services\Boosts\TopAds;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
+use App\Services\Insights\PriceGuide;
 use App\Services\Insights\Trends;
 use App\Services\Listings\ListingPresenter;
+use App\Services\Money\Money;
 use App\Services\Search\ListingSearch;
 use App\Services\Search\MysqlListingSearch;
 use App\Services\Search\SearchCriteria;
@@ -47,6 +50,8 @@ class SearchController extends Controller
         private readonly TopAds $topAds,
         private readonly SearchTerms $terms,
         private readonly Trends $trends,
+        private readonly PriceGuide $prices,
+        private readonly Money $money,
     ) {}
 
     public function country(Request $request, CountryContext $context): View|RedirectResponse
@@ -74,6 +79,51 @@ class SearchController extends Controller
         return $this->results($request, $input, $country, $leaf);
     }
 
+    /**
+     * `/{cc}/ads/{category}/{subcategory}/make/{make}/{model?}` (G4, ADR-027): the category's results
+     * for one make (and model), with its own title and a price guide, indexable for search engines.
+     * Unknown makes or models, or a category without makes, answer 404; old category slugs 301.
+     */
+    public function make(Request $request, CountryContext $context): View|RedirectResponse
+    {
+        $country = $context->current($request);
+        [$parentSlug, $leafSlug, $makeSlug, $modelSlug] = array_map(
+            fn (string $name) => is_string($request->route($name)) ? $request->route($name) : null,
+            ['category', 'subcategory', 'make', 'model'],
+        );
+        $parent = Category::findBySlugOrRedirect((string) $parentSlug);
+        $leaf = Category::findBySlugOrRedirect((string) $leafSlug);
+        if ($parent === null || $leaf === null || $leaf->parent_id !== $parent->id || ! $leaf->isAvailableIn($country->iso2)) {
+            abort(404);
+        }
+        if ([$parentSlug, $leafSlug] !== [$parent->slug, $leaf->slug]) {
+            return redirect()->to(route('ads.make', array_filter(['cc' => strtolower($country->iso2), 'category' => $parent->slug,
+                'subcategory' => $leaf->slug, 'make' => $makeSlug, 'model' => $modelSlug])), 301);
+        }
+
+        $filterable = array_flip($this->schemas->for($leaf, $country->iso2)->filterableKeys());
+        $make = isset($filterable['make']) ? $this->option('make', (string) $makeSlug) : null;
+        $model = $modelSlug === null ? null : (isset($filterable['model']) ? $this->option('model', $modelSlug, $make) : null);
+        if ($make === null || ($modelSlug !== null && $model === null)) {
+            abort(404);
+        }
+
+        $input = Arr::except($request->query(), ['category', 'a']);
+        $input['category'] = $leaf->slug;
+        $input[SearchCriteriaFactory::ATTRIBUTE_INPUT] = array_filter(['make' => $make->value, 'model' => $model?->value]);
+
+        return $this->results($request, $input, $country, $leaf, ['make' => $make, 'model' => $model]);
+    }
+
+    private function option(string $key, string $value, ?AttributeOption $parent = null): ?AttributeOption
+    {
+        return AttributeOption::query()
+            ->whereHas('attribute', fn ($q) => $q->where('key', $key)->where('is_active', true))
+            ->where('value', $value)->where('is_active', true)
+            ->when($parent !== null, fn ($q) => $q->where('parent_option_id', $parent->id))
+            ->first();
+    }
+
     /** `/ads`: across all active countries; `?country=xx` is the country page itself (301). */
     public function global(Request $request, CountryContext $context): View|RedirectResponse
     {
@@ -90,8 +140,11 @@ class SearchController extends Controller
         return $this->results($request, $input, null, $category);
     }
 
-    /** @param  array<string, mixed>  $input */
-    private function results(Request $request, array $input, ?Country $country, ?Category $category): View|RedirectResponse
+    /**
+     * @param  array<string, mixed>  $input
+     * @param  array{make: AttributeOption, model: AttributeOption|null}|null  $landing  make/model page (G4)
+     */
+    private function results(Request $request, array $input, ?Country $country, ?Category $category, ?array $landing = null): View|RedirectResponse
     {
         try {
             $criteria = $this->factory->fromInput($input, $country);
@@ -106,8 +159,15 @@ class SearchController extends Controller
         }
         $categories = $this->tree->forCountry($country?->iso2);
         $filters = $criteria->category !== null && $country !== null ? $this->filterFields($criteria->category, $country) : [];
+        $seo = $this->seo($request, $criteria, $results->total());
+        if ($landing !== null && $country !== null) {
+            $landing['name'] = trim($landing['make']->label.' '.($landing['model']->label ?? ''));
+            $landing['guide'] = $this->prices->for($criteria, $country);
+            $seo = $this->landingSeo($request, $landing, $country, $results->total());
+        }
 
         return view('public.search', [
+            'landing' => $landing,
             'country' => $country,
             'currentCountry' => $country,
             'criteria' => $criteria,
@@ -120,9 +180,30 @@ class SearchController extends Controller
             'filters' => $filters,
             'page' => new SearchPage($request, $criteria, $country, $filters, $categories),
             'present' => $this->present,
-            'seo' => $this->seo($request, $criteria, $results->total()),
+            'seo' => $seo,
             'countCap' => MysqlListingSearch::countCap(),
         ]);
+    }
+
+    /**
+     * "{Make} {Model} for sale in {Country}" with the count and, when known, the typical price range.
+     * Indexable without a query string; canonical is the make/model address itself.
+     *
+     * @param  array{name: string, guide: array<string, mixed>|null}  $landing
+     */
+    private function landingSeo(Request $request, array $landing, Country $country, int $total): PageSeo
+    {
+        $count = trans_choice('public.ads_count', $total, ['count' => number_format($total)]);
+        $guide = $landing['guide'];
+        $description = $guide === null
+            ? __('public.make_page.description', ['count' => $count, 'what' => $landing['name'], 'place' => $country->name])
+            : __('public.make_page.description_prices', [
+                'count' => $count, 'what' => $landing['name'], 'place' => $country->name,
+                'low' => (string) $this->money->forCountry($guide['low'], $guide['currency'], $country),
+                'high' => (string) $this->money->forCountry($guide['high'], $guide['currency'], $country),
+            ]);
+
+        return PageSeo::make(__('public.make_page.title', ['what' => $landing['name'], 'place' => $country->name]), $description, $request->url(), $request->query() === []);
     }
 
     /**

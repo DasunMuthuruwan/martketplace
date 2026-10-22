@@ -21,7 +21,16 @@
                 <li aria-hidden="true">›</li>
                 <li><a class="hover:text-fg" href="{{ $page->url(['category' => $category->parent->slug, 'a' => null]) }}">{{ $category->parent->name }}</a></li>
             @endif
-            @if ($category)
+            @if ($category && $landing)
+                <li aria-hidden="true">›</li>
+                <li><a class="hover:text-fg" href="{{ $page->url(['a' => null]) }}">{{ $category->name }}</a></li>
+                @if ($landing['model'])
+                    <li aria-hidden="true">›</li>
+                    <li><a class="hover:text-fg" href="{{ route('ads.make', ['cc' => $cc, 'category' => $category->parent->slug, 'subcategory' => $category->slug, 'make' => $landing['make']->value]) }}">{{ $landing['make']->label }}</a></li>
+                @endif
+                <li aria-hidden="true">›</li>
+                <li aria-current="page" class="text-fg">{{ $landing['model']?->label ?? $landing['make']->label }}</li>
+            @elseif ($category)
                 <li aria-hidden="true">›</li>
                 <li aria-current="page" class="text-fg">{{ $category->name }}</li>
             @endif
@@ -34,6 +43,29 @@
             <p class="mt-0.5 text-ui text-fg-muted" role="status" aria-live="polite">{{ $count }}</p>
         </div>
     </div>
+
+    {{-- Price guide on make/model pages (G4): asking prices of current ads, shown from enough ads. --}}
+    @if ($landing && $landing['guide'])
+        @php($guide = $landing['guide'])
+        <section aria-labelledby="price-guide" class="mb-5 rounded-card border border-line bg-surface p-4" data-price-guide>
+            <h2 id="price-guide" class="mb-2 text-h3 font-semibold">{{ __('public.make_page.guide_title', ['what' => $landing['name']]) }}</h2>
+            <dl class="grid gap-3 sm:grid-cols-3">
+                <div>
+                    <dt class="text-small text-fg-muted">{{ __('public.make_page.guide_median') }}</dt>
+                    <dd><x-ui.money :amount="$guide['median']" :currency="$guide['currency']" :country="$country" /></dd>
+                </div>
+                <div>
+                    <dt class="text-small text-fg-muted">{{ __('public.make_page.guide_range') }}</dt>
+                    <dd class="text-ui font-semibold text-fg"><x-ui.money :amount="$guide['low']" :currency="$guide['currency']" :country="$country" size="inherit" /> – <x-ui.money :amount="$guide['high']" :currency="$guide['currency']" :country="$country" size="inherit" /></dd>
+                </div>
+                <div>
+                    <dt class="text-small text-fg-muted">{{ __('public.make_page.guide_based_on') }}</dt>
+                    <dd class="text-ui font-semibold text-fg">{{ trans_choice('public.make_page.guide_count', $guide['count'], ['count' => number_format($guide['count'])]) }}</dd>
+                </div>
+            </dl>
+            <p class="mt-2 text-small text-fg-subtle">{{ __('public.make_page.guide_note') }}</p>
+        </section>
+    @endif
 
     @if ($criteria->priceIgnored)
         <x-ui.alert variant="info" class="mb-4">{{ __('public.price_needs_currency') }}</x-ui.alert>

@@ -88,6 +88,10 @@
         </div>
     </div>
 
+    @if (($makePage ?? null) && $listing->isPublic())
+        <p class="mt-8"><a href="{{ $makePage['url'] }}" class="inline-flex items-center gap-1 text-ui font-medium text-fg underline-offset-2 hover:underline" data-make-page>{{ __('public.make_page.more', ['what' => $makePage['name']]) }}<x-ui.icon name="chevron-right" size="16" /></a></p>
+    @endif
+
     @if ($similar->isNotEmpty())
         <section aria-labelledby="ad-similar" class="mt-10">
             <h2 id="ad-similar" class="mb-3 text-h2 font-semibold">{{ __('public.similar') }}</h2>

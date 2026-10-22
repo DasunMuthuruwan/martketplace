@@ -23,4 +23,11 @@ interface ListingSearch
      * @return Collection<int, Listing>
      */
     public function among(SearchCriteria $criteria, array $ids): Collection;
+
+    /**
+     * Asking prices of matching ads for sale in one currency (price guide, G4), at most $limit.
+     *
+     * @return list<string>
+     */
+    public function priceSample(SearchCriteria $criteria, string $currency, int $limit): array;
 }
