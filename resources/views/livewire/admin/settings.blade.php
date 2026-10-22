@@ -34,6 +34,11 @@
             </div>
         </section>
 
+        <section aria-labelledby="s-boosts" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
+            <h2 id="s-boosts" class="text-h3 font-semibold">{{ __('admin.nav.boosts') }}</h2>
+            <x-ui.checkbox type="switch" :label="__('admin.settings.boost_sales')" :hint="__('admin.settings.boost_sales_help')" id="s-boost-sales" wire:model="values.boost_sales_enabled" :checked="(bool) ($values['boost_sales_enabled'] ?? false)" />
+        </section>
+
         <section aria-labelledby="s-contact" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
             <h2 id="s-contact" class="text-h3 font-semibold">{{ __('admin.settings.contact') }}</h2>
             <x-ui.checkbox type="switch" :label="__('admin.settings.contact_call')" id="s-call" wire:model="values.contact_call" :checked="(bool) ($values['contact_call'] ?? false)" />

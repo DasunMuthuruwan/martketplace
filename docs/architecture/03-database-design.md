@@ -382,3 +382,7 @@ Indexes: `(listing_id)`, `(attribute_id, value_option_id, listing_id)`, `(attrib
 - `listings.sorted_at`: the "newest" order (search, category, country home, seller page, similar ads). Equal to `published_at` until a Bump moves it; renewal leaves it alone. The six browse indexes `(status, …, published_at)` now end with `sorted_at`.
 - `listing_boosts`: `listing_id` (cascade), `type` (`bump`, `top`), `order_id` (B5, nullable), `granted_by` (staff, nullable), `starts_at`, `ends_at` (null for a Bump), `ended_at` (ended early), `last_shown_at` (top-ad rotation). Indexes `(type, ends_at)`, `(listing_id, type)`, `order_id`.
 - `listing_daily_views`: `(listing_id, date)` primary key, `views`. One view per visitor session, ad and day; owner, staff and bots not counted (`ListingViews`). `listings.view_count` is the running total.
+- `boost_products` (B4): `type`, `duration_days` (null for a Bump), `sort_order`, `is_active`; unique `(type, duration_days)`. Inserted by migration: Bump; Top ad 3, 7, 15 days (D1). No prices.
+- `boost_prices` (B4): product × country, `currency` (the country's), `amount DECIMAL(18,3)`; unique `(boost_product_id, country_id)`. No row = not offered in that country (D2).
+- `bank_transfer_accounts` (B4): one per country (`country_id` unique): bank, account name and number, branch, SWIFT, instructions, `is_active` (default off), `updated_by` (D3).
+

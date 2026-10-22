@@ -20,6 +20,7 @@ use App\Http\Controllers\SellerController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\BlocklistAdmin;
+use App\Livewire\Admin\BoostPricesAdmin;
 use App\Livewire\Admin\BoostsAdmin;
 use App\Livewire\Admin\CategoriesAdmin;
 use App\Livewire\Admin\CountriesAdmin;
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/pages', PagesAdmin::class)->middleware('can:'.Permissions::PAGES_MANAGE)->name('pages');
         Route::livewire('/blocklist', BlocklistAdmin::class)->middleware('can:'.Permissions::BLOCKLIST_MANAGE)->name('blocklist');
         Route::livewire('/boosts', BoostsAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boosts');
+        Route::livewire('/boosts/prices', BoostPricesAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boost-prices');
         Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');
         // Account and staff changes: password re-confirmed within 15 minutes (2FA doc §6).
         Route::livewire('/users', UsersAdmin::class)->middleware(['can:'.Permissions::USERS_VIEW, 'password.confirm'])->name('users');

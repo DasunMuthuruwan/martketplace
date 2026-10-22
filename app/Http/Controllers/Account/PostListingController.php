@@ -27,6 +27,7 @@ use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Security\Turnstile;
+use App\Support\Decimal;
 use App\View\PostingSteps;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -148,7 +149,7 @@ class PostListingController extends Controller
                 'details' => app(SaveListingDetails::class)->handle($user, $listing, $request->only(['title', 'description', 'type', 'condition', CategorySchema::INPUT])),
                 'price' => app(SaveListingPrice::class)->handle($user, $listing, array_map(
                     fn ($v) => $v === '' ? null : $v,
-                    ['price' => $this->amount($request->input('price'), $listing->country->number_locale)] + $request->only(['price_type', 'rent_period']),
+                    ['price' => Decimal::fromLocale($request->input('price'), $listing->country->number_locale)] + $request->only(['price_type', 'rent_period']),
                 )),
                 default => abort(404),
             };
@@ -240,25 +241,6 @@ class PostListingController extends Controller
             'unitPrice' => app(ListingPresenter::class)->unitPrice($listing),
             'needsDetails' => $listing->type === null,
         ]);
-    }
-
-    /**
-     * The price as typed, in the country's number format (grouping and decimal sign from ICU, global
-     * UX §3): "1,250,000.50" in en_LK, "1.250.000,50" where a comma is the decimal sign. Anything
-     * else is passed on as typed, so the action reports it as invalid.
-     */
-    private function amount(mixed $value, string $locale): mixed
-    {
-        if (! is_string($value) || trim($value) === '') {
-            return $value;
-        }
-        $formatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
-        $group = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
-        $decimal = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
-
-        $plain = str_replace([$group, ' ', "\u{00A0}", "\u{202F}"], '', trim($value));
-
-        return $decimal === '.' ? $plain : str_replace($decimal, '.', $plain);
     }
 
     private function photosStep(Listing $listing): View

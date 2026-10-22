@@ -20,6 +20,7 @@
         ],
         __('admin.groups.sales') => [
             ['admin.boosts', 'chevron-up', __('admin.nav.boosts'), P::BOOSTS_MANAGE, null],
+            ['admin.boost-prices', 'sliders-horizontal', __('admin.nav.boost_prices'), P::BOOSTS_MANAGE, null],
         ],
         __('admin.groups.people') => [
             ['admin.users', 'user', __('admin.nav.users'), P::USERS_VIEW, null],

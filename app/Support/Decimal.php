@@ -14,6 +14,25 @@ final class Decimal
     /** Internal precision for intermediate results. */
     public const SCALE = 20;
 
+    /**
+     * An amount as typed in a country's number format (grouping and decimal sign from ICU, global
+     * UX §3) turned into a plain number string: "1,250,000.50" in en_LK, "1.250.000,50" where a comma
+     * is the decimal sign. Anything else is returned as typed, so validation reports it.
+     */
+    public static function fromLocale(mixed $value, string $locale): mixed
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return $value;
+        }
+        $formatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+        $group = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+        $decimal = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+
+        $plain = str_replace([$group, ' ', "\u{00A0}", "\u{202F}"], '', trim($value));
+
+        return $decimal === '.' ? $plain : str_replace($decimal, '.', $plain);
+    }
+
     /** A canonical numeric string, or null when the value is not a finite number. */
     public static function parse(mixed $value): ?string
     {
