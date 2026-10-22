@@ -50,6 +50,9 @@ final class Permissions
 
     public const AUDIT_VIEW = 'audit.view';
 
+    /** Grant and end paid boosts (ADR-026); orders and prices join it in B4–B5. */
+    public const BOOSTS_MANAGE = 'boosts.manage';
+
     /**
      * @return list<string>
      */

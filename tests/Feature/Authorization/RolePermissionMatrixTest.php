@@ -53,6 +53,7 @@ class RolePermissionMatrixTest extends TestCase
             'settings.manage' => [Permissions::SETTINGS_MANAGE, true, false, false],
             'staff.manage' => [Permissions::STAFF_MANAGE, true, false, false],
             'audit.view' => [Permissions::AUDIT_VIEW, true, true, false],
+            'boosts.manage' => [Permissions::BOOSTS_MANAGE, true, true, false],
         ];
     }
 

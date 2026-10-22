@@ -5,6 +5,7 @@ use App\Http\Controllers\Account\DashboardController;
 use App\Http\Controllers\Account\FavouritesController;
 use App\Http\Controllers\Account\ListingPhotosController;
 use App\Http\Controllers\Account\ListingsController;
+use App\Http\Controllers\Account\ListingStatsController;
 use App\Http\Controllers\Account\PostListingController;
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\SellerController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\BlocklistAdmin;
+use App\Livewire\Admin\BoostsAdmin;
 use App\Livewire\Admin\CategoriesAdmin;
 use App\Livewire\Admin\CountriesAdmin;
 use App\Livewire\Admin\Dashboard;
@@ -50,6 +52,7 @@ Route::delete('/account', [SettingsController::class, 'destroy'])->middleware('a
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
     Route::get('/', DashboardController::class)->name('overview');
     Route::get('/listings', [ListingsController::class, 'index'])->name('listings');
+    Route::get('/listings/{listing}/stats', ListingStatsController::class)->whereNumber('listing')->middleware('verified')->name('listings.stats');
     Route::post('/listings/{listing}/sold', [ListingsController::class, 'sold'])->whereNumber('listing')->name('listings.sold');
     Route::post('/listings/{listing}/renew', [ListingsController::class, 'renew'])->whereNumber('listing')->name('listings.renew');
     Route::delete('/listings/{listing}', [ListingsController::class, 'destroy'])->whereNumber('listing')->name('listings.destroy');
@@ -114,6 +117,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/locations/requests', LocationRequestsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('location-requests');
         Route::livewire('/pages', PagesAdmin::class)->middleware('can:'.Permissions::PAGES_MANAGE)->name('pages');
         Route::livewire('/blocklist', BlocklistAdmin::class)->middleware('can:'.Permissions::BLOCKLIST_MANAGE)->name('blocklist');
+        Route::livewire('/boosts', BoostsAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boosts');
         Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');
         // Account and staff changes: password re-confirmed within 15 minutes (2FA doc §6).
         Route::livewire('/users', UsersAdmin::class)->middleware(['can:'.Permissions::USERS_VIEW, 'password.confirm'])->name('users');

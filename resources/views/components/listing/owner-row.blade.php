@@ -19,6 +19,8 @@
     $cover = $present->coverUrl($listing);
     $editUrl = \Illuminate\Support\Facades\Route::has('listings.edit') ? route('listings.edit', $listing) : null;
     $canRenew = $lifecycle->renewable($listing);
+    $top = $listing->relationLoaded('boosts') ? $listing->boosts->first() : null;
+    $hasStats = $listing->published_at !== null;
 @endphp
 <article {{ $attributes->class('flex gap-3 rounded-card border border-line bg-surface p-3 sm:gap-4') }}>
     <div class="aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-control bg-surface-muted sm:w-32">
@@ -55,6 +57,12 @@
                 {{ __('account.listings.sold_on', ['date' => $listing->sold_at->toFormattedDateString()]) }}
             @endif
         </p>
+        @if ($top)
+            <p class="flex items-center gap-1.5 text-small text-fg" data-owner-top-ad>
+                <x-ui.badge variant="neutral">{{ __('boosts.top.badge') }}</x-ui.badge>
+                {{ $top->starts_at->isPast() ? __('account.listings.top_until', ['date' => $top->ends_at->toFormattedDateString()]) : __('account.listings.top_from', ['date' => $top->starts_at->toFormattedDateString()]) }}
+            </p>
+        @endif
         @if (in_array($status, [S::Rejected, S::Suspended], true) && $listing->moderation_note)
             <p class="rounded-control bg-surface-muted px-3 py-2 text-small text-fg">{{ __('account.listings.reason', ['reason' => $listing->moderation_note]) }}</p>
         @endif
@@ -68,6 +76,9 @@
             @endif
             @if ($editUrl && $status !== S::Sold)
                 <x-ui.button size="sm" variant="secondary" icon="pencil" :href="$editUrl">{{ $status === S::Rejected ? __('account.listings.edit_resubmit') : __('account.listings.edit') }}</x-ui.button>
+            @endif
+            @if ($hasStats)
+                <x-ui.button size="sm" variant="secondary" icon="eye" :href="route('account.listings.stats', $listing)">{{ __('account.listings.stats') }}</x-ui.button>
             @endif
             <x-ui.button size="sm" variant="ghost" icon="trash-2" data-modal-open="delete-{{ $listing->id }}" class="text-danger">{{ __('account.listings.delete') }}</x-ui.button>
         </div>

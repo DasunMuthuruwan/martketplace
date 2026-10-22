@@ -18,6 +18,9 @@
             ['admin.pages', 'pencil', __('admin.nav.pages'), P::PAGES_MANAGE, null],
             ['admin.blocklist', 'circle-alert', __('admin.nav.blocklist'), P::BLOCKLIST_MANAGE, null],
         ],
+        __('admin.groups.sales') => [
+            ['admin.boosts', 'chevron-up', __('admin.nav.boosts'), P::BOOSTS_MANAGE, null],
+        ],
         __('admin.groups.people') => [
             ['admin.users', 'user', __('admin.nav.users'), P::USERS_VIEW, null],
             ['admin.staff', 'badge-check', __('admin.nav.staff'), P::STAFF_MANAGE, null],

@@ -16,7 +16,7 @@
     $accountLinks = $accountLinks->unique('href');
     $current = rtrim(request()->url(), '/');
     $activeKey = $accountLinks->search(fn ($item) => rtrim($item['href'], '/') === $current)
-        ?: (request()->routeIs('account.two-factor') ? 'security' : null);
+        ?: (request()->routeIs('account.two-factor') ? 'security' : (request()->routeIs('account.listings.stats') ? 'my_ads' : null));
 @endphp
 
 @section('content')

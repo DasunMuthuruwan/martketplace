@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Account;
 
 use App\Actions\Listings\ListingLifecycle;
+use App\Enums\BoostType;
 use App\Enums\ListingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
@@ -32,7 +33,9 @@ class ListingsController extends Controller
         $counts = self::counts($user->id);
 
         $listings = self::tab(Listing::where('user_id', $user->id), $tab)
-            ->with(['country', 'currencyModel', 'coverImage', 'category.parent', 'city', 'region', 'subregion', 'locality'])
+            ->with(['country', 'currencyModel', 'coverImage', 'category.parent', 'city', 'region', 'subregion', 'locality',
+                // Running or queued Top ads, shown on the row (B3).
+                'boosts' => fn ($q) => $q->where('type', BoostType::Top->value)->whereNull('ended_at')->where('ends_at', '>', now())->orderBy('starts_at')])
             ->withCount('images')
             ->latest('updated_at')->latest('id')
             ->paginate(20)->withQueryString();

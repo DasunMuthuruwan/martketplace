@@ -49,6 +49,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.pages' => Permissions::PAGES_MANAGE,
         'admin.blocklist' => Permissions::BLOCKLIST_MANAGE,
         'admin.audit' => Permissions::AUDIT_VIEW,
+        'admin.boosts' => Permissions::BOOSTS_MANAGE,
         'admin.users' => Permissions::USERS_VIEW,
         'admin.design-system' => Permissions::SETTINGS_MANAGE,
         'admin.settings' => Permissions::SETTINGS_MANAGE,
@@ -82,7 +83,7 @@ class AuthorizationSweepTest extends TestCase
         'account.listings.sold' => 'owned', 'account.listings.renew' => 'owned', 'account.listings.destroy' => 'owned',
         'listings.edit' => 'owned', 'listings.update' => 'owned', 'listings.contact-options' => 'owned', 'listings.submit' => 'owned',
         'listings.submitted' => 'owned', 'listings.photos.store' => 'owned', 'listings.photos.move' => 'owned',
-        'listings.photos.cover' => 'owned', 'listings.photos.destroy' => 'owned',
+        'listings.photos.cover' => 'owned', 'listings.photos.destroy' => 'owned', 'account.listings.stats' => 'owned',
     ] + self::ADMIN_CLASSES;
 
     private const ADMIN_CLASSES = [
@@ -90,6 +91,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.categories' => 'admin', 'admin.attributes' => 'admin', 'admin.locations' => 'admin', 'admin.countries' => 'admin',
         'admin.location-requests' => 'admin', 'admin.pages' => 'admin', 'admin.blocklist' => 'admin', 'admin.audit' => 'admin',
         'admin.users' => 'admin', 'admin.design-system' => 'admin', 'admin.settings' => 'admin', 'admin.staff' => 'admin',
+        'admin.boosts' => 'admin',
     ];
 
     /** Framework and package internals: not application endpoints. */
@@ -330,7 +332,7 @@ class AuthorizationSweepTest extends TestCase
             'listings.update' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.photos.move', 'listings.photos.cover', 'listings.photos.destroy' => ['listing' => $listing->id, 'image' => $this->image->id],
             'listings.contact-options', 'listings.submit', 'listings.submitted', 'listings.photos.store',
-            'account.listings.sold', 'account.listings.renew', 'account.listings.destroy', 'listings.favourite' => ['listing' => $listing->id],
+            'account.listings.sold', 'account.listings.renew', 'account.listings.destroy', 'account.listings.stats', 'listings.favourite' => ['listing' => $listing->id],
             default => [],
         };
 

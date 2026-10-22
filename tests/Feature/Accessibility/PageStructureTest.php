@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Listing;
 use App\Models\Page;
 use App\Models\User;
+use App\Services\Boosts\BoostManager;
 use App\Support\ListingsDisk;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,6 +70,7 @@ class PageStructureTest extends TestCase
             'forgot password' => ['guest', 'forgot'],
             'account overview' => ['seller', 'account'],
             'my ads' => ['seller', 'my-ads'],
+            'ad statistics' => ['seller', 'stats'],
             'saved' => ['seller', 'saved'],
             'profile settings' => ['seller', 'profile'],
             'security settings' => ['seller', 'security'],
@@ -90,6 +92,7 @@ class PageStructureTest extends TestCase
             'admin place requests' => ['owner', 'admin.location-requests'],
             'admin pages' => ['owner', 'admin.pages'],
             'admin blocklist' => ['owner', 'admin.blocklist'],
+            'admin boosts' => ['owner', 'admin.boosts'],
             'admin audit' => ['owner', 'admin.audit'],
             'admin users' => ['owner', 'admin.users'],
             'admin settings' => ['owner', 'admin.settings'],
@@ -105,6 +108,11 @@ class PageStructureTest extends TestCase
             'owner' => $this->actingAs($this->staff(StaffRole::Owner)),
             default => null,
         };
+
+        if ($page === 'category') {
+            // The labelled top-ad block above the results (ADR-026) is part of the page.
+            app(BoostManager::class)->top($this->live, 7);
+        }
 
         if ($page === 'home') {
             // Without a default country (and no cookie) the home page is the country chooser.
@@ -137,6 +145,7 @@ class PageStructureTest extends TestCase
             'forgot' => route('password.request'),
             'account' => route('account.overview'),
             'my-ads' => route('account.listings'),
+            'stats' => route('account.listings.stats', $this->live),
             'saved' => route('account.favourites'),
             'profile' => route('account.settings.profile'),
             'security' => route('account.settings.security'),

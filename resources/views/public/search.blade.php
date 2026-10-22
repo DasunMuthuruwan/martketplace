@@ -92,11 +92,13 @@
                             @endforeach
                         </ul>
                     @else
-                        <ul class="listing-grid">
-                            @foreach ($topAds as $listing)
-                                <li><x-listing.card :listing="$listing" :present="$present" class="h-full" :promoted="true" /></li>
-                            @endforeach
-                        </ul>
+                        <div class="listing-grid-area">
+                            <ul class="listing-grid">
+                                @foreach ($topAds as $listing)
+                                    <li><x-listing.card :listing="$listing" :present="$present" class="h-full" :promoted="true" /></li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
                 </section>
             @endif

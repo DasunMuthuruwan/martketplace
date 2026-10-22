@@ -105,7 +105,25 @@ return [
         'shortcuts' => 'Shortcuts',
     ],
 
+    'stats' => [
+        'title' => 'Ad statistics',
+        'views_period' => 'Views, last :days days',
+        'views_all' => 'Views since publishing',
+        'top_effect' => 'Views per day: before → with Top ad',
+        'top_effect_help' => 'Average of the 7 days before your latest Top ad and the :days day(s) it has run.',
+        'per_day' => 'Views per day',
+        'per_day_help' => 'Each visitor counts once per day. Your own visits and search engines are not counted.',
+        'date' => 'Date',
+        'views' => 'Views',
+        'chart' => 'Bar',
+        'boosts' => 'Boosts',
+        'no_boosts' => 'This ad has not been boosted yet.',
+    ],
+
     'listings' => [
+        'top_until' => 'Shown as a Top ad until :date',
+        'top_from' => 'Top ad starts on :date',
+        'stats' => 'Statistics',
         'title' => 'My ads',
         'tabs' => 'Ad status',
         'tab' => ['active' => 'Live', 'pending' => 'In review', 'drafts' => 'Drafts', 'rejected' => 'Needs changes', 'expired' => 'Expired', 'sold' => 'Sold'],

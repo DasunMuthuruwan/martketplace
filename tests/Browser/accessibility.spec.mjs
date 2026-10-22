@@ -89,6 +89,13 @@ test.describe('seller', () => {
             await scan(page, path);
         });
     }
+
+    test('ad statistics', async ({ page }) => {
+        await scan(page, '/account/listings', async (p) => {
+            await p.getByRole('link', { name: 'Statistics' }).first().click();
+            await p.locator('#per-day').waitFor();
+        });
+    });
 });
 
 test.describe('moderator', () => {
