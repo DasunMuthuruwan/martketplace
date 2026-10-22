@@ -28,4 +28,11 @@ return [
     'empty_title' => 'No ads match',
     'empty_filters' => 'Try removing a filter or searching a wider area.',
     'empty_text' => 'Try another word or a different category.',
+
+    // Live search (G1).
+    'suggest' => [
+        'label' => 'Search suggestions',
+        'count' => ':count suggestions. Use the up and down keys to choose.',
+        'types' => ['category' => 'Category', 'make' => 'Make and model', 'place' => 'Place', 'popular' => 'Popular search'],
+    ],
 ];

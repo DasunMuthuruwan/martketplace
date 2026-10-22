@@ -372,3 +372,16 @@ test('a seller orders a Top ad, an admin confirms the bank transfer, and the ad 
     await page.goto('/lk/ads');
     await expect(page.locator('[data-top-ads]')).toContainText('Honda Vezel 2017 hybrid');
 });
+
+test('live search suggests a town while typing and opens it with the keyboard', async ({ page }) => {
+    await page.goto('/lk');
+    const box = page.locator('#header-q');
+    await box.fill('Nug');
+    const option = page.getByRole('option', { name: /Nugegoda/ });
+    await expect(option).toBeVisible();
+    await expect(box).toHaveAttribute('aria-expanded', 'true');
+    for (let i = 0; i < 10 && (await option.getAttribute('aria-selected')) !== 'true'; i += 1) {
+        await box.press('ArrowDown');
+    }
+    await Promise.all([page.waitForURL(/\/lk\/ads\/in\/[a-z0-9-]+\/nugegoda/), box.press('Enter')]);
+});

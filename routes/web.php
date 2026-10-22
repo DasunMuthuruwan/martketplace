@@ -19,6 +19,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\SuggestController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\BlocklistAdmin;
@@ -149,6 +150,8 @@ Route::get('/page/{slug}', [PageController::class, 'show'])->where('slug', '[a-z
 Route::get('/ad/{slugId}', [ListingController::class, 'show'])->where('slugId', '[A-Za-z0-9-]*-[0-9]+')->name('listing.show');
 Route::get('/seller/{idSlug}', [SellerController::class, 'show'])->where('idSlug', '[0-9]+(-[A-Za-z0-9-]*)?')->name('seller.show');
 Route::get('/ads', [SearchController::class, 'global'])->middleware('throttle:search')->name('ads.global');
+// Live search suggestions (G1, ADR-027): JSON for the search boxes.
+Route::get('/search/suggest', SuggestController::class)->middleware('throttle:suggest')->name('search.suggest');
 
 Route::prefix('{cc}')->where(['cc' => '[A-Za-z]{2}'])->middleware('country')->group(function () {
     $slug = '(?!in$)[a-z0-9-]+';

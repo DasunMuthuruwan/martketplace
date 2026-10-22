@@ -3,6 +3,7 @@ import { focusErrorSummary } from './ui/forms.js';
 import { openMarkedDialogs } from './ui/overlays.js';
 import './ui/combobox.js';
 import './ui/search.js';
+import './ui/suggest.js';
 import './ui/listing.js';
 import './ui/posting.js';
 import './ui/admin.js';

@@ -23,6 +23,7 @@
 | **Audit logs** | Created | **2 years**, append-only | Security and accountability |
 | **Contact reveal logs** | Created | **90 days** | Rate limiting and seller stats |
 | **Promotion orders** (B5, ADR-026) | Created | **Kept; period to be set by the legal/accounting review** (often several years for accounting records). Survive the ad and the account: `listing_id` / `user_id` become null, reference, product, amount and currency stay. Nothing deletes them yet. | Accounting and refunds |
+| **Search term counts** (G1, ADR-027) | Counted | **400 days**, then deleted by `marketplace:prune` (`retention.search_terms`). Counts per country, term and day only; no user, session or IP | Popular and trending searches |
 | **Ad views per day** (B1) | Counted | Deleted with the listing (cascade); counts only, no visitor data | Seller statistics |
 | **Boosts** (B1) | Granted or paid | Deleted with the listing (cascade) | |
 | **Database notifications** | Read | **90 days** | |

@@ -47,6 +47,7 @@ class RateLimitsTest extends TestCase
         'ads.category' => 'search',
         'ads.category.location' => 'search',
         'ads.subcategory.location' => 'search',
+        'search.suggest' => 'suggest',
     ];
 
     /** Limiter => list of [max attempts, decay seconds] for a signed-in request (security doc §3). */
@@ -61,6 +62,7 @@ class RateLimitsTest extends TestCase
         'contact-reveal' => [[30, 3600]],
         'report' => [[10, 86400]],
         'search' => [[120, 60]],
+        'suggest' => [[180, 60]],
     ];
 
     public function test_every_throttled_route_uses_its_limiter(): void

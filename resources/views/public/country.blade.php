@@ -11,7 +11,7 @@
         <p class="mt-2 max-w-2xl text-body text-fg-muted">{{ __('public.home.subline') }}</p>
         <form method="GET" action="{{ route('ads.country', ['cc' => $cc]) }}" role="search" class="mt-5 flex max-w-xl lg:hidden">
             <label for="home-q" class="sr-only">{{ __('layout.search_label') }}</label>
-            <input id="home-q" type="search" name="q" maxlength="100" placeholder="{{ __('layout.search_placeholder') }}"
+            <input id="home-q" type="search" name="q" maxlength="100" @include('partials.search.suggest-attributes', ['cc' => $cc]) placeholder="{{ __('layout.search_placeholder') }}"
                 class="h-11 min-w-0 flex-1 rounded-l-control border border-r-0 border-control bg-surface px-3 text-fg placeholder:text-fg-subtle">
             <button type="submit" class="grid h-11 w-12 place-items-center rounded-r-control bg-primary text-primary-fg" aria-label="{{ __('layout.search') }}"><x-ui.icon name="search" size="20" /></button>
         </form>

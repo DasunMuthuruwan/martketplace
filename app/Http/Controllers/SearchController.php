@@ -15,6 +15,7 @@ use App\Services\Search\ListingSearch;
 use App\Services\Search\MysqlListingSearch;
 use App\Services\Search\SearchCriteria;
 use App\Services\Search\SearchCriteriaFactory;
+use App\Services\Search\SearchTerms;
 use App\Services\Seo\PageSeo;
 use App\View\SearchPage;
 use Illuminate\Http\RedirectResponse;
@@ -43,6 +44,7 @@ class SearchController extends Controller
         private readonly AttributeSchema $schemas,
         private readonly ListingPresenter $present,
         private readonly TopAds $topAds,
+        private readonly SearchTerms $terms,
     ) {}
 
     public function country(Request $request, CountryContext $context): View|RedirectResponse
@@ -97,6 +99,9 @@ class SearchController extends Controller
         }
 
         $results = $this->search->search($criteria);
+        if ($criteria->page === 1) {
+            $this->terms->record($request, $country, $criteria->keyword); // counts only (G1, ADR-027 E4)
+        }
         $categories = $this->tree->forCountry($country?->iso2);
         $filters = $criteria->category !== null && $country !== null ? $this->filterFields($criteria->category, $country) : [];
 

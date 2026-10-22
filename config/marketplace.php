@@ -94,6 +94,13 @@ return [
 
     // Paid boosts (ADR-026). Top ads per results page (owner setting, D5). Selling stays off until the
     // accountant review (D6) and prices per country (D2); staff can grant boosts meanwhile.
+    // Live search and trending (G1–G2, ADR-027): a search term is shown (popular, trending) only after
+    // this many searches, so private or rare searches never appear.
+    'search' => [
+        'min_searches' => 5,
+        'suggest_per_minute' => 180,
+    ],
+
     'boosts' => [
         'top_slots' => 2,
         'sales_enabled' => (bool) env('BOOSTS_SALES_ENABLED', false),
@@ -174,6 +181,7 @@ return [
         'resolved_report' => 730,
         'audit_log' => 730,
         'contact_reveal' => 90,
+        'search_terms' => 400, // G1: a year of trends plus margin
         'read_notification' => 90,
         'failed_job' => 30,
     ],

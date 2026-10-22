@@ -4,6 +4,7 @@ namespace App\Services\Listings;
 
 use App\Models\Listing;
 use App\Models\User;
+use App\Support\Bots;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,11 +20,9 @@ class ListingViews
     /** Ads remembered per session and day; beyond this a visitor's further views still count once each. */
     private const REMEMBER = 300;
 
-    private const BOTS = '/bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|monitor|curl|wget|python|java\/|go-http|headless|lighthouse/i';
-
     public function record(Request $request, Listing $listing): void
     {
-        if ($this->isBot($request) || $this->isInsider($request->user(), $listing)) {
+        if (Bots::is($request) || $this->isInsider($request->user(), $listing)) {
             return;
         }
 
@@ -68,13 +67,6 @@ class ListingViews
         }
 
         return $series;
-    }
-
-    private function isBot(Request $request): bool
-    {
-        $agent = (string) $request->userAgent();
-
-        return $agent === '' || preg_match(self::BOTS, $agent) === 1;
     }
 
     private function isInsider(?User $user, Listing $listing): bool

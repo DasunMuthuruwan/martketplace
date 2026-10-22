@@ -68,6 +68,9 @@ class AppServiceProvider extends ServiceProvider
         // Search pages: 120 per minute per IP (security doc §3).
         RateLimiter::for('search', fn (Request $request) => Limit::perMinute(120)->by('search:'.$request->ip()));
 
+        // Live search suggestions (G1): typing sends a request per pause, so a little more than search.
+        RateLimiter::for('suggest', fn (Request $request) => Limit::perMinute((int) config('marketplace.search.suggest_per_minute'))->by('suggest:'.$request->ip()));
+
         // Reports: 10 per day per account (security doc §3).
         RateLimiter::for('report', fn (Request $request) => Limit::perDay(10)->by('report:'.($request->user()?->id ?: $request->ip())));
 

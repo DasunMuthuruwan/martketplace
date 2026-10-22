@@ -115,6 +115,10 @@ class PruneData extends Command
         // The model refuses deletes (append-only); retention is the one sanctioned removal.
         $audit = AuditLog::query()->toBase()->where('created_at', '<', $this->daysAgo($r['audit_log']));
         $this->counts['audit log entries'] = $this->dryRun ? $audit->count() : $audit->delete();
+
+        // Search term counts (G1): anonymous, but only needed for recent trends.
+        $terms = DB::table('search_terms')->where('date', '<', $this->daysAgo($r['search_terms'])->toDateString());
+        $this->counts['search term counts'] = $this->dryRun ? $terms->count() : $terms->delete();
     }
 
     /**
