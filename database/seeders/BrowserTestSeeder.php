@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\ContactVisibility;
 use App\Enums\ListingStatus;
+use App\Models\BankTransferAccount;
+use App\Models\BoostPrice;
+use App\Models\BoostProduct;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
@@ -63,6 +66,15 @@ class BrowserTestSeeder extends Seeder
         $moderator = User::factory()->create(['name' => 'Mala Moderator', 'email' => 'moderator@browser.test', 'password' => $password]);
         $moderator->assignRole('moderator');
 
+        // An Admin with confirmed two-factor sign-in (known test secret), for the promotion journey.
+        $admin = User::factory()->create(['name' => 'Ama Admin', 'email' => 'admin@browser.test', 'password' => $password]);
+        $admin->assignRole('admin');
+        $admin->forceFill([
+            'two_factor_secret' => encrypt((string) (config('marketplace.testing.browser_totp_secret') ?: 'MARKETPLACEBROWSERTESTTWOFACTORA')),
+            'two_factor_recovery_codes' => encrypt((string) json_encode(['browser-recovery-one'])),
+            'two_factor_confirmed_at' => now(),
+        ])->save();
+
         $place = ['category_id' => $category->id, 'city_id' => $city?->id] + ($city ? RegionChain::forCity($city) : []);
         $titles = ['Toyota Aqua 2015 G grade', 'Honda Vezel 2017 hybrid', 'Suzuki Wagon R 2016', 'Nissan Leaf 2018', 'Toyota Prius 2014', 'Mitsubishi Montero 2012', 'Honda Fit 2015 GP5', 'Toyota Corolla 2019'];
         foreach ($titles as $i => $title) {
@@ -70,6 +82,13 @@ class BrowserTestSeeder extends Seeder
                 'title' => $title, 'published_at' => now()->subHours($i + 1), 'expires_at' => now()->addDays(30),
             ]);
         }
+        // Promotions on sale in this country (B5): two prices in its currency and a bank account.
+        foreach ([['bump', null, '1000'], ['top', 7, '4500']] as [$type, $days, $amount]) {
+            BoostPrice::create(['boost_product_id' => BoostProduct::where('type', $type)->where('duration_days', $days)->value('id'),
+                'country_id' => $country->id, 'currency' => $country->default_currency, 'amount' => $amount]);
+        }
+        BankTransferAccount::create(['country_id' => $country->id, 'bank_name' => 'Test Bank', 'account_name' => 'Marketplace Test', 'account_number' => '0001112223', 'is_active' => true]);
+
         // One top ad, so the accessibility scans cover the labelled top-ad block (ADR-026).
         app(BoostManager::class)->top(Listing::where('title', 'Mitsubishi Montero 2012')->firstOrFail(), 7);
         Listing::factory()->inCountry($country)->for($seller)->status(ListingStatus::PendingReview)

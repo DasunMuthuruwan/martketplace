@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Accepted; being built before deployment** (owner, 2026-10-21: D7 changed). Steps 1–2 now (implementation plan §7a, B1–B6); selling stays switched off until the accountant review (D6) and prices (D2). |
+| Status | **Accepted; steps 1–2 built before deployment** (B1–B6, 2026-10-22; operating guide: `docs/operations/boosts.md`). Selling stays switched off until the accountant review (D6), prices (D2) and the published rules page (D4). Urgent, gateways and later steps not built. |
 | Date | 2026-10-21 (agreed in principle by the owner the same day) |
 | Timing | Implementation is a Phase 10 enhancement, **after launch**: boosts are worth paying for only once there are buyers. |
 | Builds on | Requirements §"Later phases" (featured listings, dealer subscriptions), SRCH-01 (home featured slot placeholder), the renewal cool-down (renewing is not free bumping), architecture 02 (reserved `Billing/` module), database design (reserved `featured_listings` / `orders` / `subscriptions`), global marketplace rules (prices and gateways per country, never hardcoded) |

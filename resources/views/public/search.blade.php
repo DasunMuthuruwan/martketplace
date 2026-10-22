@@ -83,7 +83,9 @@
                 <section aria-labelledby="top-ads" class="mb-6 rounded-card border border-line bg-surface-muted p-3 sm:p-4" data-top-ads>
                     <div class="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                         <h2 id="top-ads" class="text-h3 font-semibold">{{ __('boosts.top.heading') }}</h2>
-                        <p class="text-small text-fg-subtle">{{ __('boosts.top.why') }}</p>
+                        <p class="text-small text-fg-subtle">{{ __('boosts.top.why') }}
+                            @if (\App\Models\Page::footerLinks()->has('promotions'))<a href="{{ route('page.show', 'promotions') }}" class="text-fg-muted underline underline-offset-2">{{ __('boosts.top.learn_more') }}</a>@endif
+                        </p>
                     </div>
                     @if ($view === 'list')
                         <ul class="space-y-3">

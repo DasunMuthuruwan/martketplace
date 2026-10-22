@@ -33,6 +33,9 @@
                 <ul class="list-disc space-y-1 pl-4 text-small text-fg-muted">
                     @foreach (__('boosts.promote.rules') as $rule)<li>{{ $rule }}</li>@endforeach
                 </ul>
+                @if (\App\Models\Page::footerLinks()->has('promotions'))
+                    <p class="mt-2 text-small"><a href="{{ route('page.show', 'promotions') }}" class="text-fg underline underline-offset-2">{{ __('boosts.promote.full_rules') }}</a></p>
+                @endif
             </section>
 
             <x-ui.button type="submit" icon="chevron-right">{{ __('boosts.promote.order') }}</x-ui.button>

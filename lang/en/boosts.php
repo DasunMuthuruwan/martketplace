@@ -6,6 +6,7 @@ return [
         'heading' => 'Top ads',
         'badge' => 'Top ad',
         'why' => 'Paid placements by sellers that match your search. They also appear in their usual place below.',
+        'learn_more' => 'How promotions work',
     ],
     'products' => [
         'bump' => 'Bump',
@@ -33,6 +34,7 @@ return [
             'You get a refund if we fail to show your promotion. There is no refund when an ad is removed for breaking the rules or when you sell or delete it early.',
         ],
         'not_open' => 'Promotions are not available in your country yet.',
+        'full_rules' => 'Read the promotion and refund rules',
     ],
     'order' => [
         'closed' => 'Promotions are not available in this country yet.',

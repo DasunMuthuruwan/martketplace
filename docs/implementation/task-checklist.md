@@ -91,7 +91,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] B3 Admin grant and seller view — merged 2026-10-22
   - [x] B4 Products, prices and bank details per country — merged 2026-10-22
   - [x] B5 Orders by bank transfer — merged 2026-10-22
-  - [ ] B6 Rules, QA and docs
+  - [~] B6 Rules, QA and docs — awaiting review on `feature/B6-rules-qa-docs`
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 

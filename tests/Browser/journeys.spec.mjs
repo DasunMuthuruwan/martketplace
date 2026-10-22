@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { expect, test } from '@playwright/test';
-import { mailLog, password, root } from './environment.mjs';
+import { mailLog, password, root, totp, totpSecret } from './environment.mjs';
 
 // Whole journeys (several pages, an upload): longer than the 30 s default.
 test.describe.configure({ mode: 'serial', timeout: 180_000 });
@@ -342,4 +342,33 @@ test('several photos upload one by one; a photo over the size limit is named, no
     await expect(page.locator('img[alt="Photo 2"]')).toBeVisible({ timeout: 60_000 });
     await expect(page.getByText(/2 photos added/).first()).toBeVisible();
     await expect(page.getByRole('alert').filter({ hasText: 'huge.jpg' })).toContainText(/larger than 8 MB/);
+});
+
+test('a seller orders a Top ad, an admin confirms the bank transfer, and the ad is promoted', async ({ page }) => {
+    // Seller: Promote → choose → order → payment instructions with the reference.
+    await logIn(page, 'seller@browser.test');
+    await page.goto('/account/listings');
+    await page.locator('article', { hasText: 'Honda Vezel 2017 hybrid' }).getByRole('link', { name: 'Promote' }).click();
+    await page.getByLabel(/Top ad · 7 days/).check();
+    await Promise.all([page.waitForLoadState('networkidle'), page.getByRole('button', { name: /order and see payment details/i }).click()]);
+    await expect(page.locator('[data-payment-instructions]')).toContainText('0001112223');
+    const reference = (await page.locator('[data-order-reference]').textContent()).trim();
+    expect(reference).toMatch(/^B[A-Z2-9]{8}$/);
+    await logOut(page);
+
+    // Admin: password, then the two-factor code, then Orders → Mark paid.
+    await logIn(page, 'admin@browser.test');
+    await expect(page).toHaveURL(/two-factor-challenge/);
+    await page.locator('input[name="code"]').fill(totp(totpSecret));
+    await Promise.all([page.waitForLoadState('networkidle'), page.locator('form button[type="submit"]').first().click()]);
+    await page.goto('/admin/orders');
+    await page.locator('#o-q').fill(reference);
+    await page.getByRole('button', { name: new RegExp(`Mark paid ${reference}`) }).click();
+    await page.getByRole('button', { name: 'Payment received' }).click();
+    await expect(page.getByText(/promotion has started/)).toBeVisible();
+    await logOut(page);
+
+    // Buyers see it in the labelled Top ads.
+    await page.goto('/lk/ads');
+    await expect(page.locator('[data-top-ads]')).toContainText('Honda Vezel 2017 hybrid');
 });

@@ -34,6 +34,8 @@ class Page extends Model
         'prohibited-items' => 'Prohibited items',
         'faq' => 'Frequently asked questions',
         'contact' => 'Contact us',
+        // Paid boosts (ADR-026, D4): the rules and refund exceptions, written by the Owner.
+        'promotions' => 'Promotions and refunds',
     ];
 
     private const FOOTER_CACHE = 'pages:footer';

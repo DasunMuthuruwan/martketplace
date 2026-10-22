@@ -2,6 +2,7 @@
 // database seeded by BrowserTestSeeder, served by `php artisan serve` with environment overrides for
 // that process only (.env is never changed). PHP_BINARY points at PHP when it is not on PATH.
 import { execFileSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,6 +12,8 @@ export const php = process.env.PHP_BINARY || 'php';
 export const port = Number(process.env.BROWSER_TEST_PORT || 8130);
 export const baseURL = `http://127.0.0.1:${port}`;
 export const password = process.env.BROWSER_TEST_PASSWORD || 'browser-test-password';
+// Two-factor secret (base32) of the seeded Admin: test data only, never a real account.
+export const totpSecret = process.env.BROWSER_TEST_TOTP_SECRET || 'MARKETPLACEBROWSERTESTTWOFACTORA';
 export const database = resolve(root, 'storage/framework/testing/browser.sqlite');
 // Emails of the test server (log mailer): the journeys read verification links from here.
 export const mailLog = resolve(root, 'storage/framework/testing/browser-mail.log');
@@ -63,7 +66,27 @@ export function serverEnv() {
         SEO_INDEXING: 'true',
         MARKETPLACE_DEFAULT_COUNTRY: process.env.BROWSER_TEST_COUNTRY || 'LK',
         BROWSER_TEST_PASSWORD: password,
+        BROWSER_TEST_TOTP_SECRET: totpSecret,
+        // Paid boosts: selling on, so the promotion journey can order (prices and bank seeded).
+        BOOSTS_SALES_ENABLED: 'true',
     };
+}
+
+/** The current 6-digit TOTP code (RFC 6238, SHA-1, 30 s) for a base32 secret. */
+export function totp(secret, at = Date.now()) {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let bits = '';
+    for (const char of secret.replace(/=+$/, '').toUpperCase()) {
+        bits += alphabet.indexOf(char).toString(2).padStart(5, '0');
+    }
+    const key = Buffer.from(bits.match(/.{8}/g).map((byte) => parseInt(byte, 2)));
+    const counter = Buffer.alloc(8);
+    counter.writeBigUInt64BE(BigInt(Math.floor(at / 30000)));
+    const hmac = createHmac('sha1', key).update(counter).digest();
+    const offset = hmac[hmac.length - 1] & 0x0f;
+    const code = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1000000;
+
+    return String(code).padStart(6, '0');
 }
 
 /** Fresh database with the browser-test data. Needs a production build (npm run build). */

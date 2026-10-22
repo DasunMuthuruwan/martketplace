@@ -181,6 +181,8 @@ return [
     // Browser tests only (BrowserTestSeeder, tests/Browser, ADR-025): password of the seeded accounts.
     'testing' => [
         'browser_password' => env('BROWSER_TEST_PASSWORD'),
+        // Base32 TOTP secret of the seeded Admin, so the journeys can pass two-factor sign-in.
+        'browser_totp_secret' => env('BROWSER_TEST_TOTP_SECRET'),
     ],
 
 ];
