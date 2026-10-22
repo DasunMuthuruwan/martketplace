@@ -74,6 +74,9 @@ class AppServiceProvider extends ServiceProvider
         // New drafts and submissions: 30 per hour per IP (security doc §3, S-01). The per-account daily
         // limit (LST-09) is enforced by SaveListingLocation; photo uploads are counted per file in
         // ListingPhotosController.
+        // Promotion orders (B5): per account.
+        RateLimiter::for('boost-order', fn (Request $request) => Limit::perHour((int) config('marketplace.boosts.orders_per_hour_user'))->by('boost-order:'.$request->user()?->id));
+
         RateLimiter::for('listing-submit', fn (Request $request) => Limit::perHour((int) config('marketplace.listings.submits_per_hour_ip'))->by('listing-submit:'.$request->ip()));
     }
 }

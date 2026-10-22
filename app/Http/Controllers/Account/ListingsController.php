@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Account;
 
 use App\Actions\Listings\ListingLifecycle;
+use App\Enums\BoostOrderStatus;
 use App\Enums\BoostType;
 use App\Enums\ListingStatus;
 use App\Http\Controllers\Controller;
+use App\Models\BoostOrder;
 use App\Models\Listing;
+use App\Services\Boosts\BoostCatalogue;
 use App\Services\Listings\ListingPresenter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,7 +29,7 @@ class ListingsController extends Controller
 
     public function __construct(private readonly ListingLifecycle $lifecycle) {}
 
-    public function index(Request $request, ListingPresenter $present): View
+    public function index(Request $request, ListingPresenter $present, BoostCatalogue $catalogue): View
     {
         $user = $request->user();
         $tab = in_array($request->query('status'), self::TABS, true) ? $request->query('status') : 'active';
@@ -45,6 +48,11 @@ class ListingsController extends Controller
             'counts' => $counts,
             'listings' => $listings,
             'publicIds' => self::publicIds($listings->getCollection()),
+            // Promotions (B5): countries where selling is open, and unpaid orders per ad.
+            'promotable' => $listings->getCollection()->pluck('country')->filter()->unique('id')
+                ->filter(fn ($country) => $catalogue->isOpen($country))->pluck('id')->all(),
+            'pendingOrders' => BoostOrder::where('user_id', $user->id)->where('status', BoostOrderStatus::Pending->value)
+                ->whereIn('listing_id', $listings->getCollection()->modelKeys())->get()->keyBy('listing_id'),
             'present' => $present,
             'lifecycle' => $this->lifecycle,
         ]);

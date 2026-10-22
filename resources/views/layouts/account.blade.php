@@ -11,12 +11,14 @@
         'profile' => [__('account.nav.profile'), route('account.settings.profile')],
         'contact' => [__('account.nav.contact'), route('account.settings.contact')],
         'security' => [__('account.nav.security'), route('account.settings.security')],
+        // Promotion orders (B5): once selling is on, or the account has orders.
+        'orders' => [__('boosts.order.orders'), (config('marketplace.boosts.sales_enabled') || \App\Models\BoostOrder::where('user_id', auth()->id())->exists()) ? route('account.orders') : null],
     ])->filter(fn ($item) => $item[1] !== null)->map(fn ($item) => ['label' => $item[0], 'href' => $item[1]]);
     // The overview URL falls back to the profile page when there is no overview: keep one entry per URL.
     $accountLinks = $accountLinks->unique('href');
     $current = rtrim(request()->url(), '/');
     $activeKey = $accountLinks->search(fn ($item) => rtrim($item['href'], '/') === $current)
-        ?: (request()->routeIs('account.two-factor') ? 'security' : (request()->routeIs('account.listings.stats') ? 'my_ads' : null));
+        ?: (request()->routeIs('account.two-factor') ? 'security' : (request()->routeIs('account.listings.stats', 'account.listings.promote') ? 'my_ads' : (request()->routeIs('account.orders.show') ? 'orders' : null)));
 @endphp
 
 @section('content')

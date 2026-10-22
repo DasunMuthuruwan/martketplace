@@ -1,4 +1,4 @@
-@props(['listing', 'present', 'lifecycle', 'public' => null]) {{-- public: known by the page (one query for all rows); else asked here --}}
+@props(['listing', 'present', 'lifecycle', 'public' => null, 'canPromote' => false, 'pendingOrder' => null]) {{-- public: known by the page (one query for all rows); else asked here --}}
 {{-- A seller's own ad in My listings (layout doc §3.5): photo, title, price, status, what happens next,
      the moderation note when rejected or suspended, and the actions that are possible now. --}}
 @use('App\Enums\ListingStatus', 'S')
@@ -63,6 +63,9 @@
                 {{ $top->starts_at->isPast() ? __('account.listings.top_until', ['date' => $top->ends_at->toFormattedDateString()]) : __('account.listings.top_from', ['date' => $top->starts_at->toFormattedDateString()]) }}
             </p>
         @endif
+        @if ($pendingOrder)
+            <p class="text-small"><a href="{{ route('account.orders.show', $pendingOrder) }}" class="text-fg underline-offset-2 hover:underline">{{ __('boosts.order.pending_row', ['reference' => $pendingOrder->reference]) }}</a></p>
+        @endif
         @if (in_array($status, [S::Rejected, S::Suspended], true) && $listing->moderation_note)
             <p class="rounded-control bg-surface-muted px-3 py-2 text-small text-fg">{{ __('account.listings.reason', ['reason' => $listing->moderation_note]) }}</p>
         @endif
@@ -76,6 +79,9 @@
             @endif
             @if ($editUrl && $status !== S::Sold)
                 <x-ui.button size="sm" variant="secondary" icon="pencil" :href="$editUrl">{{ $status === S::Rejected ? __('account.listings.edit_resubmit') : __('account.listings.edit') }}</x-ui.button>
+            @endif
+            @if ($canPromote)
+                <x-ui.button size="sm" icon="chevron-up" :href="route('account.listings.promote', $listing)">{{ __('boosts.promote.button') }}</x-ui.button>
             @endif
             @if ($hasStats)
                 <x-ui.button size="sm" variant="secondary" icon="eye" :href="route('account.listings.stats', $listing)">{{ __('account.listings.stats') }}</x-ui.button>

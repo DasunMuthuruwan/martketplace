@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $ends_at
  * @property Carbon|null $ended_at
  * @property Carbon|null $last_shown_at
+ * @property Carbon|null $ending_reminder_sent_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -38,6 +39,7 @@ class ListingBoost extends Model
             'ends_at' => 'datetime',
             'ended_at' => 'datetime',
             'last_shown_at' => 'datetime',
+            'ending_reminder_sent_at' => 'datetime',
         ];
     }
 
@@ -45,6 +47,12 @@ class ListingBoost extends Model
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class);
+    }
+
+    /** @return BelongsTo<BoostOrder, $this> */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(BoostOrder::class, 'order_id');
     }
 
     /** @return BelongsTo<User, $this> */

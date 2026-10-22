@@ -18,7 +18,8 @@
     @else
         <ul class="space-y-3">
             @foreach ($listings as $listing)
-                <li><x-listing.owner-row :listing="$listing" :present="$present" :lifecycle="$lifecycle" :public="in_array($listing->id, $publicIds, true)" /></li>
+                <li><x-listing.owner-row :listing="$listing" :present="$present" :lifecycle="$lifecycle" :public="in_array($listing->id, $publicIds, true)"
+                    :can-promote="in_array($listing->id, $publicIds, true) && in_array($listing->country_id, $promotable, true)" :pending-order="$pendingOrders[$listing->id] ?? null" /></li>
             @endforeach
         </ul>
         <x-ui.pagination :paginator="$listings" class="mt-6" />

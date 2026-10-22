@@ -1,12 +1,14 @@
 <?php
 
 use App\Authorization\Permissions;
+use App\Http\Controllers\Account\BoostOrdersController;
 use App\Http\Controllers\Account\DashboardController;
 use App\Http\Controllers\Account\FavouritesController;
 use App\Http\Controllers\Account\ListingPhotosController;
 use App\Http\Controllers\Account\ListingsController;
 use App\Http\Controllers\Account\ListingStatsController;
 use App\Http\Controllers\Account\PostListingController;
+use App\Http\Controllers\Account\PromoteController;
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
 use App\Http\Controllers\CountryController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\SellerController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\AuditLogViewer;
 use App\Livewire\Admin\BlocklistAdmin;
+use App\Livewire\Admin\BoostOrdersAdmin;
 use App\Livewire\Admin\BoostPricesAdmin;
 use App\Livewire\Admin\BoostsAdmin;
 use App\Livewire\Admin\CategoriesAdmin;
@@ -70,6 +73,14 @@ Route::middleware(['auth', 'verified'])->prefix('account/listings')->name('listi
     Route::post('/{listing}/submit', 'submit')->whereNumber('listing')->middleware('throttle:listing-submit')->name('submit');
     Route::get('/{listing}/submitted', 'submitted')->whereNumber('listing')->name('submitted');
 });
+// Promotions (B5, ADR-026): order a boost for one's own live ad, pay by bank transfer.
+Route::middleware(['auth', 'verified'])->prefix('account')->name('account.')->group(function () {
+    Route::get('/listings/{listing}/promote', [PromoteController::class, 'show'])->whereNumber('listing')->name('listings.promote');
+    Route::post('/listings/{listing}/promote', [PromoteController::class, 'store'])->whereNumber('listing')->middleware('throttle:boost-order')->name('listings.promote.store');
+    Route::get('/orders', [BoostOrdersController::class, 'index'])->name('orders');
+    Route::get('/orders/{order}', [BoostOrdersController::class, 'show'])->whereNumber('order')->name('orders.show');
+    Route::post('/orders/{order}/cancel', [BoostOrdersController::class, 'cancel'])->whereNumber('order')->name('orders.cancel');
+});
 Route::middleware(['auth', 'verified'])->prefix('account/listings/{listing}/photos')->name('listings.photos.')->controller(ListingPhotosController::class)
     ->whereNumber(['listing', 'image'])->group(function () {
         Route::post('/', 'store')->name('store');
@@ -118,6 +129,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/locations/requests', LocationRequestsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('location-requests');
         Route::livewire('/pages', PagesAdmin::class)->middleware('can:'.Permissions::PAGES_MANAGE)->name('pages');
         Route::livewire('/blocklist', BlocklistAdmin::class)->middleware('can:'.Permissions::BLOCKLIST_MANAGE)->name('blocklist');
+        Route::livewire('/orders', BoostOrdersAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('orders');
         Route::livewire('/boosts', BoostsAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boosts');
         Route::livewire('/boosts/prices', BoostPricesAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boost-prices');
         Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');

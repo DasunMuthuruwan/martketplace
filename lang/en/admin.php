@@ -18,10 +18,36 @@ return [
         'blocklist' => 'Blocklist',
         'boosts' => 'Boosts',
         'boost_prices' => 'Boost prices',
+        'orders' => 'Orders',
         'audit' => 'Audit log',
         'settings' => 'Settings',
         'design_system' => 'Design system',
         'site' => 'View site',
+    ],
+
+    'orders' => [
+        'help' => 'Promotion orders paid by bank transfer. Find an order by the reference on the transfer, then mark it paid to start the promotion.',
+        'search' => 'Reference',
+        'empty' => 'No orders here.',
+        'actions' => 'Actions',
+        'mark_paid' => 'Mark paid',
+        'cancel' => 'Cancel order',
+        'refund' => 'Refund',
+        'payment_note' => 'Payment note',
+        'payment_note_hint' => 'Optional: what you saw, e.g. the bank statement line. The seller does not see it.',
+        'reason' => 'Reason',
+        'reason_hint' => 'The seller receives this in the email.',
+        'confirm' => [
+            'paid' => 'Have you seen the payment for :reference? The promotion starts now.',
+            'cancel' => 'Cancel unpaid order :reference?',
+            'refund' => 'Refund order :reference? The promotion ends now. Send the money back by bank transfer.',
+        ],
+        'confirm_button' => ['paid' => 'Payment received', 'cancel' => 'Cancel order', 'refund' => 'Refund and end'],
+        'done' => [
+            'paid' => 'Order :reference is paid; the promotion has started.',
+            'cancel' => 'Order :reference was cancelled.',
+            'refund' => 'Order :reference was refunded; the promotion has ended.',
+        ],
     ],
 
     'boost_prices' => [

@@ -97,6 +97,10 @@ return [
     'boosts' => [
         'top_slots' => 2,
         'sales_enabled' => (bool) env('BOOSTS_SALES_ENABLED', false),
+        // Days a seller has to pay an order by bank transfer before it lapses (B5).
+        'payment_days' => 7,
+        // Orders a seller may place per hour (B5).
+        'orders_per_hour_user' => 10,
     ],
 
     'mail' => [

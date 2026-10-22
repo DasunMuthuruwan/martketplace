@@ -6,6 +6,7 @@ use App\Authorization\Permissions;
 use App\Enums\ListingStatus;
 use App\Enums\StaffRole;
 use App\Livewire\Admin\DesignSystem;
+use App\Models\BoostOrder;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Listing;
@@ -51,6 +52,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.audit' => Permissions::AUDIT_VIEW,
         'admin.boosts' => Permissions::BOOSTS_MANAGE,
         'admin.boost-prices' => Permissions::BOOSTS_MANAGE,
+        'admin.orders' => Permissions::BOOSTS_MANAGE,
         'admin.users' => Permissions::USERS_VIEW,
         'admin.design-system' => Permissions::SETTINGS_MANAGE,
         'admin.settings' => Permissions::SETTINGS_MANAGE,
@@ -85,6 +87,8 @@ class AuthorizationSweepTest extends TestCase
         'listings.edit' => 'owned', 'listings.update' => 'owned', 'listings.contact-options' => 'owned', 'listings.submit' => 'owned',
         'listings.submitted' => 'owned', 'listings.photos.store' => 'owned', 'listings.photos.move' => 'owned',
         'listings.photos.cover' => 'owned', 'listings.photos.destroy' => 'owned', 'account.listings.stats' => 'owned',
+        'account.listings.promote' => 'owned', 'account.listings.promote.store' => 'owned',
+        'account.orders' => 'verified', 'account.orders.show' => 'owned', 'account.orders.cancel' => 'owned',
     ] + self::ADMIN_CLASSES;
 
     private const ADMIN_CLASSES = [
@@ -92,7 +96,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.categories' => 'admin', 'admin.attributes' => 'admin', 'admin.locations' => 'admin', 'admin.countries' => 'admin',
         'admin.location-requests' => 'admin', 'admin.pages' => 'admin', 'admin.blocklist' => 'admin', 'admin.audit' => 'admin',
         'admin.users' => 'admin', 'admin.design-system' => 'admin', 'admin.settings' => 'admin', 'admin.staff' => 'admin',
-        'admin.boosts' => 'admin', 'admin.boost-prices' => 'admin',
+        'admin.boosts' => 'admin', 'admin.boost-prices' => 'admin', 'admin.orders' => 'admin',
     ];
 
     /** Framework and package internals: not application endpoints. */
@@ -108,6 +112,8 @@ class AuthorizationSweepTest extends TestCase
     private Listing $live;
 
     private ListingImage $image;
+
+    private BoostOrder $memberOrder;
 
     protected function setUp(): void
     {
@@ -137,6 +143,11 @@ class AuthorizationSweepTest extends TestCase
         $this->image->forceFill([
             'listing_id' => $this->memberDraft->id, 'user_id' => $this->member->id, 'disk' => 'listings', 'directory' => 'listings/'.$this->memberDraft->id,
             'basename' => Str::lower(Str::random(32)), 'format' => 'webp', 'width' => 800, 'height' => 600, 'bytes' => 1000, 'sha256' => str_repeat('a', 64),
+        ])->save();
+        $this->memberOrder = new BoostOrder;
+        $this->memberOrder->forceFill([
+            'reference' => 'BSWEEP001', 'user_id' => $this->member->id, 'listing_id' => $this->live->id, 'product_type' => 'bump',
+            'country_id' => $lk->id, 'currency' => $this->live->currency, 'amount' => '100', 'status' => 'pending', 'expires_at' => now()->addWeek(),
         ])->save();
     }
 
@@ -332,8 +343,9 @@ class AuthorizationSweepTest extends TestCase
             'listings.edit' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.update' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.photos.move', 'listings.photos.cover', 'listings.photos.destroy' => ['listing' => $listing->id, 'image' => $this->image->id],
+            'account.orders.show', 'account.orders.cancel' => ['order' => $this->memberOrder->id],
             'listings.contact-options', 'listings.submit', 'listings.submitted', 'listings.photos.store',
-            'account.listings.sold', 'account.listings.renew', 'account.listings.destroy', 'account.listings.stats', 'listings.favourite' => ['listing' => $listing->id],
+            'account.listings.sold', 'account.listings.renew', 'account.listings.destroy', 'account.listings.stats', 'account.listings.promote', 'account.listings.promote.store', 'listings.favourite' => ['listing' => $listing->id],
             default => [],
         };
 

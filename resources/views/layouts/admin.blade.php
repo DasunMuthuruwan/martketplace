@@ -10,6 +10,9 @@
         if (auth()->user()?->can(\App\Authorization\Permissions::REPORTS_VIEW)) {
             $adminBadges['reports'] = \App\Models\Report::where('status', \App\Enums\ReportStatus::Open)->count() ?: null;
         }
+        if (auth()->user()?->can(\App\Authorization\Permissions::BOOSTS_MANAGE)) {
+            $adminBadges['orders'] = \App\Models\BoostOrder::where('status', \App\Enums\BoostOrderStatus::Pending)->count() ?: null;
+        }
     } catch (\Throwable $e) {
         report($e);
     }
