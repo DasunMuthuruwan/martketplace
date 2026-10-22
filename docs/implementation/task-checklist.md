@@ -89,7 +89,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] B1 Foundations (sort time, boosts, daily views) — merged 2026-10-21
   - [x] B2 Top ads and bumps in results — merged 2026-10-21
   - [x] B3 Admin grant and seller view — merged 2026-10-22
-  - [~] B4 Products, prices and bank details per country — awaiting review on `feature/B4-products-prices`
+  - [x] B4 Products, prices and bank details per country — merged 2026-10-22
   - [ ] B5 Orders by bank transfer
   - [ ] B6 Rules, QA and docs
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
