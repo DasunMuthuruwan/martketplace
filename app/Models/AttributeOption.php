@@ -81,6 +81,12 @@ class AttributeOption extends Model
         return $this->belongsTo(Attribute::class);
     }
 
+    /** @return BelongsTo<AttributeOption, $this> the option this one depends on (Model "Aqua" → Make "Toyota") */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(AttributeOption::class, 'parent_option_id');
+    }
+
     /** @return BelongsTo<AttributeOption, $this> */
     public function parentOption(): BelongsTo
     {

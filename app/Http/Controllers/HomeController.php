@@ -7,6 +7,7 @@ use App\Models\Country;
 use App\Models\Listing;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
+use App\Services\Insights\Trends;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Seo\PageSeo;
 use Illuminate\Database\Eloquent\Collection;
@@ -37,7 +38,7 @@ class HomeController extends Controller
         ]);
     }
 
-    public function country(Request $request, CountryContext $context, CategoryTree $tree, ListingPresenter $present): View
+    public function country(Request $request, CountryContext $context, CategoryTree $tree, ListingPresenter $present, Trends $trends): View
     {
         $country = $context->current($request);
 
@@ -46,6 +47,11 @@ class HomeController extends Controller
             'categories' => $tree->forCountry($country->iso2),
             'categoryCounts' => $this->categoryCounts($country),
             'latest' => $this->latest($country),
+            // G2 (ADR-027): each list is empty until there is enough data.
+            'popular' => $trends->popularAds($country),
+            'trendingSearches' => $trends->trendingSearches($country),
+            'trendingModels' => $trends->trendingModels($country),
+            'mostSold' => $trends->mostMarkedSold($country),
             'present' => $present,
             'seo' => PageSeo::make(
                 __('public.seo.country_title', ['country' => $country->name]),

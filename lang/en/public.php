@@ -86,4 +86,17 @@ return [
         'photos' => 'photos',
         'sold' => 'Sold',
     ],
+
+    // Popular, trending, most marked as sold (G2, ADR-027).
+    'trends' => [
+        'trending' => 'Trending now',
+        'searches' => 'Searches',
+        'models' => 'Makes and models',
+        'popular' => 'Popular this week',
+        'popular_help' => 'Most viewed ads in the last 7 days.',
+        'most_sold' => 'Most marked as sold',
+        'most_sold_help' => 'Makes and models sellers marked as sold in the last 90 days.',
+        'sold_count' => '{1} 1 sold|[2,*] :count sold',
+        'in_category' => 'Trending in :category',
+    ],
 ];

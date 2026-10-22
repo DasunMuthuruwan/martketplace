@@ -101,6 +101,13 @@ return [
         'suggest_per_minute' => 180,
     ],
 
+    // Popular, trending, most marked as sold (G2, ADR-027): minimum counts before an item shows.
+    'trends' => [
+        'min_views' => 10,
+        'min_sold' => 3,
+        'cache_minutes' => 60,
+    ],
+
     'boosts' => [
         'top_slots' => 2,
         'sales_enabled' => (bool) env('BOOSTS_SALES_ENABLED', false),

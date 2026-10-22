@@ -77,6 +77,15 @@
                 </div>
             @endif
 
+            @if ($trendingInCategory !== [])
+                <nav aria-label="{{ __('public.trends.in_category', ['category' => $criteria->category->name]) }}" class="mb-4 flex flex-wrap items-center gap-2" data-trending-category>
+                    <span class="text-small font-medium text-fg-muted">{{ __('public.trends.in_category', ['category' => $criteria->category->name]) }}</span>
+                    @foreach ($trendingInCategory as $item)
+                        <a href="{{ $page->url(['q' => $item['label']]) }}" class="inline-flex h-8 items-center rounded-full border border-line bg-surface-muted px-3 text-small text-fg hover:border-control">{{ $item['label'] }}</a>
+                    @endforeach
+                </nav>
+            @endif
+
             {{-- Paid placements (ADR-026, D5): labelled, at most a few, matching this search; the same
                  ads also keep their usual place in the results below. --}}
             @if ($topAds->isNotEmpty())

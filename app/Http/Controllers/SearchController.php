@@ -10,6 +10,7 @@ use App\Services\Attributes\AttributeSchema;
 use App\Services\Boosts\TopAds;
 use App\Services\Catalogue\CategoryTree;
 use App\Services\Geo\CountryContext;
+use App\Services\Insights\Trends;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Search\ListingSearch;
 use App\Services\Search\MysqlListingSearch;
@@ -45,6 +46,7 @@ class SearchController extends Controller
         private readonly ListingPresenter $present,
         private readonly TopAds $topAds,
         private readonly SearchTerms $terms,
+        private readonly Trends $trends,
     ) {}
 
     public function country(Request $request, CountryContext $context): View|RedirectResponse
@@ -111,6 +113,9 @@ class SearchController extends Controller
             'criteria' => $criteria,
             'results' => $results,
             'topAds' => $this->topAds->for($criteria),
+            // G2: makes and models trending in this category (country category pages, first page).
+            'trendingInCategory' => $country !== null && $criteria->category !== null && $criteria->keyword === null && $criteria->page === 1
+                ? $this->trends->trendingModels($country, $criteria->category, 6) : [],
             'categories' => $categories,
             'filters' => $filters,
             'page' => new SearchPage($request, $criteria, $country, $filters, $categories),

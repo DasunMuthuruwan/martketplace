@@ -94,7 +94,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] B6 Rules, QA and docs — merged 2026-10-22
 - [~] M9c Audience features before deployment (owner 2026-10-22; [proposal](../proposals/engagement-features.md), ADR-027)
   - [x] G1 Search terms and live search — merged 2026-10-22
-  - [ ] G2 Popular, trending, most marked as sold
+  - [~] G2 Popular, trending, most marked as sold — awaiting review on `feature/G2-trending`
   - [ ] G3 Share to WhatsApp and Facebook
   - [ ] G4 Make/model pages and price guide
   - [ ] G5 Seller ratings and trust badges

@@ -31,6 +31,68 @@
         </section>
     @endif
 
+    {{-- Trending searches and makes/models (G2, ADR-027): shown only once there is enough data. --}}
+    @if ($trendingSearches !== [] || $trendingModels !== [])
+        <section aria-labelledby="home-trending" class="mb-10" data-trending>
+            <h2 id="home-trending" class="mb-3 text-h2 font-semibold">{{ __('public.trends.trending') }}</h2>
+            <div class="space-y-3">
+                @if ($trendingSearches !== [])
+                    <div>
+                        <h3 class="mb-2 text-small font-medium text-fg-muted">{{ __('public.trends.searches') }}</h3>
+                        <ul class="flex flex-wrap gap-2">
+                            @foreach ($trendingSearches as $item)
+                                <li><a href="{{ route('ads.country', ['cc' => $cc, 'q' => $item['term']]) }}" class="inline-flex h-8 items-center rounded-full border border-line bg-surface-muted px-3 text-small text-fg hover:border-control">{{ $item['term'] }}</a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                @if ($trendingModels !== [])
+                    <div>
+                        <h3 class="mb-2 text-small font-medium text-fg-muted">{{ __('public.trends.models') }}</h3>
+                        <ul class="flex flex-wrap gap-2">
+                            @foreach ($trendingModels as $item)
+                                <li><a href="{{ route('ads.country', ['cc' => $cc, 'q' => $item['label']]) }}" class="inline-flex h-8 items-center rounded-full border border-line bg-surface-muted px-3 text-small text-fg hover:border-control">{{ $item['label'] }}</a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endif
+
+    @if ($popular->isNotEmpty())
+        <section aria-labelledby="home-popular" class="mb-10" data-popular>
+            <div class="mb-3 flex flex-wrap items-baseline justify-between gap-x-4">
+                <h2 id="home-popular" class="text-h2 font-semibold">{{ __('public.trends.popular') }}</h2>
+                <p class="text-small text-fg-subtle">{{ __('public.trends.popular_help') }}</p>
+            </div>
+            <div class="listing-grid-area">
+                <ul class="listing-grid">
+                    @foreach ($popular as $listing)
+                        <li><x-listing.card :listing="$listing" :present="$present" class="h-full" /></li>
+                    @endforeach
+                </ul>
+            </div>
+        </section>
+    @endif
+
+    @if ($mostSold !== [])
+        <section aria-labelledby="home-sold" class="mb-10" data-most-sold>
+            <div class="mb-3 flex flex-wrap items-baseline justify-between gap-x-4">
+                <h2 id="home-sold" class="text-h2 font-semibold">{{ __('public.trends.most_sold') }}</h2>
+                <p class="text-small text-fg-subtle">{{ __('public.trends.most_sold_help') }}</p>
+            </div>
+            <ol class="grid gap-2 sm:grid-cols-2">
+                @foreach ($mostSold as $item)
+                    <li class="flex items-center justify-between gap-3 rounded-card border border-line bg-surface px-3 py-2">
+                        <a href="{{ route('ads.country', ['cc' => $cc, 'q' => $item['label']]) }}" class="min-w-0 truncate text-ui text-fg hover:underline"><span class="tabular mr-2 text-fg-subtle">{{ $loop->iteration }}.</span>{{ $item['label'] }}</a>
+                        <span class="shrink-0 text-small text-fg-muted">{{ trans_choice('public.trends.sold_count', $item['sold'], ['count' => $item['sold']]) }}</span>
+                    </li>
+                @endforeach
+            </ol>
+        </section>
+    @endif
+
     <section aria-labelledby="home-latest" class="mb-10">
         <div class="mb-3 flex items-baseline justify-between gap-4">
             <h2 id="home-latest" class="text-h2 font-semibold">{{ __('public.latest') }}</h2>

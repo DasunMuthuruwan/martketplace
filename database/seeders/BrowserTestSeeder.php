@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Services\Boosts\BoostManager;
 use App\Services\Geo\RegionChain;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -88,6 +89,12 @@ class BrowserTestSeeder extends Seeder
                 'country_id' => $country->id, 'currency' => $country->default_currency, 'amount' => $amount]);
         }
         BankTransferAccount::create(['country_id' => $country->id, 'bank_name' => 'Test Bank', 'account_name' => 'Marketplace Test', 'account_number' => '0001112223', 'is_active' => true]);
+
+        // Views and searches this week, so the accessibility scans cover the popular and trending blocks (G2).
+        foreach (Listing::where('country_id', $country->id)->where('status', ListingStatus::Active)->limit(3)->pluck('id') as $id) {
+            DB::table('listing_daily_views')->insert(['listing_id' => $id, 'date' => now()->toDateString(), 'views' => 15]);
+        }
+        DB::table('search_terms')->insert(['country_id' => $country->id, 'term' => 'toyota aqua', 'date' => now()->toDateString(), 'searches' => 8]);
 
         // One top ad, so the accessibility scans cover the labelled top-ad block (ADR-026).
         app(BoostManager::class)->top(Listing::where('title', 'Mitsubishi Montero 2012')->firstOrFail(), 7);
