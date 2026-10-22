@@ -63,7 +63,9 @@ class ListingPageTest extends TestCase
         $this->assertStringContainsString('data-contact-channel="whatsapp"', $html);
         $this->assertStringContainsString('data-contact-url="'.route('listings.contact', $listing).'"', $html);
         $this->assertStringNotContainsString('771234567', $html);
-        $this->assertStringNotContainsString('wa.me', $html);
+        // The seller's WhatsApp link (wa.me/<number>) comes only from the reveal endpoint; the
+        // share-to-WhatsApp link (wa.me/?text=…, G3) carries no number.
+        $this->assertDoesNotMatchRegularExpression('#wa\.me/\+?\d#', $html);
     }
 
     public function test_phone_bar_replaces_the_bottom_navigation_on_the_listing_page(): void

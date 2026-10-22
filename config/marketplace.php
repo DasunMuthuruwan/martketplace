@@ -94,6 +94,12 @@ return [
 
     // Paid boosts (ADR-026). Top ads per results page (owner setting, D5). Selling stays off until the
     // accountant review (D6) and prices per country (D2); staff can grant boosts meanwhile.
+    // Share an ad to these services (G3, ADR-027): the encoded text or ad address is appended.
+    'share' => [
+        'whatsapp' => env('SHARE_WHATSAPP_URL', 'https://wa.me/?text='),
+        'facebook' => env('SHARE_FACEBOOK_URL', 'https://www.facebook.com/sharer/sharer.php?u='),
+    ],
+
     // Live search and trending (G1–G2, ADR-027): a search term is shown (popular, trending) only after
     // this many searches, so private or rare searches never appear.
     'search' => [

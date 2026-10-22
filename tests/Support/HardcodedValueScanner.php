@@ -37,6 +37,7 @@ class HardcodedValueScanner
         'sqs.us-east-1.amazonaws.com',
         'challenges.cloudflare.com',
         'wa.me',
+        'www.facebook.com', // share link (G3, ADR-027), configured in marketplace.share
         'download.geonames.org',
     ];
 
