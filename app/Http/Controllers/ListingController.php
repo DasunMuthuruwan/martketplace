@@ -9,6 +9,7 @@ use App\Services\Contact\ContactResolver;
 use App\Services\Insights\MakePages;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Listings\ListingViews;
+use App\Services\Reviews\SellerReviews;
 use App\Services\Security\Turnstile;
 use App\Services\Seo\PageSeo;
 use App\Services\Seo\StructuredData;
@@ -90,6 +91,7 @@ class ListingController extends Controller
             'favourited' => $request->user()?->favourites()->whereKey($listing->id)->exists() ?? false,
             'similar' => $this->similar($listing),
             'makePage' => app(MakePages::class)->forListing($listing), // "More Toyota Aqua ads" (G4)
+            'reviewSummary' => app(SellerReviews::class)->summary($listing->user), // seller card (G5)
             'sellerAds' => Listing::public()->where('listings.user_id', $listing->user_id)->count(),
             'turnstileSiteKey' => app(Turnstile::class)->enabled() ? app(Turnstile::class)->siteKey() : null,
             'currentCountry' => $listing->country,

@@ -8,6 +8,7 @@
         'overview' => [__('account.nav.overview'), \App\View\Navigation::url('account')],
         'my_ads' => [__('layout.my_ads'), \App\View\Navigation::url('my_ads')],
         'saved' => [__('layout.saved'), \App\View\Navigation::url('saved')],
+        'reviews' => [__('reviews.mine_title'), auth()->user()?->hasVerifiedEmail() ? route('account.reviews') : null],
         'profile' => [__('account.nav.profile'), route('account.settings.profile')],
         'contact' => [__('account.nav.contact'), route('account.settings.contact')],
         'security' => [__('account.nav.security'), route('account.settings.security')],

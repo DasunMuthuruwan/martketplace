@@ -20,12 +20,28 @@ class ListingScreener
 
     public function screen(Listing $listing): ScreeningResult
     {
-        $text = mb_strtolower($listing->title.' '.$listing->description);
+        $result = $this->screenText($listing->title.' '.$listing->description, $listing->country_id);
+        $flags = $result->flags;
+        if ($this->isDuplicate($listing)) {
+            $flags[] = 'duplicate';
+        }
+
+        return new ScreeningResult($result->blocked, $flags);
+    }
+
+    /**
+     * Blocked and flagged terms (global and the country's) and contact details in any text, e.g. a
+     * review comment or a seller's reply (G5).
+     */
+    public function screenText(string $text, ?int $countryId): ScreeningResult
+    {
+        $lower = mb_strtolower($text);
         $blocked = [];
         $flags = [];
 
-        foreach (BlockedTerm::forCountry($listing->country_id)->get() as $term) {
-            if (! $this->matches($text, $term)) {
+        $terms = $countryId === null ? BlockedTerm::whereNull('country_id') : BlockedTerm::forCountry($countryId);
+        foreach ($terms->get() as $term) {
+            if (! $this->matches($lower, $term)) {
                 continue;
             }
             if ($term->action === BlockedTerm::ACTION_BLOCK) {
@@ -35,11 +51,8 @@ class ListingScreener
             }
         }
 
-        if ($this->containsContactDetails((string) $listing->description.' '.$listing->title)) {
+        if ($this->containsContactDetails($text)) {
             $flags[] = 'contact_in_text';
-        }
-        if ($this->isDuplicate($listing)) {
-            $flags[] = 'duplicate';
         }
 
         return new ScreeningResult(array_values(array_unique($blocked)), $flags);

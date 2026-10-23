@@ -8,6 +8,9 @@
         </span>
     </a>
     <ul class="mt-3 space-y-1 text-small text-fg-muted">
+        @if (($reviewSummary['count'] ?? 0) > 0)
+            <li>@include('public.partials.rating-summary', ['summary' => $reviewSummary])</li>
+        @endif
         @if ($seller->hasVerifiedEmail())
             <li class="flex items-center gap-1.5"><x-ui.icon name="badge-check" size="16" class="text-success" />{{ __('public.email_verified') }}</li>
         @endif

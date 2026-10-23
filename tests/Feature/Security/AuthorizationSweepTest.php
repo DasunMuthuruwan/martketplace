@@ -13,6 +13,7 @@ use App\Models\Listing;
 use App\Models\ListingImage;
 use App\Models\Page;
 use App\Models\Region;
+use App\Models\SellerReview;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -89,6 +90,7 @@ class AuthorizationSweepTest extends TestCase
         'listings.photos.cover' => 'owned', 'listings.photos.destroy' => 'owned', 'account.listings.stats' => 'owned',
         'account.listings.promote' => 'owned', 'account.listings.promote.store' => 'owned',
         'account.orders' => 'verified', 'account.orders.show' => 'owned', 'account.orders.cancel' => 'owned',
+        'seller.reviews.store' => 'verified', 'account.reviews' => 'verified', 'account.reviews.reply' => 'owned',
     ] + self::ADMIN_CLASSES;
 
     private const ADMIN_CLASSES = [
@@ -114,6 +116,8 @@ class AuthorizationSweepTest extends TestCase
     private ListingImage $image;
 
     private BoostOrder $memberOrder;
+
+    private SellerReview $memberReview;
 
     protected function setUp(): void
     {
@@ -149,6 +153,8 @@ class AuthorizationSweepTest extends TestCase
             'reference' => 'BSWEEP001', 'user_id' => $this->member->id, 'listing_id' => $this->live->id, 'product_type' => 'bump',
             'country_id' => $lk->id, 'currency' => $this->live->currency, 'amount' => '100', 'status' => 'pending', 'expires_at' => now()->addWeek(),
         ])->save();
+        $this->memberReview = new SellerReview;
+        $this->memberReview->forceFill(['seller_id' => $this->member->id, 'reviewer_id' => $this->users['owner']->id, 'rating' => 4])->save();
     }
 
     // ---- 1. Roles ----------------------------------------------------------------------------
@@ -346,6 +352,8 @@ class AuthorizationSweepTest extends TestCase
             'listings.update' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.photos.move', 'listings.photos.cover', 'listings.photos.destroy' => ['listing' => $listing->id, 'image' => $this->image->id],
             'account.orders.show', 'account.orders.cancel' => ['order' => $this->memberOrder->id],
+            'account.reviews.reply' => ['review' => $this->memberReview->id],
+            'seller.reviews.store' => ['seller' => $this->member->id],
             'listings.contact-options', 'listings.submit', 'listings.submitted', 'listings.photos.store',
             'account.listings.sold', 'account.listings.renew', 'account.listings.destroy', 'account.listings.stats', 'account.listings.promote', 'account.listings.promote.store', 'listings.favourite' => ['listing' => $listing->id],
             default => [],

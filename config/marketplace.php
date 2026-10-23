@@ -114,6 +114,16 @@ return [
         'cache_minutes' => 60,
     ],
 
+    // Seller ratings (G5, ADR-027 E2): who may rate (days since they revealed the seller's number,
+    // their account's age), how many reviews before an average shows, how many a buyer may write a day.
+    'reviews' => [
+        'min_days' => 2,
+        'max_days' => 90,
+        'min_account_days' => 7,
+        'min_for_average' => 3,
+        'per_day_user' => 10,
+    ],
+
     // Price guide on make/model pages (G4): shown from this many ads for sale.
     'price_guide' => [
         'min_ads' => 5,

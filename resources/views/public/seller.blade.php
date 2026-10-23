@@ -14,6 +14,7 @@
                     <span class="inline-flex items-center gap-1 text-fg-muted"><x-ui.icon name="badge-check" size="16" class="text-success" />{{ __('public.email_verified') }}</span>
                 @endif
                 <span>{{ trans_choice('public.ads_count', $listings->total(), ['count' => number_format($listings->total())]) }}</span>
+                @include('public.partials.rating-summary', ['summary' => $reviewSummary])
             </p>
         </div>
     </section>
@@ -31,4 +32,6 @@
         </div>
         <x-ui.pagination :paginator="$listings" class="mt-8" />
     @endif
+
+    @include('public.partials.seller-reviews')
 @endsection

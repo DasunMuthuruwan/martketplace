@@ -9,6 +9,7 @@ use App\Http\Controllers\Account\ListingsController;
 use App\Http\Controllers\Account\ListingStatsController;
 use App\Http\Controllers\Account\PostListingController;
 use App\Http\Controllers\Account\PromoteController;
+use App\Http\Controllers\Account\ReviewsController;
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\ContactRevealController;
 use App\Http\Controllers\CountryController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\SellerReviewController;
 use App\Http\Controllers\SuggestController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\AuditLogViewer;
@@ -150,6 +152,14 @@ Route::get('/page/{slug}', [PageController::class, 'show'])->where('slug', '[a-z
 Route::get('/ad/{slugId}', [ListingController::class, 'show'])->where('slugId', '[A-Za-z0-9-]*-[0-9]+')->name('listing.show');
 Route::get('/seller/{idSlug}', [SellerController::class, 'show'])->where('idSlug', '[0-9]+(-[A-Za-z0-9-]*)?')->name('seller.show');
 Route::get('/ads', [SearchController::class, 'global'])->middleware('throttle:search')->name('ads.global');
+// Seller ratings (G5, ADR-027): buyers who contacted the seller rate them; sellers reply once.
+Route::post('/seller/{seller}/reviews', [SellerReviewController::class, 'store'])->whereNumber('seller')
+    ->middleware(['auth', 'verified', 'throttle:review'])->name('seller.reviews.store');
+Route::middleware(['auth', 'verified'])->prefix('account/reviews')->name('account.reviews')->controller(ReviewsController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/{review}/reply', 'reply')->whereNumber('review')->middleware('throttle:review')->name('.reply');
+});
+
 // Live search suggestions (G1, ADR-027): JSON for the search boxes.
 Route::get('/search/suggest', SuggestController::class)->middleware('throttle:suggest')->name('search.suggest');
 
