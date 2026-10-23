@@ -53,6 +53,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.audit' => Permissions::AUDIT_VIEW,
         'admin.boosts' => Permissions::BOOSTS_MANAGE,
         'admin.boost-prices' => Permissions::BOOSTS_MANAGE,
+        'admin.reviews' => Permissions::REVIEWS_MODERATE,
         'admin.orders' => Permissions::BOOSTS_MANAGE,
         'admin.users' => Permissions::USERS_VIEW,
         'admin.design-system' => Permissions::SETTINGS_MANAGE,
@@ -90,7 +91,7 @@ class AuthorizationSweepTest extends TestCase
         'listings.photos.cover' => 'owned', 'listings.photos.destroy' => 'owned', 'account.listings.stats' => 'owned',
         'account.listings.promote' => 'owned', 'account.listings.promote.store' => 'owned',
         'account.orders' => 'verified', 'account.orders.show' => 'owned', 'account.orders.cancel' => 'owned',
-        'seller.reviews.store' => 'verified', 'account.reviews' => 'verified', 'account.reviews.reply' => 'owned',
+        'seller.reviews.store' => 'verified', 'account.reviews' => 'verified', 'account.reviews.reply' => 'owned', 'reviews.report' => 'verified',
     ] + self::ADMIN_CLASSES;
 
     private const ADMIN_CLASSES = [
@@ -98,7 +99,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.categories' => 'admin', 'admin.attributes' => 'admin', 'admin.locations' => 'admin', 'admin.countries' => 'admin',
         'admin.location-requests' => 'admin', 'admin.pages' => 'admin', 'admin.blocklist' => 'admin', 'admin.audit' => 'admin',
         'admin.users' => 'admin', 'admin.design-system' => 'admin', 'admin.settings' => 'admin', 'admin.staff' => 'admin',
-        'admin.boosts' => 'admin', 'admin.boost-prices' => 'admin', 'admin.orders' => 'admin',
+        'admin.boosts' => 'admin', 'admin.boost-prices' => 'admin', 'admin.orders' => 'admin', 'admin.reviews' => 'admin',
     ];
 
     /** Framework and package internals: not application endpoints. */
@@ -163,7 +164,7 @@ class AuthorizationSweepTest extends TestCase
     {
         // docs/architecture/05-authorization.md §3, written out (Owner: everything).
         $moderator = [Permissions::ACCESS_ADMIN, Permissions::LISTINGS_VIEW_ANY, Permissions::LISTINGS_MODERATE, Permissions::LISTINGS_SUSPEND,
-            Permissions::REPORTS_VIEW, Permissions::REPORTS_RESOLVE, Permissions::USERS_VIEW, Permissions::BLOCKLIST_MANAGE];
+            Permissions::REPORTS_VIEW, Permissions::REPORTS_RESOLVE, Permissions::USERS_VIEW, Permissions::BLOCKLIST_MANAGE, Permissions::REVIEWS_MODERATE];
         $adminLacks = [Permissions::USERS_DELETE, Permissions::SETTINGS_MANAGE, Permissions::STAFF_MANAGE];
 
         foreach (Permissions::all() as $permission) {
@@ -352,7 +353,7 @@ class AuthorizationSweepTest extends TestCase
             'listings.update' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.photos.move', 'listings.photos.cover', 'listings.photos.destroy' => ['listing' => $listing->id, 'image' => $this->image->id],
             'account.orders.show', 'account.orders.cancel' => ['order' => $this->memberOrder->id],
-            'account.reviews.reply' => ['review' => $this->memberReview->id],
+            'account.reviews.reply', 'reviews.report' => ['review' => $this->memberReview->id],
             'seller.reviews.store' => ['seller' => $this->member->id],
             'listings.contact-options', 'listings.submit', 'listings.submitted', 'listings.photos.store',
             'account.listings.sold', 'account.listings.renew', 'account.listings.destroy', 'account.listings.stats', 'account.listings.promote', 'account.listings.promote.store', 'listings.favourite' => ['listing' => $listing->id],

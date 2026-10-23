@@ -65,6 +65,21 @@
                             <p class="prose-user whitespace-pre-line text-ui text-fg">{{ $review->reply }}</p>
                         </div>
                     @endif
+                    {{-- Report a review (G5b): any signed-in user except its author; staff decide. --}}
+                    @auth
+                        @if (auth()->id() !== $review->reviewer_id)
+                            <details class="mt-2 text-small" @if ($errors->{'report-'.$review->id}->any()) open @endif>
+                                <summary class="cursor-pointer text-fg-subtle hover:text-fg">{{ __('reviews.report') }}</summary>
+                                <form method="POST" action="{{ route('reviews.report', $review) }}" class="mt-2 space-y-2">
+                                    @csrf
+                                    <x-ui.select :label="__('reviews.report_reason')" id="report-reason-{{ $review->id }}" name="reason" required :error="$errors->{'report-'.$review->id}->first('reason')"
+                                        :options="__('reviews.report_reasons')" :placeholder="__('reviews.report_choose')" />
+                                    <x-ui.textarea :label="__('reviews.report_details')" id="report-details-{{ $review->id }}" name="details" rows="2" maxlength="500" />
+                                    <x-ui.button type="submit" size="sm" variant="secondary">{{ __('reviews.report_send') }}</x-ui.button>
+                                </form>
+                            </details>
+                        @endif
+                    @endauth
                 </li>
             @endforeach
         </ul>

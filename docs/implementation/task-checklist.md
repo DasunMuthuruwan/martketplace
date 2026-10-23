@@ -98,7 +98,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] G3 Share to WhatsApp and Facebook — merged 2026-10-22
   - [x] G4 Make/model pages and price guide — merged 2026-10-22
   - [x] G5a Seller ratings (eligibility, stars, comments, replies) — merged 2026-10-23
-  - [ ] G5b Review moderation, reporting and trust badges
+  - [~] G5b Review moderation, reporting and trust badges — awaiting review on `feature/G5b-review-moderation`
   - [ ] G6 QA and docs
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations

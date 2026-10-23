@@ -7,6 +7,7 @@ use App\Models\SellerReview;
 use App\Models\User;
 use App\Services\Listings\ListingPresenter;
 use App\Services\Reviews\SellerReviews;
+use App\Services\Reviews\TrustBadges;
 use App\Services\Seo\PageSeo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -44,6 +45,7 @@ class SellerController extends Controller
             'present' => $present,
             // Ratings (G5, ADR-027): summary, published reviews, and the form for eligible buyers.
             'reviewSummary' => $reviews->summary($seller),
+            'trusted' => app(TrustBadges::class)->isTrusted($seller),
             'reviews' => $reviews->published($seller),
             'canReview' => $reviews->eligibleListing($viewer, $seller) !== null,
             'myReview' => $viewer === null ? null : SellerReview::where('seller_id', $seller->id)->where('reviewer_id', $viewer->id)->first(),

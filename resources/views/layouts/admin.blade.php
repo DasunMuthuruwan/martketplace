@@ -10,6 +10,10 @@
         if (auth()->user()?->can(\App\Authorization\Permissions::REPORTS_VIEW)) {
             $adminBadges['reports'] = \App\Models\Report::where('status', \App\Enums\ReportStatus::Open)->count() ?: null;
         }
+        if (auth()->user()?->can(\App\Authorization\Permissions::REVIEWS_MODERATE)) {
+            $adminBadges['reviews'] = \App\Models\SellerReview::where('status', 'published')
+                ->where(fn ($q) => $q->where('comment_status', 'pending')->orWhereNotNull('reported_at'))->count() ?: null;
+        }
         if (auth()->user()?->can(\App\Authorization\Permissions::BOOSTS_MANAGE)) {
             $adminBadges['orders'] = \App\Models\BoostOrder::where('status', \App\Enums\BoostOrderStatus::Pending)->count() ?: null;
         }

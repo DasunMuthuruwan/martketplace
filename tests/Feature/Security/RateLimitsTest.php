@@ -51,6 +51,7 @@ class RateLimitsTest extends TestCase
         'ads.make' => 'search',
         'seller.reviews.store' => 'review',
         'account.reviews.reply' => 'review',
+        'reviews.report' => 'report',
     ];
 
     /** Limiter => list of [max attempts, decay seconds] for a signed-in request (security doc §3). */

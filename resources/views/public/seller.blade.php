@@ -15,6 +15,7 @@
                 @endif
                 <span>{{ trans_choice('public.ads_count', $listings->total(), ['count' => number_format($listings->total())]) }}</span>
                 @include('public.partials.rating-summary', ['summary' => $reviewSummary])
+                @if ($trusted)<x-ui.badge variant="success" data-trusted-seller>{{ __('reviews.trusted') }}</x-ui.badge>@endif
             </p>
         </div>
     </section>

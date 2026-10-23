@@ -42,6 +42,7 @@
 | `settings.manage` | Site settings (moderation mode, limits, contact toggles, expiry, retention) |
 | `staff.manage` | Assign or remove staff roles, adjust role permissions |
 | `audit.view` | View audit log |
+| `reviews.moderate` | Approve or reject review comments, keep or remove reported reviews (G5b, ADR-027) |
 | `boosts.manage` | Grant and end paid boosts; later orders and prices (ADR-026, B3; synced to existing databases by migration `2026_10_21_000002`) |
 
 ## 3. Role Matrix
@@ -69,6 +70,7 @@
 | staff.manage | ✔ | — | — |
 | audit.view | ✔ | ✔ | — |
 | boosts.manage | ✔ | ✔ | — |
+| reviews.moderate | ✔ | ✔ | ✔ |
 
 Owner is granted every permission explicitly. There is no blanket `Gate::before` bypass, so a forgotten permission check shows up in tests. The matrix is seeded and Owner-editable later (`staff.manage`) [RECOMMENDED: keep it fixed in the MVP; make it editable post-MVP].
 

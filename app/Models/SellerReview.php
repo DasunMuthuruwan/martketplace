@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -23,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $reply
  * @property Carbon|null $replied_at
  * @property string $status
+ * @property Carbon|null $reported_at
  * @property string|null $removed_reason
  * @property int|null $moderated_by
  * @property Carbon|null $moderated_at
@@ -51,6 +53,7 @@ class SellerReview extends Model
         return [
             'rating' => 'integer',
             'replied_at' => 'datetime',
+            'reported_at' => 'datetime',
             'moderated_at' => 'datetime',
         ];
     }
@@ -71,6 +74,12 @@ class SellerReview extends Model
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class)->withTrashed();
+    }
+
+    /** @return HasMany<ReviewReport, $this> */
+    public function reports(): HasMany
+    {
+        return $this->hasMany(ReviewReport::class, 'review_id');
     }
 
     /** @param  Builder<SellerReview>  $query */

@@ -122,6 +122,11 @@ return [
         'min_account_days' => 7,
         'min_for_average' => 3,
         'per_day_user' => 10,
+        // "Trusted seller" (G5b, E6); the day, sold and review counts are Owner settings.
+        'trusted_min_days' => 90,
+        'trusted_min_sold' => 5,
+        'trusted_min_reviews' => 5,
+        'trusted_min_average' => 4.5,
     ],
 
     // Price guide on make/model pages (G4): shown from this many ads for sale.

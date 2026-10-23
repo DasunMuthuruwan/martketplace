@@ -98,6 +98,7 @@ class PageStructureTest extends TestCase
             'admin boosts' => ['owner', 'admin.boosts'],
             'admin boost prices' => ['owner', 'admin.boost-prices'],
             'admin orders' => ['owner', 'admin.orders'],
+            'admin reviews' => ['owner', 'admin.reviews'],
             'admin audit' => ['owner', 'admin.audit'],
             'admin users' => ['owner', 'admin.users'],
             'admin settings' => ['owner', 'admin.settings'],

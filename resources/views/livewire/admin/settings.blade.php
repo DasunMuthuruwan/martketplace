@@ -39,6 +39,16 @@
             <x-ui.checkbox type="switch" :label="__('admin.settings.boost_sales')" :hint="__('admin.settings.boost_sales_help')" id="s-boost-sales" wire:model="values.boost_sales_enabled" :checked="(bool) ($values['boost_sales_enabled'] ?? false)" />
         </section>
 
+        <section aria-labelledby="s-trust" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
+            <h2 id="s-trust" class="text-h3 font-semibold">{{ __('admin.settings.trust') }}</h2>
+            <div class="grid gap-3 sm:grid-cols-3">
+                <x-ui.input type="number" :label="__('admin.settings.trusted_min_days')" id="s-trusted-days" wire:model="values.trusted_min_days" min="0" max="3650" :error="$errors->first('values.trusted_min_days')" />
+                <x-ui.input type="number" :label="__('admin.settings.trusted_min_sold')" id="s-trusted-sold" wire:model="values.trusted_min_sold" min="0" max="1000" :error="$errors->first('values.trusted_min_sold')" />
+                <x-ui.input type="number" :label="__('admin.settings.trusted_min_reviews')" id="s-trusted-reviews" wire:model="values.trusted_min_reviews" min="1" max="1000" :error="$errors->first('values.trusted_min_reviews')" />
+            </div>
+            <p class="text-small text-fg-subtle">{{ __('admin.settings.trusted_help') }}</p>
+        </section>
+
         <section aria-labelledby="s-contact" class="space-y-3 rounded-card border border-line bg-surface p-4 lg:p-5">
             <h2 id="s-contact" class="text-h3 font-semibold">{{ __('admin.settings.contact') }}</h2>
             <x-ui.checkbox type="switch" :label="__('admin.settings.contact_call')" id="s-call" wire:model="values.contact_call" :checked="(bool) ($values['contact_call'] ?? false)" />

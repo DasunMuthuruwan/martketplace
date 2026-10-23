@@ -8,6 +8,7 @@
             ['admin.moderation', 'shield-check', __('admin.nav.moderation'), P::LISTINGS_MODERATE, $adminBadges['pending'] ?? null],
             ['admin.changes', 'clock', __('admin.nav.changes'), P::LISTINGS_MODERATE, null],
             ['admin.reports', 'flag', __('admin.nav.reports'), P::REPORTS_VIEW, $adminBadges['reports'] ?? null],
+            ['admin.reviews', 'badge-check', __('admin.nav.reviews'), P::REVIEWS_MODERATE, $adminBadges['reviews'] ?? null],
         ],
         __('admin.groups.catalogue') => [
             ['admin.categories', 'list', __('admin.nav.categories'), P::CATEGORIES_MANAGE, null],

@@ -8,6 +8,9 @@
         </span>
     </a>
     <ul class="mt-3 space-y-1 text-small text-fg-muted">
+        @if ($sellerTrusted ?? false)
+            <li class="flex items-center gap-1.5" data-trusted-seller><x-ui.icon name="shield-check" size="16" class="text-success" />{{ __('reviews.trusted') }}</li>
+        @endif
         @if (($reviewSummary['count'] ?? 0) > 0)
             <li>@include('public.partials.rating-summary', ['summary' => $reviewSummary])</li>
         @endif

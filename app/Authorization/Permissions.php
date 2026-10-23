@@ -53,6 +53,9 @@ final class Permissions
     /** Grant and end paid boosts (ADR-026); orders and prices join it in B4–B5. */
     public const BOOSTS_MANAGE = 'boosts.manage';
 
+    /** Approve or reject review comments, keep or remove reported reviews (G5b, ADR-027). */
+    public const REVIEWS_MODERATE = 'reviews.moderate';
+
     /**
      * @return list<string>
      */
@@ -85,6 +88,7 @@ final class Permissions
                 self::REPORTS_RESOLVE,
                 self::USERS_VIEW,
                 self::BLOCKLIST_MANAGE,
+                self::REVIEWS_MODERATE,
             ],
         ];
     }

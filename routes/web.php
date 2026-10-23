@@ -17,6 +17,7 @@ use App\Http\Controllers\EngagementController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\ReviewReportController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
@@ -38,6 +39,7 @@ use App\Livewire\Admin\ModerationQueue;
 use App\Livewire\Admin\PagesAdmin;
 use App\Livewire\Admin\RecentChanges;
 use App\Livewire\Admin\ReportsQueue;
+use App\Livewire\Admin\ReviewsAdmin;
 use App\Livewire\Admin\SettingsAdmin;
 use App\Livewire\Admin\StaffAdmin;
 use App\Livewire\Admin\UsersAdmin;
@@ -132,6 +134,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/locations/requests', LocationRequestsAdmin::class)->middleware('can:'.Permissions::LOCATIONS_MANAGE)->name('location-requests');
         Route::livewire('/pages', PagesAdmin::class)->middleware('can:'.Permissions::PAGES_MANAGE)->name('pages');
         Route::livewire('/blocklist', BlocklistAdmin::class)->middleware('can:'.Permissions::BLOCKLIST_MANAGE)->name('blocklist');
+        Route::livewire('/reviews', ReviewsAdmin::class)->middleware('can:'.Permissions::REVIEWS_MODERATE)->name('reviews');
         Route::livewire('/orders', BoostOrdersAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('orders');
         Route::livewire('/boosts', BoostsAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boosts');
         Route::livewire('/boosts/prices', BoostPricesAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boost-prices');
@@ -155,6 +158,8 @@ Route::get('/ads', [SearchController::class, 'global'])->middleware('throttle:se
 // Seller ratings (G5, ADR-027): buyers who contacted the seller rate them; sellers reply once.
 Route::post('/seller/{seller}/reviews', [SellerReviewController::class, 'store'])->whereNumber('seller')
     ->middleware(['auth', 'verified', 'throttle:review'])->name('seller.reviews.store');
+Route::post('/reviews/{review}/report', ReviewReportController::class)->whereNumber('review')
+    ->middleware(['auth', 'verified', 'throttle:report'])->name('reviews.report');
 Route::middleware(['auth', 'verified'])->prefix('account/reviews')->name('account.reviews')->controller(ReviewsController::class)->group(function () {
     Route::get('/', 'index');
     Route::post('/{review}/reply', 'reply')->whereNumber('review')->middleware('throttle:review')->name('.reply');
