@@ -84,6 +84,7 @@ test.describe('seller', () => {
         ['security', '/account/settings/security'],
         ['contact settings', '/account/settings/contact'],
         ['post: category', '/account/listings/create'],
+        ['my reviews', '/account/reviews'],
     ]) {
         test(name, async ({ page }) => {
             await scan(page, path);
@@ -131,5 +132,9 @@ test.describe('moderator', () => {
 
     test('recent changes', async ({ page }) => {
         await scan(page, '/admin/moderation/changes');
+    });
+
+    test('reviews', async ({ page }) => {
+        await scan(page, '/admin/reviews');
     });
 });

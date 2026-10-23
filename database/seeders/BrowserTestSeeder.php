@@ -9,6 +9,7 @@ use App\Models\BoostPrice;
 use App\Models\BoostProduct;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\ContactReveal;
 use App\Models\Country;
 use App\Models\Listing;
 use App\Models\Page;
@@ -89,6 +90,12 @@ class BrowserTestSeeder extends Seeder
                 'country_id' => $country->id, 'currency' => $country->default_currency, 'amount' => $amount]);
         }
         BankTransferAccount::create(['country_id' => $country->id, 'bank_name' => 'Test Bank', 'account_name' => 'Marketplace Test', 'account_number' => '0001112223', 'is_active' => true]);
+
+        // A buyer who may rate the seller (G5): account 30 days old, revealed the number 5 days ago.
+        $buyer = User::factory()->create(['name' => 'Bimal Buyer', 'email' => 'buyer@browser.test', 'password' => $password, 'created_at' => now()->subDays(30)]);
+        $reveal = new ContactReveal(['listing_id' => Listing::where('user_id', $seller->id)->where('status', ListingStatus::Active)->value('id'),
+            'user_id' => $buyer->id, 'channel' => ContactReveal::CALL, 'ip_hash' => str_repeat('0', 64)]);
+        $reveal->forceFill(['created_at' => now()->subDays(5)])->save();
 
         // Views and searches this week, so the accessibility scans cover the popular and trending blocks (G2).
         foreach (Listing::where('country_id', $country->id)->where('status', ListingStatus::Active)->limit(3)->pluck('id') as $id) {

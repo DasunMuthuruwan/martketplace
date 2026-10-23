@@ -99,7 +99,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] G4 Make/model pages and price guide — merged 2026-10-22
   - [x] G5a Seller ratings (eligibility, stars, comments, replies) — merged 2026-10-23
   - [x] G5b Review moderation, reporting and trust badges — merged 2026-10-23
-  - [ ] G6 QA and docs
+  - [~] G6 QA and docs — awaiting approval
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 

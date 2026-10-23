@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Listing;
 use App\Services\Search\MysqlListingSearch;
+use App\Services\Search\SearchTerms;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -67,7 +68,8 @@ class Trends
                 ->selectRaw('SUM(CASE WHEN date < ? THEN searches ELSE 0 END) as last_week', [$week])
                 ->get();
 
-            return $rows->filter(fn ($r) => (int) $r->this_week >= (int) config('marketplace.search.min_searches') && (int) $r->this_week > (int) $r->last_week)
+            return $rows->filter(fn ($r) => (int) $r->this_week >= (int) config('marketplace.search.min_searches') && (int) $r->this_week > (int) $r->last_week
+                    && ! SearchTerms::looksPersonal((string) $r->term))
                 ->sortByDesc(fn ($r) => [(int) $r->this_week - (int) $r->last_week, (int) $r->this_week])
                 ->take($limit)
                 ->map(fn ($r) => ['term' => (string) $r->term, 'searches' => (int) $r->this_week])

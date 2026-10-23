@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Accepted (owner, 2026-10-22: recommendations E1–E7, ratings included before deployment as originally requested).** Plan: implementation plan §7b (G1–G6), ADR-027. |
+| Status | **Accepted (owner, 2026-10-22: recommendations E1–E7, ratings included before deployment as originally requested). Built (G1–G6, 2026-10-23).** Plan: implementation plan §7b (G1–G6), ADR-027. Owner guide: [audience-features.md](../operations/audience-features.md). |
 | Date | 2026-10-22 (requested by the owner before the deployment plan) |
 | Builds on | Requirements (SRCH-09 saved searches, MSG-08 messaging, NFR-U5 Sinhala/Tamil ready, GLB-20 translations), global marketplace rules (everything per country, nothing hardcoded), paid boosts (ADR-026: view counts per ad and day already exist) |
 

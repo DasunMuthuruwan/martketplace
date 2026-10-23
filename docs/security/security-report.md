@@ -18,7 +18,7 @@
 | S-04 | Medium | A password reset left the account's other sessions signed in (an intruder stayed in) | A reset ends every session and cycles the remember token | `PasswordResetTest`: fails without the fix |
 | S-05 | Medium | No security emails: password, email or 2FA changes went unnoticed; an intruder could change the email, then the password | `SecurityChange` notices after a password change or reset, 2FA off, new recovery codes, and an email change (sent to the old address) | `SecurityChangeNoticesTest` (12 tests) |
 
-No High findings. Nothing was found that exposes another user's data or allows an account takeover without the victim's credentials.
+No High findings. S-06 (Low, privacy) was found in the G6 pass after this review and fixed; see §7 and the findings log. Nothing was found that exposes another user's data or allows an account takeover without the victim's credentials.
 
 ## 2. What Was Checked
 
@@ -86,3 +86,23 @@ Phase 8 added 15 security test files (`tests/Feature/Security/`).
 | Full suites | see [QA report §7](../qa/qa-report.md) |
 | Production configuration | `php artisan marketplace:check-production` (on the host) |
 | Dependencies | `composer audit` (with PHP 8.4), `npm audit` |
+
+## 7. Addendum: Features Added After Phase 8 (2026-10-23)
+
+Paid boosts (ADR-026) and the audience features (ADR-027) were built after this review, before deployment. Each was reviewed against the same checklist as it was built; G6 added a final pass over the audience features.
+
+| Area | Check | Result | Tests |
+|---|---|---|---|
+| Boosts: payment amounts | The price is never taken from the form; staff cannot change the amount when marking paid | Amount always from the price table | `BoostSecurityTest` |
+| Boosts: bank details and staff notes | Shown to sellers, in emails and admin lists | Escaped everywhere | `BoostSecurityTest` |
+| Boosts: authorization | Sellers order only for their own live ads; staff cannot boost their own ads; permissions per screen | Enforced and audited | `AuthorizationSweepTest`, boost feature tests |
+| Reviews: text from users | Comments, seller replies and report details on the seller page and the moderation screen | Escaped | `AudienceFeaturesSecurityTest`, `StoredXssTest` |
+| Reviews: eligibility | Extra form fields (reviewer, seller, comment status, listing) | Ignored: eligibility comes from the buyer's own contact reveal; comments always wait for moderation | `AudienceFeaturesSecurityTest`, `SellerReviewsTest` |
+| Reviews: targets | Banned, unknown or non-seller accounts | 404, nothing stored | `AudienceFeaturesSecurityTest` |
+| Reviews: abuse | Limit 10 reviews a day per buyer; reports once per person, never by the author; staff never moderate reviews about or by themselves; blocklist screening of comments and replies | Enforced and audited | `SellerReviewsTest`, `ReviewModerationTest` |
+| Search counts: privacy | Counts per country, term and day only (no user, session or IP); bots not counted; pruned after 400 days | As designed | `LiveSearchTest`, `RetentionTest` |
+| Search counts: personal data | A term with a phone-length run of digits (7 or more, spaces ignored) | **Was recorded and could appear in popular searches once searched 5+ times (fixed in G6, S-06):** never recorded, never shown in suggestions, popular or trending searches | `AudienceFeaturesSecurityTest` |
+| Suggestions | Rare terms (under 5 searches), emails and phone numbers; rate limit 180/min per IP | Never shown; limited | `AudienceFeaturesSecurityTest`, `LiveSearchTest` |
+| Share links | Service addresses come from configuration; no phone number in the link | As designed | `ShareLinksTest`, `ListingPageTest` |
+
+Residual risk added: seller ratings depend on unverifiable deals (a buyer who revealed a number may not have bought). Mitigated by the contact requirement, account age, moderation of comments, reporting and the trust rules; the review rules in the Terms need legal review before launch (owner).

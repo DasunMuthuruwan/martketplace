@@ -385,3 +385,36 @@ test('live search suggests a town while typing and opens it with the keyboard', 
     }
     await Promise.all([page.waitForURL(/\/lk\/ads\/in\/[a-z0-9-]+\/nugegoda/), box.press('Enter')]);
 });
+
+test('a buyer who contacted the seller rates them, and the comment appears once a moderator approves it', async ({ page }) => {
+    // Buyer: from an ad to the seller's page, then the rating form.
+    await logIn(page, 'buyer@browser.test');
+    await page.goto('/lk/ads');
+    await Promise.all([page.waitForLoadState('networkidle'), page.locator('main a[href*="/ad/"]').first().click()]);
+    await Promise.all([page.waitForLoadState('networkidle'), page.locator('a[href*="/seller/"]').first().click()]);
+    const sellerUrl = page.url();
+    const form = page.locator('[data-review-form]');
+    await expect(form).toBeVisible();
+    await form.locator('label:has(input[name="rating"][value="5"])').click();
+    await form.locator('label:has(input[name="deal"][value="yes"])').click();
+    await form.locator('textarea[name="comment"]').fill('Quick replies and the car was exactly as described.');
+    await Promise.all([page.waitForLoadState('networkidle'), form.getByRole('button', { name: 'Send review' }).click()]);
+    // The confirmation appears twice on the page (strict mode needs one element).
+    await expect(page.getByText(/Thank you\. Your rating is published/).first()).toBeVisible();
+    await logOut(page);
+
+    // Visitors see the stars at once, not yet the comment.
+    await page.goto(sellerUrl);
+    await expect(page.locator('[data-review]').first()).toContainText('★★★★★');
+    await expect(page.getByText('Quick replies and the car was exactly as described.')).toHaveCount(0);
+
+    // Moderator approves the comment.
+    await logIn(page, 'moderator@browser.test');
+    await page.goto('/admin/reviews');
+    await page.getByRole('button', { name: 'Approve comment' }).first().click();
+    await expect(page.getByText('The comment is now shown.')).toBeVisible();
+    await logOut(page);
+
+    await page.goto(sellerUrl);
+    await expect(page.getByText('Quick replies and the car was exactly as described.')).toBeVisible();
+});

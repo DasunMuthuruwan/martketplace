@@ -30,10 +30,16 @@ class SearchTerms
         return mb_strlen($term) >= 2 ? trim($term) : null;
     }
 
+    /** A phone number or similar (7+ digits, spaces ignored): never stored or shown. */
+    public static function looksPersonal(string $term): bool
+    {
+        return preg_match('/\d{7,}/', str_replace(' ', '', $term)) === 1;
+    }
+
     public function record(Request $request, ?Country $country, ?string $keyword): void
     {
         $term = self::normalise($keyword);
-        if ($term === null || Bots::is($request)) {
+        if ($term === null || Bots::is($request) || self::looksPersonal($term)) {
             return;
         }
         $today = now()->toDateString();
@@ -76,7 +82,8 @@ class SearchTerms
             ->orderBy('term')
             ->limit($limit)
             ->get([DB::raw('term'), DB::raw('SUM(searches) as total')])
+            ->reject(fn ($row) => self::looksPersonal((string) $row->term))
             ->map(fn ($row) => ['term' => (string) $row->term, 'searches' => (int) $row->total])
-            ->all();
+            ->values()->all();
     }
 }
