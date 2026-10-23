@@ -97,7 +97,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] G2 Popular, trending, most marked as sold — merged 2026-10-22
   - [x] G3 Share to WhatsApp and Facebook — merged 2026-10-22
   - [x] G4 Make/model pages and price guide — merged 2026-10-22
-  - [~] G5a Seller ratings (eligibility, stars, comments, replies) — awaiting review on `feature/G5a-seller-ratings`
+  - [x] G5a Seller ratings (eligibility, stars, comments, replies) — merged 2026-10-23
   - [ ] G5b Review moderation, reporting and trust badges
   - [ ] G6 QA and docs
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
