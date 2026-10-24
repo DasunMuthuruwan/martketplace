@@ -6,6 +6,7 @@ use App\Enums\BoostOrderStatus;
 use App\Enums\BoostType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
@@ -28,6 +29,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $expires_at
  * @property Carbon|null $paid_at
  * @property Carbon|null $closed_at
+ * @property Carbon|null $proof_at
+ * @property Carbon|null $transfer_date
+ * @property string|null $transfer_note
  * @property int|null $handled_by
  * @property string|null $note
  * @property Carbon $created_at
@@ -48,7 +52,15 @@ class BoostOrder extends Model
             'expires_at' => 'datetime',
             'paid_at' => 'datetime',
             'closed_at' => 'datetime',
+            'proof_at' => 'datetime',
+            'transfer_date' => 'date',
         ];
+    }
+
+    /** @return HasMany<PaymentProof, $this> */
+    public function proofs(): HasMany
+    {
+        return $this->hasMany(PaymentProof::class)->orderBy('id');
     }
 
     /** @return BelongsTo<User, $this> */

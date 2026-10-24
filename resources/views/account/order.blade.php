@@ -40,6 +40,11 @@
             @endif
             <p class="text-small text-fg-muted">{{ __('boosts.order.pay_by', ['date' => $order->expires_at?->toFormattedDayDateString()]) }}</p>
         </section>
+    @endif
+
+    @include('account.partials.payment-proofs')
+
+    @if ($order->status->isOpen())
 
         <x-ui.button variant="ghost" icon="x" class="text-danger" data-modal-open="cancel-order">{{ __('boosts.order.cancel') }}</x-ui.button>
         <x-ui.modal id="cancel-order" :title="__('boosts.order.cancel')" size="sm">

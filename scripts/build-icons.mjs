@@ -16,7 +16,7 @@ export const ICONS = [
     // Theme
     'sun', 'moon', 'monitor',
     // Listing and contact
-    'phone', 'message-circle', 'share-2', 'flag', 'map-pin', 'clock', 'image', 'camera', 'upload',
+    'phone', 'message-circle', 'share-2', 'flag', 'map-pin', 'clock', 'image', 'camera', 'upload', 'file-text',
     'trash-2', 'pencil', 'eye', 'eye-off', 'globe',
     // Status
     'check', 'circle-check', 'circle-alert', 'triangle-alert', 'info', 'shield-check', 'badge-check', 'loader-circle',

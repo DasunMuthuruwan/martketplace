@@ -10,6 +10,8 @@
         <x-ui.input type="search" :label="__('admin.orders.search')" id="o-q" wire:model.live.debounce.400ms="q" maxlength="16" class="min-w-56" />
         <x-ui.select :label="__('boosts.order.status_label')" id="o-status" wire:model.live="status" :placeholder="__('public.any')" class="min-w-48"
             :options="__('boosts.order.status')" />
+        <x-ui.select :label="__('admin.orders.proof_filter')" id="o-proof" wire:model.live="proof" :placeholder="__('admin.orders.proof_any')" class="min-w-44"
+            :options="['with' => __('admin.orders.proof_with'), 'without' => __('admin.orders.proof_without')]" />
     </div>
 
     @if ($orders->isEmpty())
@@ -31,6 +33,9 @@
                         <td data-label="{{ __('boosts.order.reference') }}">
                             <span class="tabular font-semibold text-fg">{{ $order->reference }}</span>
                             <span class="block text-small text-fg-subtle">{{ $order->created_at->toFormattedDateString() }} · {{ $order->user?->name ?? __('account.deleted_user') }}</span>
+                            @if ($order->proofs->isNotEmpty())
+                                <x-ui.badge variant="info" class="mt-1" data-proof-received>{{ __('boosts.proof.received') }}</x-ui.badge>
+                            @endif
                         </td>
                         <td data-label="{{ __('boosts.order.ad') }}" class="min-w-0">
                             @if ($order->listing && $order->listing->isPublic())
@@ -47,6 +52,11 @@
                         </td>
                         <td class="text-right">
                             <div class="flex flex-wrap justify-end gap-1">
+                                @if ($order->proofs->isNotEmpty())
+                                    <x-ui.button size="sm" variant="secondary" icon="file-text" wire:click="toggleProof({{ $order->id }})" aria-expanded="{{ $proofId === $order->id ? 'true' : 'false' }}" aria-controls="order-proof-{{ $order->id }}">
+                                        {{ $proofId === $order->id ? __('admin.orders.hide_proof') : __('admin.orders.show_proof', ['count' => $order->proofs->count()]) }}<span class="sr-only"> {{ $order->reference }}</span>
+                                    </x-ui.button>
+                                @endif
                                 @if ($order->status->value === 'pending')
                                     <x-ui.button size="sm" icon="check" wire:click="start({{ $order->id }}, 'paid')">{{ __('admin.orders.mark_paid') }}<span class="sr-only"> {{ $order->reference }}</span></x-ui.button>
                                     <x-ui.button size="sm" variant="ghost" wire:click="start({{ $order->id }}, 'cancel')">{{ __('admin.orders.cancel') }}<span class="sr-only"> {{ $order->reference }}</span></x-ui.button>
@@ -56,6 +66,40 @@
                             </div>
                         </td>
                     </tr>
+                    @if ($proofId === $order->id && $order->proofs->isNotEmpty())
+                        <tr wire:key="order-{{ $order->id }}-proof">
+                            <td colspan="5">
+                                <section id="order-proof-{{ $order->id }}" aria-labelledby="order-proof-title-{{ $order->id }}" class="space-y-3 rounded-card bg-surface-muted p-3" data-order-proof>
+                                    <h3 id="order-proof-title-{{ $order->id }}" class="text-ui font-semibold text-fg">{{ __('admin.orders.proof_title', ['reference' => $order->reference]) }}</h3>
+                                    <x-ui.alert variant="warning">{{ __('admin.orders.proof_warning') }}</x-ui.alert>
+                                    @if ($order->transfer_date || $order->transfer_note)
+                                        <dl class="grid gap-x-4 gap-y-1 text-small sm:grid-cols-[12rem_minmax(0,1fr)]">
+                                            @if ($order->transfer_date)<dt class="text-fg-muted">{{ __('admin.orders.transfer_date') }}</dt><dd class="text-fg">{{ $order->transfer_date->toFormattedDateString() }}</dd>@endif
+                                            @if ($order->transfer_note)<dt class="text-fg-muted">{{ __('admin.orders.transfer_note') }}</dt><dd class="prose-user text-fg">{{ $order->transfer_note }}</dd>@endif
+                                        </dl>
+                                    @endif
+                                    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                        @foreach ($order->proofs as $proof)
+                                            <li wire:key="proof-{{ $proof->id }}" class="min-w-0 rounded-control border border-line bg-surface p-2">
+                                                @if ($proof->isPdf())
+                                                    <a href="{{ route('admin.orders.proof', $proof) }}" class="flex items-center gap-2 text-ui text-fg hover:underline">
+                                                        <x-ui.icon name="file-text" size="20" class="text-fg-muted" /><span class="truncate">{{ $proof->original_name }}</span>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('admin.orders.proof', $proof) }}" target="_blank" rel="noopener" class="block">
+                                                        <img src="{{ route('admin.orders.proof', $proof) }}" alt="{{ __('admin.orders.proof_image', ['n' => $loop->iteration, 'reference' => $order->reference]) }}"
+                                                            loading="lazy" class="max-h-80 w-full rounded-control object-contain">
+                                                    </a>
+                                                    <span class="mt-1 block truncate text-small text-fg-subtle">{{ $proof->original_name }}</span>
+                                                @endif
+                                                <span class="block text-small text-fg-subtle">{{ \Illuminate\Support\Number::fileSize($proof->bytes) }} · {{ $proof->created_at->toFormattedDateString() }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </section>
+                            </td>
+                        </tr>
+                    @endif
                     @if ($actingId === $order->id)
                         <tr wire:key="order-{{ $order->id }}-action">
                             <td colspan="5">

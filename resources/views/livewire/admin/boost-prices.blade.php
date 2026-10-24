@@ -6,13 +6,19 @@
         <x-ui.alert variant="success" role="status" class="mb-4">{{ session('status') }}</x-ui.alert>
     @endif
 
-    <x-ui.alert :variant="$open ? 'success' : 'info'" class="mb-4" data-sales-state>
-        @if (! $salesEnabled)
-            {{ __('admin.boost_prices.sales_off') }}
-        @elseif ($open)
+    <x-ui.alert :variant="$missing === [] ? 'success' : 'info'" class="mb-4" data-sales-state>
+        @if ($missing === [])
             {{ __('admin.boost_prices.open', ['country' => $country->name]) }}
+        @elseif ($country)
+            @unless ($salesEnabled)<p class="mb-1">{{ __('admin.boost_prices.sales_off') }}</p>@endunless
+            <p>{{ __('admin.boost_prices.not_open', ['country' => $country->name]) }}</p>
+            <ul class="mt-1 list-disc ps-5">
+                @foreach ($missing as $item)
+                    <li data-missing="{{ $item }}">{{ __('admin.boost_prices.missing.'.$item) }}</li>
+                @endforeach
+            </ul>
         @else
-            {{ __('admin.boost_prices.not_open') }}
+            {{ __('admin.boost_prices.sales_off') }}
         @endif
     </x-ui.alert>
 
@@ -33,7 +39,8 @@
                         @foreach ($products as $product)
                             <li wire:key="product-{{ $product->id }}" class="flex flex-wrap items-end gap-3 py-3">
                                 <div class="min-w-48 flex-1">
-                                    <p class="text-ui font-medium text-fg">{{ $product->name() }}</p>
+                                    <p class="text-ui font-medium text-fg">{{ $product->name() }}
+                                        <x-ui.badge :variant="$product->is_active ? 'success' : 'neutral'" class="ms-1" data-product-state="{{ $product->is_active ? 'on' : 'off' }}">{{ $product->is_active ? __('admin.boost_prices.on_sale') : __('admin.boost_prices.off') }}</x-ui.badge></p>
                                     <p class="text-small text-fg-subtle">{{ $product->is_active ? __('admin.boost_prices.product_on') : __('admin.boost_prices.product_off') }}</p>
                                 </div>
                                 <x-ui.input :label="__('admin.boost_prices.price', ['currency' => $currency->code])" id="bp-price-{{ $product->id }}" inputmode="decimal"

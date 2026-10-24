@@ -12,6 +12,7 @@ use App\Models\Country;
 use App\Models\Listing;
 use App\Models\ListingImage;
 use App\Models\Page;
+use App\Models\PaymentProof;
 use App\Models\Region;
 use App\Models\SellerReview;
 use App\Models\User;
@@ -19,6 +20,7 @@ use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as Router;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
@@ -55,6 +57,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.boost-prices' => Permissions::BOOSTS_MANAGE,
         'admin.reviews' => Permissions::REVIEWS_MODERATE,
         'admin.orders' => Permissions::BOOSTS_MANAGE,
+        'admin.orders.proof' => Permissions::BOOSTS_MANAGE,
         'admin.users' => Permissions::USERS_VIEW,
         'admin.design-system' => Permissions::SETTINGS_MANAGE,
         'admin.settings' => Permissions::SETTINGS_MANAGE,
@@ -91,6 +94,7 @@ class AuthorizationSweepTest extends TestCase
         'listings.photos.cover' => 'owned', 'listings.photos.destroy' => 'owned', 'account.listings.stats' => 'owned',
         'account.listings.promote' => 'owned', 'account.listings.promote.store' => 'owned',
         'account.orders' => 'verified', 'account.orders.show' => 'owned', 'account.orders.cancel' => 'owned',
+        'account.orders.proofs.store' => 'owned', 'account.orders.proofs.show' => 'owned', 'account.orders.proofs.destroy' => 'owned',
         'seller.reviews.store' => 'verified', 'account.reviews' => 'verified', 'account.reviews.reply' => 'owned', 'reviews.report' => 'verified',
     ] + self::ADMIN_CLASSES;
 
@@ -100,6 +104,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.location-requests' => 'admin', 'admin.pages' => 'admin', 'admin.blocklist' => 'admin', 'admin.audit' => 'admin',
         'admin.users' => 'admin', 'admin.design-system' => 'admin', 'admin.settings' => 'admin', 'admin.staff' => 'admin',
         'admin.boosts' => 'admin', 'admin.boost-prices' => 'admin', 'admin.orders' => 'admin', 'admin.reviews' => 'admin',
+        'admin.orders.proof' => 'admin',
     ];
 
     /** Framework and package internals: not application endpoints. */
@@ -119,6 +124,8 @@ class AuthorizationSweepTest extends TestCase
     private BoostOrder $memberOrder;
 
     private SellerReview $memberReview;
+
+    private PaymentProof $memberProof;
 
     protected function setUp(): void
     {
@@ -153,6 +160,13 @@ class AuthorizationSweepTest extends TestCase
         $this->memberOrder->forceFill([
             'reference' => 'BSWEEP001', 'user_id' => $this->member->id, 'listing_id' => $this->live->id, 'product_type' => 'bump',
             'country_id' => $lk->id, 'currency' => $this->live->currency, 'amount' => '100', 'status' => 'pending', 'expires_at' => now()->addWeek(),
+        ])->save();
+        Storage::fake('local');
+        Storage::disk('local')->put('payment-proofs/sweep.jpg', 'proof');
+        $this->memberProof = new PaymentProof;
+        $this->memberProof->forceFill([
+            'boost_order_id' => $this->memberOrder->id, 'user_id' => $this->member->id, 'kind' => PaymentProof::IMAGE,
+            'path' => 'payment-proofs/sweep.jpg', 'original_name' => 'slip.jpg', 'bytes' => 5, 'sha256' => str_repeat('b', 64),
         ])->save();
         $this->memberReview = new SellerReview;
         $this->memberReview->forceFill(['seller_id' => $this->member->id, 'reviewer_id' => $this->users['owner']->id, 'rating' => 4])->save();
@@ -352,7 +366,9 @@ class AuthorizationSweepTest extends TestCase
             'listings.edit' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.update' => ['listing' => $listing->id, 'step' => 'details'],
             'listings.photos.move', 'listings.photos.cover', 'listings.photos.destroy' => ['listing' => $listing->id, 'image' => $this->image->id],
-            'account.orders.show', 'account.orders.cancel' => ['order' => $this->memberOrder->id],
+            'account.orders.show', 'account.orders.cancel', 'account.orders.proofs.store' => ['order' => $this->memberOrder->id],
+            'account.orders.proofs.show', 'account.orders.proofs.destroy' => ['order' => $this->memberOrder->id, 'proof' => $this->memberProof->id],
+            'admin.orders.proof' => ['proof' => $this->memberProof->id],
             'account.reviews.reply', 'reviews.report' => ['review' => $this->memberReview->id],
             'seller.reviews.store' => ['seller' => $this->member->id],
             'listings.contact-options', 'listings.submit', 'listings.submitted', 'listings.photos.store',

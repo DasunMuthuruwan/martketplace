@@ -89,7 +89,7 @@ Phase 8 added 15 security test files (`tests/Feature/Security/`).
 
 ## 7. Addendum: Features Added After Phase 8 (2026-10-23)
 
-Paid boosts (ADR-026) and the audience features (ADR-027) were built after this review, before deployment. Each was reviewed against the same checklist as it was built; G6 added a final pass over the audience features.
+Paid boosts (ADR-026, including B7 proof of payment) and the audience features (ADR-027) were built after this review, before deployment. Each was reviewed against the same checklist as it was built; G6 added a final pass over the audience features.
 
 | Area | Check | Result | Tests |
 |---|---|---|---|
@@ -104,5 +104,6 @@ Paid boosts (ADR-026) and the audience features (ADR-027) were built after this 
 | Search counts: personal data | A term with a phone-length run of digits (7 or more, spaces ignored) | **Was recorded and could appear in popular searches once searched 5+ times (fixed in G6, S-06):** never recorded, never shown in suggestions, popular or trending searches | `AudienceFeaturesSecurityTest` |
 | Suggestions | Rare terms (under 5 searches), emails and phone numbers; rate limit 180/min per IP | Never shown; limited | `AudienceFeaturesSecurityTest`, `LiveSearchTest` |
 | Share links | Service addresses come from configuration; no phone number in the link | As designed | `ShareLinksTest`, `ListingPageTest` |
+| Boosts: proof of payment (B7, 2026-10-24) | Uploads by others, guests, unverified accounts; another order's proof by swapping ids; staff without the boosts permission; HTML, PHP, SVG, GIF and executables disguised as allowed types; PDFs with JavaScript, launch actions or attached files; oversized files; file names with paths or markup; caching; public reachability; rate limit | Only the ordering seller (own unpaid order) and staff with `boosts.manage`; content-checked (finfo + image header, PDF header and end marker); images re-encoded as JPEG without metadata; PDFs with active content refused and always sent as downloads; private disk with random names, `no-store`, nosniff; names cleaned and escaped; 10 uploads/hour; uploads, removals and staff views audited; deleted 90 days after the order closes. Residual: a PDF can hide active content in compressed streams, so staff open PDFs with an up-to-date reader | `PaymentProofSecurityTest`, `PaymentProofsTest`, `AuthorizationSweepTest`, browser journey |
 
 Residual risk added: seller ratings depend on unverifiable deals (a buyer who revealed a number may not have bought). Mitigated by the contact requirement, account age, moderation of comments, reporting and the trust rules; the review rules in the Terms need legal review before launch (owner).

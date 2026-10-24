@@ -3,7 +3,7 @@
 For the owner, on the Windows machine described in [local-development.md](local-development.md). It covers what was built after the last local run (2026-10-18):
 
 - the Phase 8 security fixes;
-- paid boosts (B1–B6, [ADR-026](../decisions/README.md));
+- paid boosts (B1–B7, [ADR-026](../decisions/README.md)), including proof of payment uploads (B7);
 - the audience features: live search, trends, sharing, make/model pages and seller ratings (G1–G6, ADR-027).
 
 Every command runs from the project folder `D:\My Project\martketplace` in PowerShell or Command Prompt. PHP is always `C:\php8.4\php.exe`.
@@ -22,7 +22,7 @@ C:\php8.4\php.exe artisan optimize:clear
 
 | Step | Why |
 |---|---|
-| `migrate` | New tables: boosts, the boost products (Bump; Top ad 3, 7, 15 days), prices, orders, bank accounts, daily views, search terms, seller reviews, review reports. It also adds the new staff permissions (boosts, reviews) to the roles. The local database was already migrated through G5b on 2026-10-23, in which case it reports "Nothing to migrate". |
+| `migrate` | New tables: boosts, the boost products (Bump; Top ad 3, 7, 15 days), prices, orders, bank accounts, daily views, search terms, seller reviews, review reports, payment proofs (B7). It also adds the new staff permissions (boosts, reviews) to the roles. The local database was migrated through G5b on 2026-10-23, so it now adds only the B7 payment proof table. |
 | `db:seed --class=PageSeeder` | Adds the new **Promotions and refunds** page (empty, unpublished). It only adds missing pages. |
 | `npm run build` | New scripts: live search, photo upload one at a time, sharing. |
 | `optimize:clear` | Clears cached settings and the catalogue cache. |
@@ -74,15 +74,21 @@ Full guide: [boosts.md](boosts.md). Selling is off by default. Staff can still g
 
 ### 3.2 Selling to a Seller (Bank Transfer)
 
-1. Owner: Admin → Sales → **Boost prices** → choose the country → enter test prices → enter test bank details → switch on "Accept bank transfers in this country" → Save.
+1. Owner: Admin → Sales → **Boost prices** → choose the country → enter test prices → enter test bank details → switch on "Accept bank transfers in this country" → Save. Each product must show **On sale** (use **Switch on** if it shows **Off**).
 2. Owner: Admin → **Settings** → Boosts → switch on "Sell boosts to sellers" (password confirmation).
+   - Back on Boost prices, the box at the top should say "Sellers in … can buy boosts." Otherwise it lists exactly what is missing.
 3. Seller: My ads → **Promote** on a live ad → choose a product → order.
    - Expected: an order reference (for example `BX7K2M9QP`), the bank details, and 7 days to pay.
    - An email with the same details appears in the log.
-4. Owner: Admin → Sales → **Orders**, which shows a count of unpaid orders. Open the order → **Mark paid** → Payment received.
-   - Expected: the promotion starts at once, and a receipt email appears in the log.
-5. Try **Cancel order** on a second order. A reason is required, and the seller gets an email.
-6. Afterwards, switch "Sell boosts to sellers" **off** again. It must stay off until the accountant review and real prices are done.
+4. Seller, on the same order page: **Proof of payment** → choose a photo or PDF of a slip → optional transfer date and note → **Attach proof**.
+   - Expected: "Proof received…", the file listed with **View** (or **Download** for a PDF) and **Remove**, and "1 of 3 files attached".
+   - Try a 4th file after attaching 3 (refused), a file over 5 MB (refused), and a `.txt` renamed to `.pdf` (refused).
+5. Owner: Admin → Sales → **Orders**, which shows a count of unpaid orders. The order shows **Proof received** and is listed first. Click **Proof (1)**.
+   - Expected: the image, the seller's note and the warning to check the bank statement. A PDF downloads instead.
+   - Then **Mark paid** → Payment received. The promotion starts at once, and a receipt email appears in the log.
+   - Back on the seller's order page, the proof is now read-only (no Remove, no upload form).
+6. Try **Cancel order** on a second order. A reason is required, and the seller gets an email.
+7. Afterwards, switch "Sell boosts to sellers" **off** again. It must stay off until the accountant review and real prices are done.
 
 ### 3.3 Ending and Lapsing
 
@@ -212,7 +218,8 @@ The browser tests use their own database and port 8130, so the site on 8001 can 
 | Symptom | Fix |
 |---|---|
 | 500 error after `git pull` | Run `migrate`, then `optimize:clear`. |
-| No **Promote** button on an ad | Selling is off (§3.2 step 2), the country has no prices, or the ad is not live. |
+| No **Promote** button on an ad | Open Admin → Sales → Boost prices for the ad's country: the box at the top lists what is missing (selling off, bank account, prices, or every priced product switched off). Also check that the ad is live. |
+| Proof image does not open | `storage\app\private` must be writable; the files are never in `public\`. |
 | No **Reviews** in the admin menu | Run `migrate` (it adds the permission), then sign out and in. |
 | Promotions page link missing | Publish it: Admin → Pages → Promotions and refunds. |
 | Lists or badge do not update | `C:\php8.4\php.exe artisan cache:clear` (they are cached for up to an hour). |

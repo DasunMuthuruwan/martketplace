@@ -39,6 +39,7 @@ class RateLimitsTest extends TestCase
         'listings.store' => 'listing-submit',
         'listings.submit' => 'listing-submit',
         'account.listings.promote.store' => 'boost-order',
+        'account.orders.proofs.store' => 'payment-proof',
         'listings.contact' => 'contact-reveal',
         'reports.store' => 'report',
         'ads.global' => 'search',

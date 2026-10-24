@@ -175,7 +175,7 @@ class BoostPricesAdmin extends Component
             'currency' => $country?->defaultCurrency,
             'products' => BoostProduct::orderBy('sort_order')->get(),
             'salesEnabled' => $catalogue->salesEnabled(),
-            'open' => $country !== null && $catalogue->isOpen($country),
+            'missing' => $country !== null ? $catalogue->missing($country) : ['prices'],
         ]);
     }
 }

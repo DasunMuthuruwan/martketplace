@@ -42,6 +42,29 @@ class BoostCatalogue
 
     public function isOpen(Country $country): bool
     {
-        return $this->salesEnabled() && $this->bankAccount($country) !== null && $this->offers($country)->isNotEmpty();
+        return $this->missing($country) === [];
+    }
+
+    /**
+     * What stops selling in the country, so the Boost prices screen can name it (B7): `sales_off`,
+     * `bank` (no active account), `prices` (no price at all) or `products_off` (prices exist, but
+     * only for products switched off).
+     *
+     * @return list<string>
+     */
+    public function missing(Country $country): array
+    {
+        $missing = [];
+        if (! $this->salesEnabled()) {
+            $missing[] = 'sales_off';
+        }
+        if ($this->bankAccount($country) === null) {
+            $missing[] = 'bank';
+        }
+        if ($this->offers($country)->isEmpty()) {
+            $missing[] = BoostPrice::where('country_id', $country->id)->exists() ? 'products_off' : 'prices';
+        }
+
+        return $missing;
     }
 }

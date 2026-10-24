@@ -141,6 +141,12 @@ return [
         'payment_days' => 7,
         // Orders a seller may place per hour (B5).
         'orders_per_hour_user' => 10,
+        // Payment proof (B7, owner 2026-10-24): transfer slips sellers attach to unpaid orders. Kept on
+        // the private disk; images re-encoded (longest edge `proof_max_px`), PDFs download-only.
+        'proof_max_kb' => 5120,
+        'proof_max_files' => 3,
+        'proof_max_px' => 2400,
+        'proofs_per_hour_user' => 10,
     ],
 
     'mail' => [
@@ -215,6 +221,7 @@ return [
         'audit_log' => 730,
         'contact_reveal' => 90,
         'search_terms' => 400, // G1: a year of trends plus margin
+        'payment_proof' => 90, // B7: days after the order is paid or closed
         'read_notification' => 90,
         'failed_job' => 30,
     ],

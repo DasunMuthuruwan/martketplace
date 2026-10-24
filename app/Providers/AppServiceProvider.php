@@ -83,6 +83,8 @@ class AppServiceProvider extends ServiceProvider
         // Promotion orders (B5): per account.
         RateLimiter::for('boost-order', fn (Request $request) => Limit::perHour((int) config('marketplace.boosts.orders_per_hour_user'))->by('boost-order:'.$request->user()?->id));
 
+        RateLimiter::for('payment-proof', fn (Request $request) => Limit::perHour((int) config('marketplace.boosts.proofs_per_hour_user'))->by('payment-proof:'.$request->user()?->id));
+
         RateLimiter::for('listing-submit', fn (Request $request) => Limit::perHour((int) config('marketplace.listings.submits_per_hour_ip'))->by('listing-submit:'.$request->ip()));
     }
 }

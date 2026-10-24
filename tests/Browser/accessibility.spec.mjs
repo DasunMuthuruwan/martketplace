@@ -91,6 +91,13 @@ test.describe('seller', () => {
         });
     }
 
+    test('promotion order with the proof of payment form', async ({ page }) => {
+        await scan(page, '/account/orders', async (p) => {
+            await p.locator('main a[href*="/account/orders/"]').first().click();
+            await p.locator('[data-proof-form]').waitFor();
+        });
+    });
+
     test('ad statistics', async ({ page }) => {
         await scan(page, '/account/listings', async (p) => {
             await p.getByRole('link', { name: 'Statistics' }).first().click();

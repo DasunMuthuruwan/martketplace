@@ -17,6 +17,7 @@ use App\Models\Region;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\Boosts\BoostManager;
+use App\Services\Boosts\BoostOrders;
 use App\Services\Geo\RegionChain;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -90,6 +91,10 @@ class BrowserTestSeeder extends Seeder
                 'country_id' => $country->id, 'currency' => $country->default_currency, 'amount' => $amount]);
         }
         BankTransferAccount::create(['country_id' => $country->id, 'bank_name' => 'Test Bank', 'account_name' => 'Marketplace Test', 'account_number' => '0001112223', 'is_active' => true]);
+        // An unpaid order, so the scans cover the order page with the proof of payment form (B7).
+        config(['marketplace.boosts.sales_enabled' => true]);
+        app(BoostOrders::class)->place($seller, Listing::where('title', 'Toyota Prius 2014')->firstOrFail(),
+            (int) BoostPrice::where('country_id', $country->id)->whereHas('product', fn ($q) => $q->where('type', 'bump'))->value('id'));
 
         // A buyer who may rate the seller (G5): account 30 days old, revealed the number 5 days ago.
         $buyer = User::factory()->create(['name' => 'Bimal Buyer', 'email' => 'buyer@browser.test', 'password' => $password, 'created_at' => now()->subDays(30)]);

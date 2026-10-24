@@ -7,10 +7,12 @@ use App\Http\Controllers\Account\FavouritesController;
 use App\Http\Controllers\Account\ListingPhotosController;
 use App\Http\Controllers\Account\ListingsController;
 use App\Http\Controllers\Account\ListingStatsController;
+use App\Http\Controllers\Account\PaymentProofsController;
 use App\Http\Controllers\Account\PostListingController;
 use App\Http\Controllers\Account\PromoteController;
 use App\Http\Controllers\Account\ReviewsController;
 use App\Http\Controllers\Account\SettingsController;
+use App\Http\Controllers\Admin\PaymentProofController;
 use App\Http\Controllers\ContactRevealController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\EngagementController;
@@ -85,6 +87,10 @@ Route::middleware(['auth', 'verified'])->prefix('account')->name('account.')->gr
     Route::get('/orders', [BoostOrdersController::class, 'index'])->name('orders');
     Route::get('/orders/{order}', [BoostOrdersController::class, 'show'])->whereNumber('order')->name('orders.show');
     Route::post('/orders/{order}/cancel', [BoostOrdersController::class, 'cancel'])->whereNumber('order')->name('orders.cancel');
+    // Proof of payment (B7): one file per request.
+    Route::post('/orders/{order}/proofs', [PaymentProofsController::class, 'store'])->whereNumber('order')->middleware('throttle:payment-proof')->name('orders.proofs.store');
+    Route::get('/orders/{order}/proofs/{proof}', [PaymentProofsController::class, 'show'])->whereNumber(['order', 'proof'])->name('orders.proofs.show');
+    Route::delete('/orders/{order}/proofs/{proof}', [PaymentProofsController::class, 'destroy'])->whereNumber(['order', 'proof'])->name('orders.proofs.destroy');
 });
 Route::middleware(['auth', 'verified'])->prefix('account/listings/{listing}/photos')->name('listings.photos.')->controller(ListingPhotosController::class)
     ->whereNumber(['listing', 'image'])->group(function () {
@@ -136,6 +142,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::livewire('/blocklist', BlocklistAdmin::class)->middleware('can:'.Permissions::BLOCKLIST_MANAGE)->name('blocklist');
         Route::livewire('/reviews', ReviewsAdmin::class)->middleware('can:'.Permissions::REVIEWS_MODERATE)->name('reviews');
         Route::livewire('/orders', BoostOrdersAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('orders');
+        Route::get('/orders/proofs/{proof}', PaymentProofController::class)->whereNumber('proof')->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('orders.proof');
         Route::livewire('/boosts', BoostsAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boosts');
         Route::livewire('/boosts/prices', BoostPricesAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boost-prices');
         Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');

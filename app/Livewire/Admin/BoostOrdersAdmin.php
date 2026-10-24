@@ -37,6 +37,12 @@ class BoostOrdersAdmin extends Component
     #[Url]
     public string $q = '';
 
+    /** Proof of payment filter (B7): '', 'with' or 'without'. */
+    #[Url]
+    public string $proof = '';
+
+    public ?int $proofId = null;
+
     public ?int $actingId = null;
 
     public string $action = '';
@@ -60,6 +66,21 @@ class BoostOrdersAdmin extends Component
     public function updatedQ(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedProof(): void
+    {
+        if (! in_array($this->proof, ['', 'with', 'without'], true)) {
+            $this->proof = '';
+        }
+        $this->resetPage();
+    }
+
+    /** Shows or hides an order's proof of payment (B7). */
+    public function toggleProof(int $id): void
+    {
+        $this->requirePermission(Permissions::BOOSTS_MANAGE);
+        $this->proofId = $this->proofId === $id ? null : $id;
     }
 
     public function start(int $id, string $action): void
@@ -113,9 +134,13 @@ class BoostOrdersAdmin extends Component
 
         return view('livewire.admin.boost-orders', [
             'orders' => BoostOrder::query()
-                ->with(['listing', 'user', 'country', 'currencyModel', 'handledBy'])
+                ->with(['listing', 'user', 'country', 'currencyModel', 'handledBy', 'proofs'])
                 ->when($this->status !== '', fn ($query) => $query->where('status', $this->status))
                 ->when($q !== '', fn ($query) => $query->where('reference', 'like', '%'.addcslashes($q, '%_\\').'%'))
+                ->when($this->proof === 'with', fn ($query) => $query->whereNotNull('proof_at'))
+                ->when($this->proof === 'without', fn ($query) => $query->whereNull('proof_at'))
+                // Unpaid orders with proof first: staff can match them to the statement straight away.
+                ->when($this->status === 'pending', fn ($query) => $query->orderByRaw('case when proof_at is null then 1 else 0 end'))
                 ->orderByRaw($this->status === 'pending' ? 'created_at asc' : 'created_at desc')
                 ->orderBy('id')
                 ->paginate(30),

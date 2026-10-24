@@ -6,11 +6,13 @@ use App\Enums\ListingStatus;
 use App\Enums\ReportStatus;
 use App\Enums\UserStatus;
 use App\Models\AuditLog;
+use App\Models\BoostOrder;
 use App\Models\Listing;
 use App\Models\Report;
 use App\Models\User;
 use App\Notifications\InactiveAccountWarning;
 use App\Services\Audit\AuditLogger;
+use App\Services\Boosts\PaymentProofs;
 use App\Services\Retention\AccountAnonymiser;
 use App\Services\Retention\ListingPurger;
 use App\Support\UserSessions;
@@ -36,13 +38,14 @@ class PruneData extends Command
     /** @var array<string, int> */
     private array $counts = [];
 
-    public function handle(ListingPurger $listings, AccountAnonymiser $accounts, AuditLogger $audit): int
+    public function handle(ListingPurger $listings, AccountAnonymiser $accounts, AuditLogger $audit, PaymentProofs $proofs): int
     {
         $this->dryRun = (bool) $this->option('dry-run');
 
         $this->pruneListings($listings);
         $this->pruneAccounts($accounts, $audit);
         $this->pruneReportsAndAudit();
+        $this->prunePaymentProofs($proofs);
 
         $this->table(['data', $this->dryRun ? 'would change' : 'changed'], collect($this->counts)->map(fn (int $n, string $k) => [$k, $n])->values()->all());
 
@@ -119,6 +122,18 @@ class PruneData extends Command
         // Search term counts (G1): anonymous, but only needed for recent trends.
         $terms = DB::table('search_terms')->where('date', '<', $this->daysAgo($r['search_terms'])->toDateString());
         $this->counts['search term counts'] = $this->dryRun ? $terms->count() : $terms->delete();
+    }
+
+    /** Proof of payment (B7): files of orders paid or closed more than `payment_proof` days ago. */
+    private function prunePaymentProofs(PaymentProofs $proofs): void
+    {
+        $before = $this->daysAgo((int) config('marketplace.retention.payment_proof'));
+        $this->each('payment proofs', BoostOrder::query()->has('proofs')
+            ->whereRaw('coalesce(closed_at, paid_at) < ?', [$before]),
+            function (BoostOrder $order) use ($proofs): void {
+                $proofs->purge($order);
+                $order->forceFill(['proof_at' => null])->save();
+            });
     }
 
     /**

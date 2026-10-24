@@ -354,6 +354,15 @@ test('a seller orders a Top ad, an admin confirms the bank transfer, and the ad 
     await expect(page.locator('[data-payment-instructions]')).toContainText('0001112223');
     const reference = (await page.locator('[data-order-reference]').textContent()).trim();
     expect(reference).toMatch(/^B[A-Z2-9]{8}$/);
+
+    // B7: the seller attaches the bank slip with a note.
+    const proofs = page.locator('[data-payment-proofs]');
+    await proofs.locator('input[name="proof"]').setInputFiles(photo);
+    await proofs.getByLabel('Note').fill('Paid at the branch');
+    await Promise.all([page.waitForLoadState('networkidle'), proofs.getByRole('button', { name: 'Attach proof' }).click()]);
+    await expect(page.getByText(/Proof received\. We will start your promotion/).first()).toBeVisible();
+    await expect(page.locator('[data-proof]')).toHaveCount(1);
+    await expect(page.locator('[data-proof-count]')).toContainText('1 of 3');
     await logOut(page);
 
     // Admin: password, then the two-factor code, then Orders → Mark paid.
@@ -363,6 +372,11 @@ test('a seller orders a Top ad, an admin confirms the bank transfer, and the ad 
     await Promise.all([page.waitForLoadState('networkidle'), page.locator('form button[type="submit"]').first().click()]);
     await page.goto('/admin/orders');
     await page.locator('#o-q').fill(reference);
+    await page.getByRole('button', { name: new RegExp(`Proof \\(1\\) ${reference}`) }).click();
+    const proof = page.locator('[data-order-proof]');
+    await expect(proof).toContainText('Paid at the branch');
+    await expect(proof.locator('img')).toBeVisible();
+    expect(await proof.locator('img').evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
     await page.getByRole('button', { name: new RegExp(`Mark paid ${reference}`) }).click();
     await page.getByRole('button', { name: 'Payment received' }).click();
     await expect(page.getByText(/promotion has started/)).toBeVisible();

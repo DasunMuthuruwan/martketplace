@@ -23,6 +23,7 @@
 | **Audit logs** | Created | **2 years**, append-only | Security and accountability |
 | **Contact reveal logs** | Created | **90 days** | Rate limiting and seller stats |
 | **Promotion orders** (B5, ADR-026) | Created | **Kept; period to be set by the legal/accounting review** (often several years for accounting records). Survive the ad and the account: `listing_id` / `user_id` become null, reference, product, amount and currency stay. Nothing deletes them yet. | Accounting and refunds |
+| **Proof of payment files** (B7) | Attached by the seller to an unpaid order | Private disk only. **90 days** after the order is paid or closed (cancelled, expired, refunded), files and rows deleted by `marketplace:prune` (`retention.payment_proof`); kept while the order is unpaid. The order record stays (above). May contain bank account details | Matching transfers, disputes |
 | **Search term counts** (G1, ADR-027) | Counted | **400 days**, then deleted by `marketplace:prune` (`retention.search_terms`). Counts per country, term and day only; no user, session or IP | Popular and trending searches |
 | **Seller reviews** (G5, ADR-027) | Written | Kept while the seller's account exists; deleted with it. A reviewer's deleted account keeps the review, shown as "Deleted user" (reviewer id null after hard deletion). Removal by staff in G5b | Trust between buyers and sellers |
 | **Ad views per day** (B1) | Counted | Deleted with the listing (cascade); counts only, no visitor data | Seller statistics |

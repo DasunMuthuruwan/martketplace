@@ -29,7 +29,7 @@ class BoostOrdersController extends Controller
     public function show(Request $request, BoostOrder $order, BoostCatalogue $catalogue): View
     {
         $this->authorizeOwner($request, $order);
-        $order->loadMissing(['listing', 'country', 'currencyModel', 'boost']);
+        $order->loadMissing(['listing', 'country', 'currencyModel', 'boost', 'proofs']);
 
         return view('account.order', [
             'order' => $order,
