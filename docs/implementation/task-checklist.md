@@ -92,14 +92,15 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] B4 Products, prices and bank details per country — merged 2026-10-22
   - [x] B5 Orders by bank transfer — merged 2026-10-22
   - [x] B6 Rules, QA and docs — merged 2026-10-22
-- [~] M9c Audience features before deployment (owner 2026-10-22; [proposal](../proposals/engagement-features.md), ADR-027)
+  - [ ] B7 Payment proof uploads for orders (owner 2026-10-24: 5 MB, 3 files, deleted 90 days after the order closes, no staff email) + Boost prices status names what is missing
+- [x] M9c Audience features before deployment (owner 2026-10-22; [proposal](../proposals/engagement-features.md), ADR-027)
   - [x] G1 Search terms and live search — merged 2026-10-22
   - [x] G2 Popular, trending, most marked as sold — merged 2026-10-22
   - [x] G3 Share to WhatsApp and Facebook — merged 2026-10-22
   - [x] G4 Make/model pages and price guide — merged 2026-10-22
   - [x] G5a Seller ratings (eligibility, stars, comments, replies) — merged 2026-10-23
   - [x] G5b Review moderation, reporting and trust badges — merged 2026-10-23
-  - [~] G6 QA and docs — awaiting approval
+  - [x] G6 QA and docs — merged 2026-10-24
 - [ ] M10 Deployment (staging → production, DNS/SSL approval)
 - [ ] M11 Operations
 

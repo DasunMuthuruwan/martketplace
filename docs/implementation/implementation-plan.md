@@ -196,6 +196,7 @@ Owner decision 2026-10-21: build the paid boosts of `docs/proposals/paid-boosts.
 | B4 | **Products and prices:** `boost_products`, `boost_prices` per country (admin), per-country bank transfer details (admin), `boosts.sales_enabled` switch | M | Admin screens, seeds (no prices), tests |
 | B5 | **Orders by bank transfer:** seller "Promote" flow (live own ads only; price from the server), order with reference and instructions (page + email), admin orders (mark paid → boost starts, cancel, refund → boost ends), unpaid orders expire, emails (receipt, started, ending soon, ended), rate limit | L | Flow, admin, emails, tests |
 | B6 | **Rules, QA and docs:** boost rules and refund page (owner text, D4), browser journey (order → admin paid → top ad visible), security checks (others' ads, non-live ads, tampered amounts), docs | M | Journey, security tests, docs |
+| B7 | **Payment proof (owner 2026-10-24):** sellers attach transfer slips (JPG, PNG, WebP, PDF; 5 MB; 3 per order) to unpaid orders; private storage, images re-encoded, PDFs download-only; staff preview in Orders, "proof received" filter and count; proof never confirms payment by itself; deleted 90 days after the order closes. Also: the Boost prices status names exactly what is missing | M | Upload abuse tests, journey, docs |
 
 ## 7b. Audience Features (M9c, Before Deployment)
 
