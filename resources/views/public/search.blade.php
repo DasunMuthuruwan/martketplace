@@ -118,6 +118,8 @@
                 </nav>
             @endif
 
+            <x-banner.slot :placement="\App\Enums\BannerPlacement::SearchTop" :country="$country" />
+
             {{-- Paid placements (ADR-026, D5): labelled, at most a few, matching this search; the same
                  ads also keep their usual place in the results below. --}}
             @if ($topAds->isNotEmpty())

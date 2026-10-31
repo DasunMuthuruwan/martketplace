@@ -27,6 +27,7 @@ use App\Http\Controllers\SellerReviewController;
 use App\Http\Controllers\SuggestController;
 use App\Livewire\Admin\AttributesAdmin;
 use App\Livewire\Admin\AuditLogViewer;
+use App\Livewire\Admin\BannersAdmin;
 use App\Livewire\Admin\BlocklistAdmin;
 use App\Livewire\Admin\BoostOrdersAdmin;
 use App\Livewire\Admin\BoostPricesAdmin;
@@ -145,6 +146,7 @@ Route::middleware(['auth', 'verified', 'can:'.Permissions::ACCESS_ADMIN, 'staff.
         Route::get('/orders/proofs/{proof}', PaymentProofController::class)->whereNumber('proof')->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('orders.proof');
         Route::livewire('/boosts', BoostsAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boosts');
         Route::livewire('/boosts/prices', BoostPricesAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('boost-prices');
+        Route::livewire('/banners', BannersAdmin::class)->middleware('can:'.Permissions::BOOSTS_MANAGE)->name('banners');
         Route::livewire('/audit', AuditLogViewer::class)->middleware('can:'.Permissions::AUDIT_VIEW)->name('audit');
         // Account and staff changes: password re-confirmed within 15 minutes (2FA doc §6).
         Route::livewire('/users', UsersAdmin::class)->middleware(['can:'.Permissions::USERS_VIEW, 'password.confirm'])->name('users');

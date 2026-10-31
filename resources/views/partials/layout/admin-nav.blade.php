@@ -23,6 +23,7 @@
             ['admin.orders', 'inbox', __('admin.nav.orders'), P::BOOSTS_MANAGE, $adminBadges['orders'] ?? null],
             ['admin.boosts', 'chevron-up', __('admin.nav.boosts'), P::BOOSTS_MANAGE, null],
             ['admin.boost-prices', 'sliders-horizontal', __('admin.nav.boost_prices'), P::BOOSTS_MANAGE, null],
+            ['admin.banners', 'image', __('admin.nav.banners'), P::BOOSTS_MANAGE, null],
         ],
         __('admin.groups.people') => [
             ['admin.users', 'user', __('admin.nav.users'), P::USERS_VIEW, null],

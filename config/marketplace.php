@@ -92,6 +92,13 @@ return [
         'orphan_ttl_hours' => 24,
     ],
 
+    // Staff-managed banners (B10).
+    'banners' => [
+        'max_upload_kb' => 4096,
+        'max_width' => 1600,
+        'quality' => 82,
+    ],
+
     // Paid boosts (ADR-026). Top ads per results page (owner setting, D5). Selling stays off until the
     // accountant review (D6) and prices per country (D2); staff can grant boosts meanwhile.
     // Share an ad to these services (G3, ADR-027): the encoded text or ad address is appended.

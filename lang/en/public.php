@@ -82,6 +82,7 @@ return [
     ],
 
     // Listing card (components §5.1).
+    'banner' => ['label' => 'Advertisement'],
     'card' => [
         'photos' => 'photos',
         'sold' => 'Sold',

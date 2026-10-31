@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BannerPlacement;
 use App\Enums\ContactVisibility;
 use App\Enums\ListingStatus;
 use App\Models\BankTransferAccount;
+use App\Models\Banner;
 use App\Models\BoostPrice;
 use App\Models\BoostProduct;
 use App\Models\Category;
@@ -98,6 +100,12 @@ class BrowserTestSeeder extends Seeder
 
         // An Urgent badge, so the scans cover it on cards and on the ad page in both themes (B9).
         app(BoostManager::class)->urgent(Listing::where('title', 'Toyota Corolla 2019')->firstOrFail(), 7);
+
+        // Banners, so the scans cover them in both themes (B10). No image file: the alt text shows.
+        foreach (BannerPlacement::cases() as $placement) {
+            (new Banner(['title' => 'Browser test banner', 'placement' => $placement, 'is_active' => true]))
+                ->forceFill(['image_path' => 'banners/browser-test.webp', 'width' => 1200, 'height' => 240])->save();
+        }
 
         // A buyer who may rate the seller (G5): account 30 days old, revealed the number 5 days ago.
         $buyer = User::factory()->create(['name' => 'Bimal Buyer', 'email' => 'buyer@browser.test', 'password' => $password, 'created_at' => now()->subDays(30)]);

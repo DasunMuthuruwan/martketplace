@@ -95,6 +95,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [~] B7 Payment proof uploads for orders — awaiting approval; (owner 2026-10-24: 5 MB, 3 files, deleted 90 days after the order closes, no staff email) + Boost prices status names what is missing
   - [~] B8 Hide Promote while a Top ad is running or queued — awaiting approval
   - [~] B9 Urgent badge (paid, 7 days, priced per country; any timed promotion hides Promote) — awaiting approval
+  - [~] B10 Banners managed by staff (image, link, country, placement, dates) — awaiting approval
 - [x] M9c Audience features before deployment (owner 2026-10-22; [proposal](../proposals/engagement-features.md), ADR-027)
   - [x] G1 Search terms and live search — merged 2026-10-22
   - [x] G2 Popular, trending, most marked as sold — merged 2026-10-22

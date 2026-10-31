@@ -73,6 +73,14 @@ Sellers can attach proof of their transfer to an unpaid order: a photo of the ba
 >
 > Questions: contact us.
 
-## 7. Later (Not Built Yet)
+## 7. Banners (B10)
+
+Admin → Sales → **Banners**. Staff with the boosts permission upload an image (JPG, PNG or WebP, up to 4 MB, scaled to 1600 pixels wide) with a title, an optional link, a country (or all countries), a placement (country home page, or above search results) and optional first and last days. There is no seller self-service; agree any payment outside the system.
+
+- One banner shows per page, at random among those that match. Every banner is labelled **Advertisement**, and links open in a new tab marked as sponsored.
+- The image is re-encoded on upload. Replacing or deleting a banner removes the old file. Every change is in the audit log.
+- Check the image and the destination before saving: a banner goes live without moderation. There are no view or click counts yet.
+
+## 8. Later (Not Built Yet)
 
 Home page featured slots, bundles, dealer plans and payment gateways (D1, D3): see the proposal's phasing.

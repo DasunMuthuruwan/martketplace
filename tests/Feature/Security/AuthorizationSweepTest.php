@@ -55,6 +55,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.audit' => Permissions::AUDIT_VIEW,
         'admin.boosts' => Permissions::BOOSTS_MANAGE,
         'admin.boost-prices' => Permissions::BOOSTS_MANAGE,
+        'admin.banners' => Permissions::BOOSTS_MANAGE,
         'admin.reviews' => Permissions::REVIEWS_MODERATE,
         'admin.orders' => Permissions::BOOSTS_MANAGE,
         'admin.orders.proof' => Permissions::BOOSTS_MANAGE,
@@ -104,7 +105,7 @@ class AuthorizationSweepTest extends TestCase
         'admin.location-requests' => 'admin', 'admin.pages' => 'admin', 'admin.blocklist' => 'admin', 'admin.audit' => 'admin',
         'admin.users' => 'admin', 'admin.design-system' => 'admin', 'admin.settings' => 'admin', 'admin.staff' => 'admin',
         'admin.boosts' => 'admin', 'admin.boost-prices' => 'admin', 'admin.orders' => 'admin', 'admin.reviews' => 'admin',
-        'admin.orders.proof' => 'admin',
+        'admin.orders.proof' => 'admin', 'admin.banners' => 'admin',
     ];
 
     /** Framework and package internals: not application endpoints. */

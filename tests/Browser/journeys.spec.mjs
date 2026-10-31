@@ -3,6 +3,7 @@
 // moderator approves → search → a buyer reveals the number, saves and reports. United States (state →
 // city): the same seller posts in another country and currency. Negative paths: wrong password,
 // unverified account, incomplete ad, rejection and resubmission.
+import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { expect, test } from '@playwright/test';
@@ -380,6 +381,23 @@ test('a seller orders a Top ad, an admin confirms the bank transfer, and the ad 
     await page.getByRole('button', { name: new RegExp(`Mark paid ${reference}`) }).click();
     await page.getByRole('button', { name: 'Payment received' }).click();
     await expect(page.getByText(/promotion has started/)).toBeVisible();
+
+    // B10: the admin uploads a banner (a Livewire upload under the site's CSP).
+    await page.goto('/admin/banners');
+    await page.getByRole('button', { name: 'Add banner' }).click();
+    await page.locator('#b-title').fill('Journey banner');
+    const uploaded = page.waitForResponse((r) => r.url().includes('upload-file') && r.ok());
+    await page.locator('#b-image').setInputFiles(photo);
+    await uploaded;
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: 'Save banner' }).click();
+    await expect(page.getByRole('row', { name: /Journey banner/ })).toContainText('Live');
+    await page.getByRole('button', { name: 'Edit Journey banner' }).click();
+    const preview = page.locator('#banner-form ~ form img');
+    await expect(preview).toBeVisible();
+    expect(await preview.evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
+    const scan = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
+    expect(scan.violations.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
     await logOut(page);
 
     // Buyers see it in the labelled Top ads.

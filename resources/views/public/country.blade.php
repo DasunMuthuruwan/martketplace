@@ -20,6 +20,8 @@
         @endif
     </section>
 
+    <x-banner.slot :placement="\App\Enums\BannerPlacement::HomeTop" :country="$country" />
+
     @if ($categories->isNotEmpty())
         <section aria-labelledby="home-categories" class="mb-10">
             <h2 id="home-categories" class="mb-3 text-h2 font-semibold">{{ __('public.home.browse') }}</h2>
