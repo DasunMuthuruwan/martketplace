@@ -123,6 +123,8 @@ return [
     'listings' => [
         'top_until' => 'Shown as a Top ad until :date',
         'top_from' => 'Top ad starts on :date',
+        'urgent_until' => 'Marked urgent until :date',
+        'urgent_from' => 'Urgent badge starts on :date',
         'stats' => 'Statistics',
         'title' => 'My ads',
         'tabs' => 'Ad status',

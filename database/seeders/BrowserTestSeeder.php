@@ -96,6 +96,9 @@ class BrowserTestSeeder extends Seeder
         app(BoostOrders::class)->place($seller, Listing::where('title', 'Toyota Prius 2014')->firstOrFail(),
             (int) BoostPrice::where('country_id', $country->id)->whereHas('product', fn ($q) => $q->where('type', 'bump'))->value('id'));
 
+        // An Urgent badge, so the scans cover it on cards and on the ad page in both themes (B9).
+        app(BoostManager::class)->urgent(Listing::where('title', 'Toyota Corolla 2019')->firstOrFail(), 7);
+
         // A buyer who may rate the seller (G5): account 30 days old, revealed the number 5 days ago.
         $buyer = User::factory()->create(['name' => 'Bimal Buyer', 'email' => 'buyer@browser.test', 'password' => $password, 'created_at' => now()->subDays(30)]);
         $reveal = new ContactReveal(['listing_id' => Listing::where('user_id', $seller->id)->where('status', ListingStatus::Active)->value('id'),

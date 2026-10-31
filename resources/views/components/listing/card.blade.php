@@ -41,8 +41,11 @@
         @endif
         @if ($sold)
             <x-ui.badge variant="neutral" class="absolute left-2 top-2">{{ __('public.card.sold') }}</x-ui.badge>
-        @elseif ($promoted)
-            <x-ui.badge variant="neutral" class="absolute left-2 top-2" data-top-ad-badge>{{ __('boosts.top.badge') }}</x-ui.badge>
+        @elseif ($promoted || $listing->isUrgent())
+            <span class="absolute left-2 top-2 flex flex-wrap gap-1">
+                @if ($promoted)<x-ui.badge variant="neutral" data-top-ad-badge>{{ __('boosts.top.badge') }}</x-ui.badge>@endif
+                @if ($listing->isUrgent())<x-ui.badge variant="warning" data-urgent-badge>{{ __('boosts.urgent.badge') }}</x-ui.badge>@endif
+            </span>
         @endif
     </div>
     <div class="flex min-w-0 flex-1 flex-col gap-1 p-3">

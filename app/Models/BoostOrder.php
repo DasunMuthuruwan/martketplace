@@ -102,8 +102,6 @@ class BoostOrder extends Model
     /** "Bump", "Top ad · 7 days" (from the copied product, not the current one). */
     public function productName(): string
     {
-        return $this->product_type === BoostType::Bump
-            ? (string) __('boosts.products.bump')
-            : (string) trans_choice('boosts.products.top', (int) $this->duration_days, ['days' => $this->duration_days]);
+        return $this->product_type->productName($this->duration_days);
     }
 }

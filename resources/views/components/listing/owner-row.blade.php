@@ -19,7 +19,7 @@
     $cover = $present->coverUrl($listing);
     $editUrl = \Illuminate\Support\Facades\Route::has('listings.edit') ? route('listings.edit', $listing) : null;
     $canRenew = $lifecycle->renewable($listing);
-    $top = $listing->relationLoaded('boosts') ? $listing->boosts->first() : null;
+    $promotions = $listing->relationLoaded('boosts') ? $listing->boosts : collect();
     $hasStats = $listing->published_at !== null;
 @endphp
 <article {{ $attributes->class('flex gap-3 rounded-card border border-line bg-surface p-3 sm:gap-4') }}>
@@ -57,12 +57,12 @@
                 {{ __('account.listings.sold_on', ['date' => $listing->sold_at->toFormattedDateString()]) }}
             @endif
         </p>
-        @if ($top)
-            <p class="flex items-center gap-1.5 text-small text-fg" data-owner-top-ad>
-                <x-ui.badge variant="neutral">{{ __('boosts.top.badge') }}</x-ui.badge>
-                {{ $top->starts_at->isPast() ? __('account.listings.top_until', ['date' => $top->ends_at->toFormattedDateString()]) : __('account.listings.top_from', ['date' => $top->starts_at->toFormattedDateString()]) }}
+        @foreach ($promotions as $promotion)
+            <p class="flex items-center gap-1.5 text-small text-fg" data-owner-promotion>
+                <x-ui.badge variant="neutral">{{ __('admin.boosts.types.'.$promotion->type->value) }}</x-ui.badge>
+                {{ __('account.listings.'.$promotion->type->value.($promotion->starts_at->isPast() ? '_until' : '_from'), ['date' => ($promotion->starts_at->isPast() ? $promotion->ends_at : $promotion->starts_at)->toFormattedDateString()]) }}
             </p>
-        @endif
+        @endforeach
         @if ($pendingOrder)
             <p class="text-small"><a href="{{ route('account.orders.show', $pendingOrder) }}" class="text-fg underline-offset-2 hover:underline">{{ __('boosts.order.pending_row', ['reference' => $pendingOrder->reference]) }}</a></p>
         @endif
@@ -80,7 +80,7 @@
             @if ($editUrl && $status !== S::Sold)
                 <x-ui.button size="sm" variant="secondary" icon="pencil" :href="$editUrl">{{ $status === S::Rejected ? __('account.listings.edit_resubmit') : __('account.listings.edit') }}</x-ui.button>
             @endif
-            @if ($canPromote && ! $top)
+            @if ($canPromote && $promotions->isEmpty())
                 <x-ui.button size="sm" icon="chevron-up" :href="route('account.listings.promote', $listing)">{{ __('boosts.promote.button') }}</x-ui.button>
             @endif
             @if ($hasStats)

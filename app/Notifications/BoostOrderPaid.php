@@ -34,7 +34,7 @@ class BoostOrderPaid extends Notification implements ShouldQueue
         $amount = (string) app(Money::class)->forCountry($order->amount, $order->currencyModel, $order->country, true);
         $period = $this->boost->type === BoostType::Bump
             ? __('boosts.mail.bumped', ['date' => $this->boost->starts_at->toFormattedDayDateString()])
-            : __('boosts.mail.top_period', ['start' => $this->boost->starts_at->toFormattedDayDateString(), 'end' => $this->boost->ends_at?->toFormattedDayDateString()]);
+            : __('boosts.mail.'.$this->boost->type->value.'_period', ['start' => $this->boost->starts_at->toFormattedDayDateString(), 'end' => $this->boost->ends_at?->toFormattedDayDateString()]);
 
         $mail = (new MailMessage)
             ->subject(__('boosts.mail.paid_subject'))

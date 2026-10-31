@@ -8,8 +8,9 @@ For the Owner and Admins. What sellers can buy, how they pay, and what staff do 
 |---|---|
 | **Bump** | Moves the ad back to the top of the newest ads, once. The card keeps its real "posted" date. |
 | **Top ad** (3, 7 or 15 days) | Shows the ad in the labelled **Top ads** block above the results of its category, in its country, matching the visitor's search and filters. At most 2 per page (Settings → Ads), rotated so every paying seller is seen. The ad also keeps its normal place. |
+| **Urgent** (7 days) | Puts a labelled **Urgent** badge on the ad's card and ad page, so buyers see the seller wants to sell fast. The ad page says it is a paid label. It does not change where the ad appears. New in B9: not on sale in a country until you enter its price. |
 
-Only live ads can be promoted, and an ad with a running or queued Top ad cannot be promoted again until that ends (the Promote button is hidden). A promotion ends with its ad (sold, deleted, expired, removed by a moderator, seller suspended) and does not come back.
+Only live ads can be promoted, and an ad with a running or queued Top ad or Urgent badge cannot be promoted again until that ends (the Promote button is hidden). There is no "ends soon" email for Urgent. A promotion ends with its ad (sold, deleted, expired, removed by a moderator, seller suspended) and does not come back.
 
 ## 2. Before Selling (One-Off)
 
@@ -56,7 +57,7 @@ Sellers can attach proof of their transfer to an unpaid order: a photo of the ba
 
 > **Promotions**
 >
-> You can promote a live ad. A **Bump** moves your ad back to the top of the newest ads once. A **Top ad** shows your ad, labelled "Top ad", above the results of its category for the days you choose, together with at most one other top ad, in rotation. Your ad also keeps its normal place.
+> You can promote a live ad. A **Bump** moves your ad back to the top of the newest ads once. A **Top ad** shows your ad, labelled "Top ad", above the results of its category for the days you choose, together with at most one other top ad, in rotation. Your ad also keeps its normal place. **Urgent** puts a labelled badge on your ad for 7 days; it does not change where your ad appears.
 >
 > **Paying**
 >
@@ -74,4 +75,4 @@ Sellers can attach proof of their transfer to an unpaid order: a photo of the ba
 
 ## 7. Later (Not Built Yet)
 
-Urgent badge, home page featured slots, bundles, dealer plans and payment gateways (D1, D3): see the proposal's phasing.
+Home page featured slots, bundles, dealer plans and payment gateways (D1, D3): see the proposal's phasing.

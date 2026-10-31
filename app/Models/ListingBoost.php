@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * A Bump or Top ad on a listing (ADR-026). Granted by staff (`granted_by`) or paid by an order
+ * A Bump, Top ad or Urgent badge on a listing (ADR-026). Granted by staff (`granted_by`) or paid by an order
  * (`order_id`, B5). A boost is running between `starts_at` and `ends_at` unless `ended_at` stopped
  * it early (the ad stopped being public, a refund).
  *

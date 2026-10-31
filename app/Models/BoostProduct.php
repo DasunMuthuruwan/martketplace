@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * Something a seller can buy (ADR-026, D1): a Bump, or a Top ad for a number of days. Inserted by
+ * Something a seller can buy (ADR-026, D1): a Bump, or a Top ad or Urgent badge for a number of days. Inserted by
  * migration; the Owner switches products on or off and sets their price per country.
  *
  * @property int $id
@@ -43,8 +43,6 @@ class BoostProduct extends Model
     /** "Bump", "Top ad · 7 days" */
     public function name(): string
     {
-        return $this->type === BoostType::Bump
-            ? (string) __('boosts.products.bump')
-            : (string) trans_choice('boosts.products.top', (int) $this->duration_days, ['days' => $this->duration_days]);
+        return $this->type->productName($this->duration_days);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Account;
 
 use App\Actions\Listings\ListingLifecycle;
 use App\Enums\BoostOrderStatus;
-use App\Enums\BoostType;
 use App\Enums\ListingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\BoostOrder;
@@ -37,8 +36,8 @@ class ListingsController extends Controller
 
         $listings = self::tab(Listing::where('user_id', $user->id), $tab)
             ->with(['country', 'currencyModel', 'coverImage', 'category.parent', 'city', 'region', 'subregion', 'locality',
-                // Running or queued Top ads, shown on the row (B3).
-                'boosts' => fn ($q) => $q->where('type', BoostType::Top->value)->whereNull('ended_at')->where('ends_at', '>', now())->orderBy('starts_at')])
+                // Running or queued timed promotions, shown on the row (B3).
+                'boosts' => fn ($q) => $q->whereNull('ended_at')->where('ends_at', '>', now())->orderBy('starts_at')])
             ->withCount('images')
             ->latest('updated_at')->latest('id')
             ->paginate(20)->withQueryString();

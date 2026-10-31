@@ -55,7 +55,7 @@ class BoostCatalogueTest extends TestCase
 
     public function test_the_first_products_exist_without_prices(): void
     {
-        $this->assertSame(['Bump', 'Top ad · 3 days', 'Top ad · 7 days', 'Top ad · 15 days'], BoostProduct::orderBy('sort_order')->get()->map->name()->all());
+        $this->assertSame(['Bump', 'Top ad · 3 days', 'Top ad · 7 days', 'Top ad · 15 days', 'Urgent · 7 days'], BoostProduct::orderBy('sort_order')->get()->map->name()->all());
         $this->assertSame(0, BoostPrice::count());
     }
 

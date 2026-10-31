@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\BoostType;
 use App\Enums\ItemCondition;
 use App\Enums\ListingStatus;
 use App\Enums\ListingType;
@@ -54,6 +53,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $submitted_at
  * @property Carbon|null $published_at
  * @property Carbon|null $sorted_at the "newest" order: publication time, moved by a Bump (ADR-026)
+ * @property Carbon|null $urgent_until end of the Urgent badge, kept on the ad so cards need no query (B9)
  * @property Carbon|null $expires_at
  * @property Carbon|null $expiry_reminder_sent_at
  * @property Carbon|null $sold_at
@@ -102,6 +102,7 @@ class Listing extends Model
             'submitted_at' => 'datetime',
             'published_at' => 'datetime',
             'sorted_at' => 'datetime',
+            'urgent_until' => 'datetime',
             'expires_at' => 'datetime',
             'expiry_reminder_sent_at' => 'datetime',
             'sold_at' => 'datetime',
@@ -230,11 +231,19 @@ class Listing extends Model
         return $this->hasMany(ListingBoost::class);
     }
 
-    /** The Top ad running or queued with the latest end, if any: the ad cannot be promoted until then. */
-    public function activeTop(): ?ListingBoost
+    /**
+     * The running or queued promotion with the latest end, if any: the ad cannot be promoted until
+     * then. A Bump has no end, so it never counts.
+     */
+    public function activePromotion(): ?ListingBoost
     {
-        return $this->boosts()->where('type', BoostType::Top->value)->whereNull('ended_at')
-            ->where('ends_at', '>', now())->latest('ends_at')->first();
+        return $this->boosts()->whereNull('ended_at')->where('ends_at', '>', now())->latest('ends_at')->first();
+    }
+
+    /** Shows the Urgent badge (B9): only while the ad is active, whatever the column still says. */
+    public function isUrgent(): bool
+    {
+        return $this->status === ListingStatus::Active && $this->urgent_until?->isFuture() === true;
     }
 
     /** @return HasMany<ListingImage, $this> */

@@ -8,16 +8,22 @@ return [
         'why' => 'Paid placements by sellers that match your search. They also appear in their usual place below.',
         'learn_more' => 'How promotions work',
     ],
+    'urgent' => [
+        'badge' => 'Urgent',
+        'note' => 'Paid label: the seller marked this ad as urgent.',
+    ],
     'products' => [
         'bump' => 'Bump',
         'top' => '{1} Top ad · 1 day|[2,*] Top ad · :days days',
+        'urgent' => '{1} Urgent · 1 day|[2,*] Urgent · :days days',
     ],
     'product_help' => [
         'bump' => 'Moves your ad back to the top of the newest ads, once.',
         'top' => 'Shows your ad in the Top ads above the results of its category, in rotation with other top ads, and keeps its usual place.',
+        'urgent' => 'Puts an Urgent badge on your ad wherever it appears, so buyers see that you want to sell fast. It does not change where the ad appears.',
     ],
     'not_live' => 'Only live ads can be promoted.',
-    'already_promoted' => 'This ad is already a Top ad until :date. You can promote it again after that.',
+    'already_promoted' => 'This ad is already promoted until :date. You can promote it again after that.',
     'past_expiry' => 'The ad expires on :date, before this promotion would end. Renew the ad first.',
     'days_range' => 'Choose between 1 and :max days.',
 
@@ -85,6 +91,7 @@ return [
         'receipt' => ':product for ":title", paid on :date.',
         'bumped' => 'Your ad was moved to the top on :date.',
         'top_period' => 'Your ad is shown as a Top ad from :start to :end.',
+        'urgent_period' => 'Your ad shows the Urgent badge from :start to :end.',
         'see_stats' => 'See your ad statistics',
         'cancelled_subject' => 'Your promotion order :reference was cancelled',
         'cancelled_line' => 'Your order :reference (:product for ":title") was cancelled. Please do not pay for it.',

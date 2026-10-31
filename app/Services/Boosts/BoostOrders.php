@@ -46,8 +46,8 @@ class BoostOrders
         if (! Listing::query()->public()->whereKey($listing->id)->exists()) {
             throw ValidationException::withMessages(['price' => __('boosts.not_live')]);
         }
-        if (($top = $listing->activeTop()) !== null) {
-            throw ValidationException::withMessages(['price' => __('boosts.already_promoted', ['date' => $top->ends_at->toFormattedDateString()])]);
+        if (($active = $listing->activePromotion()) !== null) {
+            throw ValidationException::withMessages(['price' => __('boosts.already_promoted', ['date' => $active->ends_at->toFormattedDateString()])]);
         }
         $country = $listing->country;
         if (! $this->catalogue->isOpen($country)) {
@@ -58,7 +58,7 @@ class BoostOrders
             throw ValidationException::withMessages(['price' => __('boosts.order.unavailable')]);
         }
         $product = $price->product;
-        if ($product->type === BoostType::Top && $listing->expires_at !== null
+        if ($product->type->hasDuration() && $listing->expires_at !== null
             && now()->addDays((int) config('marketplace.boosts.payment_days'))->addDays((int) $product->duration_days)->isAfter($listing->expires_at)) {
             throw ValidationException::withMessages(['price' => __('boosts.order.renew_first')]);
         }
@@ -101,7 +101,7 @@ class BoostOrders
 
     /**
      * Staff saw the transfer: the boost starts now. A boost that cannot start (the ad is no longer
-     * live, or a Top ad would outlast it) leaves the order pending with the reason.
+     * live, or a timed promotion would outlast it) leaves the order pending with the reason.
      *
      * @throws ValidationException
      */
@@ -115,9 +115,11 @@ class BoostOrders
                 throw ValidationException::withMessages(['order' => __('boosts.not_live')]);
             }
 
-            $boost = $order->product_type === BoostType::Bump
-                ? $this->boosts->bump($listing, null, $order->id)
-                : $this->boosts->top($listing, (int) $order->duration_days, null, $order->id);
+            $boost = match ($order->product_type) {
+                BoostType::Bump => $this->boosts->bump($listing, null, $order->id),
+                BoostType::Top => $this->boosts->top($listing, (int) $order->duration_days, null, $order->id),
+                BoostType::Urgent => $this->boosts->urgent($listing, (int) $order->duration_days, null, $order->id),
+            };
 
             $order->forceFill(['status' => BoostOrderStatus::Paid, 'paid_at' => now(), 'handled_by' => $staff->id, 'note' => $note])->save();
             $this->audit->record($staff, 'boost_order.paid', $listing, $note, ['order' => $order->reference, 'amount' => $order->amount, 'currency' => $order->currency]);

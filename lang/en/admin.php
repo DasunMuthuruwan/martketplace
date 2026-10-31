@@ -124,13 +124,13 @@ return [
     ],
 
     'boosts' => [
-        'help' => 'Paid visibility for live ads: a Bump moves an ad back to the top once, a Top ad shows it above the results of its category for some days.',
+        'help' => 'Paid visibility for live ads: a Bump moves an ad back to the top once, a Top ad shows it above the results of its category for some days, and Urgent puts a badge on it for some days.',
         'grant_title' => 'Grant a boost',
         'grant_help' => 'Without payment, for goodwill or testing. The ad must be live, and you cannot boost your own ads.',
         'ad' => 'Ad',
         'ad_hint' => 'The ad number or its address.',
         'type' => 'Type',
-        'types' => ['top' => 'Top ad', 'bump' => 'Bump'],
+        'types' => ['top' => 'Top ad', 'urgent' => 'Urgent', 'bump' => 'Bump'],
         'days' => 'Days',
         'grant' => 'Grant',
         'granted' => ':type granted to ":title".',

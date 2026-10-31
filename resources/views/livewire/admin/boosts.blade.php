@@ -12,7 +12,7 @@
         <form wire:submit="grant" class="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_8rem_auto] md:items-end">
             <x-ui.input :label="__('admin.boosts.ad')" id="g-ad" wire:model="ad" maxlength="300" required :hint="__('admin.boosts.ad_hint')" :error="$errors->first('ad')" />
             <x-ui.select :label="__('admin.boosts.type')" id="g-type" wire:model.live="type" :options="__('admin.boosts.types')" />
-            @if ($type === 'top')
+            @if ($type !== 'bump')
                 <x-ui.input type="number" :label="__('admin.boosts.days')" id="g-days" wire:model="days" min="1" :max="\App\Services\Boosts\BoostManager::MAX_DAYS" :error="$errors->first('days')" />
             @else
                 <div class="hidden md:block"></div>

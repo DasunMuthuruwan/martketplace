@@ -19,7 +19,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
- * Boosts (ADR-026, B3, `boosts.manage`): grant a Bump or a Top ad to a live ad without payment
+ * Boosts (ADR-026, B3, `boosts.manage`): grant a Bump, Top ad or Urgent badge to a live ad without payment
  * (goodwill, testing, before selling opens), see running, upcoming and ended boosts, and end one
  * early. Staff never boost their own ads (like moderation, CD-06). Every grant and end is audited.
  */
@@ -60,7 +60,7 @@ class BoostsAdmin extends Component
         $this->validate([
             'ad' => ['required', 'string', 'max:300'],
             'type' => ['required', Rule::enum(BoostType::class)],
-            'days' => ['required_if:type,top', 'integer', 'min:1', 'max:'.BoostManager::MAX_DAYS],
+            'days' => ['required_unless:type,bump', 'integer', 'min:1', 'max:'.BoostManager::MAX_DAYS],
         ]);
 
         $listing = $this->findListing();
@@ -77,9 +77,13 @@ class BoostsAdmin extends Component
 
         $type = BoostType::from($this->type);
         try {
-            $type === BoostType::Bump ? $boosts->bump($listing, Auth::user()) : $boosts->top($listing, $this->days, Auth::user());
+            match ($type) {
+                BoostType::Bump => $boosts->bump($listing, Auth::user()),
+                BoostType::Top => $boosts->top($listing, $this->days, Auth::user()),
+                BoostType::Urgent => $boosts->urgent($listing, $this->days, Auth::user()),
+            };
         } catch (ValidationException $e) {
-            $this->addError($type === BoostType::Top && isset($e->errors()['days']) ? 'days' : 'ad', collect($e->errors())->flatten()->first());
+            $this->addError($type->hasDuration() && isset($e->errors()['days']) ? 'days' : 'ad', collect($e->errors())->flatten()->first());
 
             return;
         }
