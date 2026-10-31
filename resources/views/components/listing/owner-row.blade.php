@@ -80,7 +80,7 @@
             @if ($editUrl && $status !== S::Sold)
                 <x-ui.button size="sm" variant="secondary" icon="pencil" :href="$editUrl">{{ $status === S::Rejected ? __('account.listings.edit_resubmit') : __('account.listings.edit') }}</x-ui.button>
             @endif
-            @if ($canPromote)
+            @if ($canPromote && ! $top)
                 <x-ui.button size="sm" icon="chevron-up" :href="route('account.listings.promote', $listing)">{{ __('boosts.promote.button') }}</x-ui.button>
             @endif
             @if ($hasStats)

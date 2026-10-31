@@ -21,6 +21,7 @@ use App\Notifications\BoostOrderClosed;
 use App\Notifications\BoostOrderPaid;
 use App\Notifications\BoostOrderPlaced;
 use App\Notifications\TopAdEndingSoon;
+use App\Services\Boosts\BoostManager;
 use App\Services\Boosts\BoostOrders;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -148,6 +149,43 @@ class BoostOrdersTest extends TestCase
         $this->ad->forceFill(['status' => ListingStatus::Sold])->save();
         $this->assertSame(__('boosts.not_live'), $this->orderError(fn () => $this->order()));
         $this->assertSame(0, BoostOrder::count());
+    }
+
+    public function test_an_ad_with_a_running_top_ad_cannot_be_promoted_until_it_ends(): void
+    {
+        $boost = app(BoostManager::class)->top($this->ad, 7);
+        $until = $boost->ends_at->toFormattedDateString();
+
+        $this->actingAs($this->seller)->get(route('account.listings'))
+            ->assertSee(__('account.listings.top_until', ['date' => $until]))
+            ->assertDontSee(route('account.listings.promote', $this->ad), false);
+        $this->actingAs($this->seller)->get(route('account.listings.promote', $this->ad))
+            ->assertRedirect(route('account.listings'))->assertSessionHas('error', __('boosts.already_promoted', ['date' => $until]));
+        $this->assertStringContainsString($until, $this->orderError(fn () => $this->order('bump', null)));
+
+        // Once it ends, or a refund or staff stop it early, Promote is back.
+        $this->travelTo($boost->ends_at->addMinute());
+        $this->ad->update(['expires_at' => now()->addDays(40)]);
+        $this->actingAs($this->seller)->get(route('account.listings'))->assertSee(route('account.listings.promote', $this->ad), false);
+        $this->actingAs($this->seller)->get(route('account.listings.promote', $this->ad))->assertOk();
+    }
+
+    public function test_a_queued_top_ad_also_hides_promote_and_a_bump_does_not(): void
+    {
+        app(BoostManager::class)->bump($this->ad);
+        $this->actingAs($this->seller)->get(route('account.listings'))->assertSee(route('account.listings.promote', $this->ad), false);
+
+        $boost = app(BoostManager::class)->top($this->ad, 7);
+        $boost->forceFill(['starts_at' => now()->addDay()])->save();
+        $this->actingAs($this->seller)->get(route('account.listings'))->assertDontSee(route('account.listings.promote', $this->ad), false);
+    }
+
+    public function test_a_top_ad_ended_early_no_longer_hides_promote(): void
+    {
+        $boost = app(BoostManager::class)->top($this->ad, 7);
+        app(BoostManager::class)->end($boost);
+
+        $this->actingAs($this->seller)->get(route('account.listings'))->assertSee(route('account.listings.promote', $this->ad), false);
     }
 
     public function test_at_most_three_unpaid_orders(): void

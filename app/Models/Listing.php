@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BoostType;
 use App\Enums\ItemCondition;
 use App\Enums\ListingStatus;
 use App\Enums\ListingType;
@@ -227,6 +228,13 @@ class Listing extends Model
     public function boosts(): HasMany
     {
         return $this->hasMany(ListingBoost::class);
+    }
+
+    /** The Top ad running or queued with the latest end, if any: the ad cannot be promoted until then. */
+    public function activeTop(): ?ListingBoost
+    {
+        return $this->boosts()->where('type', BoostType::Top->value)->whereNull('ended_at')
+            ->where('ends_at', '>', now())->latest('ends_at')->first();
     }
 
     /** @return HasMany<ListingImage, $this> */

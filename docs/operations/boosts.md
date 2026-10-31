@@ -9,7 +9,7 @@ For the Owner and Admins. What sellers can buy, how they pay, and what staff do 
 | **Bump** | Moves the ad back to the top of the newest ads, once. The card keeps its real "posted" date. |
 | **Top ad** (3, 7 or 15 days) | Shows the ad in the labelled **Top ads** block above the results of its category, in its country, matching the visitor's search and filters. At most 2 per page (Settings → Ads), rotated so every paying seller is seen. The ad also keeps its normal place. |
 
-Only live ads can be promoted. A promotion ends with its ad (sold, deleted, expired, removed by a moderator, seller suspended) and does not come back.
+Only live ads can be promoted, and an ad with a running or queued Top ad cannot be promoted again until that ends (the Promote button is hidden). A promotion ends with its ad (sold, deleted, expired, removed by a moderator, seller suspended) and does not come back.
 
 ## 2. Before Selling (One-Off)
 

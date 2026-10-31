@@ -32,6 +32,7 @@ class TopAdEndingSoon extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject(__('boosts.mail.ending_subject'))
             ->line(__('boosts.mail.ending_line', ['title' => $listing?->title, 'date' => $this->boost->ends_at?->toDayDateTimeString()]))
-            ->action(__('boosts.mail.promote_again'), route('account.listings.promote', $listing));
+            ->line(__('boosts.mail.ending_next'))
+            ->action(__('boosts.mail.view_ads'), route('account.listings'));
     }
 }

@@ -17,6 +17,7 @@ return [
         'top' => 'Shows your ad in the Top ads above the results of its category, in rotation with other top ads, and keeps its usual place.',
     ],
     'not_live' => 'Only live ads can be promoted.',
+    'already_promoted' => 'This ad is already a Top ad until :date. You can promote it again after that.',
     'past_expiry' => 'The ad expires on :date, before this promotion would end. Renew the ad first.',
     'days_range' => 'Choose between 1 and :max days.',
 
@@ -94,7 +95,8 @@ return [
         'reason' => 'Note from our team: :reason',
         'ending_subject' => 'Your Top ad ends soon',
         'ending_line' => 'Your ad ":title" is shown as a Top ad until :date.',
-        'promote_again' => 'Promote again',
+        'ending_next' => 'You can promote it again once it has ended.',
+        'view_ads' => 'View my ads',
     ],
 
     // Proof of payment on an order (B7).

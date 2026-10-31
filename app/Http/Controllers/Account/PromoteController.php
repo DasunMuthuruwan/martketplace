@@ -24,6 +24,9 @@ class PromoteController extends Controller
         if (! $listing->isPublic()) {
             return redirect()->route('account.listings')->with('error', __('boosts.not_live'));
         }
+        if (($top = $listing->activeTop()) !== null) {
+            return redirect()->route('account.listings')->with('error', __('boosts.already_promoted', ['date' => $top->ends_at->toFormattedDateString()]));
+        }
         $listing->loadMissing(['country', 'currencyModel']);
         $open = $catalogue->isOpen($listing->country);
 

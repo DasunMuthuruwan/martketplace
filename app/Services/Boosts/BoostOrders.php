@@ -46,6 +46,9 @@ class BoostOrders
         if (! Listing::query()->public()->whereKey($listing->id)->exists()) {
             throw ValidationException::withMessages(['price' => __('boosts.not_live')]);
         }
+        if (($top = $listing->activeTop()) !== null) {
+            throw ValidationException::withMessages(['price' => __('boosts.already_promoted', ['date' => $top->ends_at->toFormattedDateString()])]);
+        }
         $country = $listing->country;
         if (! $this->catalogue->isOpen($country)) {
             throw ValidationException::withMessages(['price' => __('boosts.order.closed')]);
