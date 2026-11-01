@@ -7,7 +7,7 @@
                 @php($url = route('ads.category', ['cc' => strtolower($currentCountry->iso2), 'category' => $category->slug]))
                 <li>
                     <a href="{{ $url }}" @if (url()->current() === $url) aria-current="page" @endif
-                        class="inline-flex h-9 items-center whitespace-nowrap rounded-control px-3 text-ui text-fg-muted hover:bg-surface-hover hover:text-fg aria-[current]:font-semibold aria-[current]:text-fg">{{ $category->name }}</a>
+                        class="inline-flex h-9 items-center whitespace-nowrap rounded-full px-4 text-ui font-medium text-fg-muted transition-colors duration-(--duration-fast) hover:bg-surface-hover hover:text-fg aria-[current]:bg-primary aria-[current]:text-primary-fg">{{ $category->name }}</a>
                 </li>
             @endforeach
         </ul>

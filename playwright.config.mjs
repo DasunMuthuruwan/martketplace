@@ -25,6 +25,7 @@ export default defineConfig({
         { name: 'phone-light', testMatch: 'accessibility.spec.mjs', use: { ...devices['Pixel 7'], ...browser, colorScheme: 'light' } },
         // End-to-end journeys (Q7.2): they change data, so they run once, on desktop.
         { name: 'journeys', testMatch: 'journeys.spec.mjs', use: { ...devices['Desktop Chrome'], ...browser } },
+        { name: 'responsive', testMatch: 'responsive.spec.mjs', use: { ...devices['Desktop Chrome'], ...browser } },
     ],
     webServer: {
         command: serverCommand,

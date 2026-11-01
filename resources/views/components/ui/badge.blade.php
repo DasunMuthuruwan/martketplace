@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'neutral', // neutral | success | warning | danger | info | outline
+    'variant' => 'neutral', // neutral | success | warning | danger | info | outline | accent
     'icon' => null,
 ])
 @php
@@ -10,6 +10,7 @@
         'danger' => 'bg-surface-muted text-danger',
         'info' => 'bg-surface-muted text-info',
         'outline' => 'border border-control text-fg',
+        'accent' => 'bg-accent text-accent-fg',
     ];
 @endphp
 {{-- Status is never colour alone: the text is always there (design system §3.3). --}}

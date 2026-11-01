@@ -9,9 +9,9 @@
     <meta name="color-scheme" content="light dark">
     <title>{{ $title }} | {{ config('app.name') }}</title>
     <style nonce="{{ Vite::cspNonce() }}">
-        :root { --canvas: #f7f7f7; --surface: #fff; --line: #e5e5e5; --fg: #0a0a0a; --fg-muted: #4d4d4d; --primary: #0a0a0a; --primary-fg: #fff; }
+        :root { --canvas: #f5f7fc; --surface: #fff; --line: #dfe3ef; --fg: #0b1020; --fg-muted: #4d4d4d; --primary: #0a0a0a; --primary-fg: #fff; }
         @media (prefers-color-scheme: dark) {
-            :root { --canvas: #0a0a0a; --surface: #141414; --line: #2a2a2a; --fg: #f5f5f5; --fg-muted: #b3b3b3; --primary: #f5f5f5; --primary-fg: #0a0a0a; }
+            :root { --canvas: #0a0e1a; --surface: #121829; --line: #2a3450; --fg: #f2f4fa; --fg-muted: #b3b3b3; --primary: #f5f5f5; --primary-fg: #0a0a0a; }
         }
         body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 1rem; box-sizing: border-box;
             font: 400 15px/24px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: var(--canvas); color: var(--fg); }

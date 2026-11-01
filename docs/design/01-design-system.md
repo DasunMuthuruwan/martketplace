@@ -29,6 +29,8 @@
 
 ## 3. Colour Tokens
 
+> **Updated 2026-10-31 (ADR-028):** the palette is now ink navy, white, cobalt and amber. `resources/css/app.css` is the source of truth for values; the tables below show the earlier monochrome values. New tokens: `accent`, `accent-fg`, `accent-hover`, `ink`, `shadow-card`. Radii are 10, 16 and 20 px.
+
 Defined once as CSS variables (`:root` = light, `.dark` = dark) and exposed to Tailwind through `@theme inline` (e.g. `bg-surface`, `text-fg-muted`, `border-line`). Components never use raw hex values.
 
 ### 3.1 Light Theme

@@ -6,17 +6,19 @@
     @php($cc = strtolower($country->iso2))
 
     {{-- Hero (layout doc §3.1). Phones get a search box here: the header only has a search icon. --}}
-    <section class="mb-8 rounded-card border border-line bg-surface px-5 py-7 sm:px-8 sm:py-10">
-        <h1 class="max-w-2xl text-h1 font-[650] sm:text-display">{{ __('public.home.hero', ['country' => $country->name]) }}</h1>
-        <p class="mt-2 max-w-2xl text-body text-fg-muted">{{ __('public.home.subline') }}</p>
-        <form method="GET" action="{{ route('ads.country', ['cc' => $cc]) }}" role="search" class="mt-5 flex max-w-xl lg:hidden">
+    <section class="dark relative mb-8 overflow-hidden rounded-sheet bg-ink px-5 py-9 text-fg sm:px-10 sm:py-14 lg:px-14 lg:py-16">
+        <div aria-hidden="true" class="absolute -top-24 -right-16 hidden size-[26rem] rounded-full bg-primary xl:block"></div>
+        <div aria-hidden="true" class="absolute right-52 -bottom-24 hidden size-56 rounded-full bg-accent xl:block"></div>
+        <h1 class="max-w-3xl text-[2rem] leading-[2.25rem] font-bold tracking-tight sm:text-display lg:text-[3.5rem] lg:leading-[3.75rem]">{{ __('public.home.hero', ['country' => $country->name]) }}</h1>
+        <p class="mt-3 max-w-2xl text-body text-fg-muted sm:text-lg">{{ __('public.home.subline') }}</p>
+        <form method="GET" action="{{ route('ads.country', ['cc' => $cc]) }}" role="search" class="mt-6 flex max-w-2xl">
             <label for="home-q" class="sr-only">{{ __('layout.search_label') }}</label>
             <input id="home-q" type="search" name="q" maxlength="100" @include('partials.search.suggest-attributes', ['cc' => $cc]) placeholder="{{ __('layout.search_placeholder') }}"
                 class="h-11 min-w-0 flex-1 rounded-l-control border border-r-0 border-control bg-surface px-3 text-fg placeholder:text-fg-subtle">
             <button type="submit" class="grid h-11 w-12 place-items-center rounded-r-control bg-primary text-primary-fg" aria-label="{{ __('layout.search') }}"><x-ui.icon name="search" size="20" /></button>
         </form>
         @if ($postUrl = \App\View\Navigation::url('post'))
-            <x-ui.button :href="$postUrl" icon="plus" size="lg" class="mt-5 hidden lg:inline-flex">{{ __('public.home.post_cta') }}</x-ui.button>
+            <x-ui.button variant="accent" :href="$postUrl" icon="plus" size="lg" class="mt-6 hidden lg:inline-flex">{{ __('public.home.post_cta') }}</x-ui.button>
         @endif
     </section>
 
@@ -25,7 +27,7 @@
     @if ($categories->isNotEmpty())
         <section aria-labelledby="home-categories" class="mb-10">
             <h2 id="home-categories" class="mb-3 text-h2 font-semibold">{{ __('public.home.browse') }}</h2>
-            <ul class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                 @foreach ($categories as $category)
                     <li><x-category.tile :category="$category" :count="$categoryCounts[$category->id] ?? 0" :href="route('ads.category', ['cc' => $cc, 'category' => $category->slug])" class="h-full" /></li>
                 @endforeach

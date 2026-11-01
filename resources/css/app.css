@@ -20,46 +20,56 @@
 /* ---- Colour tokens (design system §3) -------------------------------------------------- */
 :root {
     color-scheme: light;
-    --canvas: #f7f7f7;
+    --canvas: #f5f7fc;
     --surface: #ffffff;
-    --surface-muted: #f0f0f0;
-    --surface-hover: #f0f0f0;
-    --line: #e5e5e5;
-    --control: #858585;
-    --fg: #0a0a0a;
-    --fg-muted: #4d4d4d;
-    --fg-subtle: #666666;
-    --primary: #0a0a0a;
+    --surface-muted: #eceff8;
+    --surface-hover: #e6eaf6;
+    --line: #dfe3ef;
+    --control: #7c859b;
+    --fg: #0b1020;
+    --fg-muted: #434a5e;
+    --fg-subtle: #586075;
+    --primary: #2447e8;
     --primary-fg: #ffffff;
-    --primary-hover: #262626;
-    --success: #137333;
+    --primary-hover: #1b37be;
+    --accent: #ffb020;
+    --accent-fg: #1a1200;
+    --accent-hover: #ffc14d;
+    --ink: #0b1020;
+    --success: #0f7a3c;
     --danger: #c5221f;
     --warning: #8a5300;
-    --info: #1a56db;
-    --overlay: rgb(10 10 10 / 0.5);
+    --info: #2447e8;
+    --overlay: rgb(11 16 32 / 0.55);
     --whatsapp: #25d366;
-    --shadow-overlay: 0 12px 32px -8px rgb(0 0 0 / 0.18);
+    --shadow-card: 0 1px 2px rgb(11 16 32 / 0.05), 0 10px 24px -14px rgb(11 16 32 / 0.2);
+    --shadow-overlay: 0 16px 40px -10px rgb(11 16 32 / 0.28);
 }
 
 .dark {
     color-scheme: dark;
-    --canvas: #0a0a0a;
-    --surface: #141414;
-    --surface-muted: #1c1c1c;
-    --surface-hover: #1f1f1f;
-    --line: #2a2a2a;
-    --control: #6e6e6e;
-    --fg: #f5f5f5;
-    --fg-muted: #b3b3b3;
-    --fg-subtle: #949494;
-    --primary: #f5f5f5;
-    --primary-fg: #0a0a0a;
-    --primary-hover: #d9d9d9;
+    --canvas: #0a0e1a;
+    --surface: #121829;
+    --surface-muted: #1a2237;
+    --surface-hover: #212b45;
+    --line: #2a3450;
+    --control: #6f7a93;
+    --fg: #f2f4fa;
+    --fg-muted: #b8c0d2;
+    --fg-subtle: #9aa4bb;
+    --primary: #8ea6ff;
+    --primary-fg: #0a0e1a;
+    --primary-hover: #aabcff;
+    --accent: #ffb020;
+    --accent-fg: #1a1200;
+    --accent-hover: #ffc14d;
+    --ink: #0a0e1a;
     --success: #4cc38a;
     --danger: #ff7a70;
     --warning: #f5b83d;
-    --info: #7ea6ff;
+    --info: #8ea6ff;
     --overlay: rgb(0 0 0 / 0.7);
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 28px -14px rgb(0 0 0 / 0.7);
     --shadow-overlay: 0 16px 40px -8px rgb(0 0 0 / 0.7);
 }
 
@@ -76,6 +86,10 @@
     --color-primary: var(--primary);
     --color-primary-fg: var(--primary-fg);
     --color-primary-hover: var(--primary-hover);
+    --color-accent: var(--accent);
+    --color-accent-fg: var(--accent-fg);
+    --color-accent-hover: var(--accent-hover);
+    --color-ink: var(--ink);
     --color-success: var(--success);
     --color-danger: var(--danger);
     --color-warning: var(--warning);
@@ -83,6 +97,7 @@
     --color-overlay: var(--overlay);
     --color-whatsapp: var(--whatsapp);
     --shadow-overlay: var(--shadow-overlay);
+    --shadow-card: var(--shadow-card);
 }
 
 /* ---- Typography, shape, motion (design system §4, §5, §8) ----------------------------- */
@@ -90,18 +105,18 @@
     --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-    --text-display: 2rem;
-    --text-display--line-height: 2.5rem;
-    --text-h1: 1.625rem;
-    --text-h1--line-height: 2rem;
+    --text-display: 2.75rem;
+    --text-display--line-height: 3rem;
+    --text-h1: 1.75rem;
+    --text-h1--line-height: 2.125rem;
     --text-h2: 1.25rem;
     --text-h2--line-height: 1.75rem;
     --text-h3: 1rem;
     --text-h3--line-height: 1.5rem;
     --text-price-xl: 1.75rem;
     --text-price-xl--line-height: 2.125rem;
-    --text-price: 1rem;
-    --text-price--line-height: 1.375rem;
+    --text-price: 1.125rem;
+    --text-price--line-height: 1.5rem;
     --text-body: 0.9375rem;
     --text-body--line-height: 1.5rem;
     --text-ui: 0.875rem;
@@ -111,9 +126,9 @@
     --text-micro: 0.75rem;
     --text-micro--line-height: 1rem;
 
-    --radius-control: 6px;
-    --radius-card: 10px;
-    --radius-sheet: 14px;
+    --radius-control: 10px;
+    --radius-card: 16px;
+    --radius-sheet: 20px;
 
     --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
     --duration-fast: 120ms;
@@ -124,7 +139,7 @@
     --breakpoint-md: 48rem;
     --breakpoint-lg: 64rem;
     --breakpoint-xl: 80rem;
-    --container-page: 77.5rem;
+    --container-page: 90rem;
 }
 
 /* ---- Base ---------------------------------------------------------------------------- */

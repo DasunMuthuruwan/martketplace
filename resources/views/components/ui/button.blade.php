@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'primary',   // primary | secondary | ghost | danger | link
+    'variant' => 'primary',   // primary | accent (the page's main call to action) | secondary | ghost | danger | link
     'size' => 'md',           // sm 32 | md 40 | lg 44
     'href' => null,
     'type' => 'button',
@@ -18,6 +18,7 @@
     ];
     $variants = [
         'primary' => 'bg-primary text-primary-fg hover:bg-primary-hover',
+        'accent' => 'bg-accent font-semibold text-accent-fg hover:bg-accent-hover',
         'secondary' => 'border border-control bg-surface text-fg hover:bg-surface-hover',
         'ghost' => 'text-fg hover:bg-surface-hover',
         'danger' => 'bg-danger text-canvas hover:opacity-90',

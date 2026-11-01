@@ -73,7 +73,7 @@ Before making changes:
 
 ## UI/UX Standards
 
-Use a premium White + Black design with light and dark themes, responsive layouts, consistent typography, controlled spacing, accessible forms and reusable components.
+Use the premium ink, white, cobalt and amber design (owner 2026-10-31, ADR-028) with light and dark themes, responsive layouts, consistent typography, controlled spacing, accessible forms and reusable components.
 
 Avoid excessive padding, inconsistent colors, unnecessary animations and duplicated components.
 
@@ -108,6 +108,7 @@ Record completed tasks, architectural decisions, known issues and pending work. 
 - Phase prompt files: `docs/01-…` to `docs/10-…` (`docs/02-system-design.md` also holds the owner's answers to Q1–Q16)
 - Existing Dev Talk blog (read-only reference, never modify): `C:\php8.2\htdocs\blog-site\blog`
 - The marketplace has its own modern marketplace-portal theme. Do not reuse Dev Talk's theme.
+- Colours live only in the tokens in `resources/css/app.css`. Amber (`accent`) is kept for the main call to action and paid highlights. `npx playwright test --project=responsive` checks 320 to 1920 px.
 - Portability is mandatory (the domain and hosting will change later). Never hardcode the domain: all URLs come from `APP_URL` / `route()` / `Storage::url()`. Follow rules P1–P11 in `docs/architecture/11-domain-migration-and-portability.md`.
 - Binding implementation requirements from approved decisions: `docs/architecture/02-system-architecture.md` §12–§13.
 - **Global marketplace (2026-10-11):** multi-country. Never hardcode a country, currency, phone format, location label or land unit (`LKR`, `Sri Lanka`, `+94`, `Province`, `perch`) in code. These live in data (countries, currencies, regions, cities, measurement units). See `docs/architecture/13-global-marketplace.md`.

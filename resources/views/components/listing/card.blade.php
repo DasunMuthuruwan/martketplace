@@ -25,12 +25,12 @@
     }
 @endphp
 <article {{ $attributes->class([
-    'group relative flex overflow-hidden rounded-card border border-line bg-surface transition-colors duration-(--duration-fast) hover:border-control focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
+    'group relative flex overflow-hidden rounded-card border border-line bg-surface transition-[border-color,box-shadow] duration-(--duration-menu) hover:border-control hover:shadow-card focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
     'flex-col' => ! $row,
 ]) }}>
-    <div @class(['relative shrink-0 bg-surface-muted aspect-[4/3]', 'w-32 sm:w-40' => $row])>
+    <div @class(['relative shrink-0 overflow-hidden bg-surface-muted aspect-[4/3]', 'w-32 sm:w-44' => $row])>
         @if ($cover)
-            <img src="{{ $cover }}" alt="" width="480" height="360" @if ($eager) fetchpriority="{{ $eager === 'high' ? 'high' : 'auto' }}" @else loading="lazy" @endif decoding="async" class="size-full object-cover">
+            <img src="{{ $cover }}" alt="" width="480" height="360" @if ($eager) fetchpriority="{{ $eager === 'high' ? 'high' : 'auto' }}" @else loading="lazy" @endif decoding="async" class="size-full object-cover transition-transform duration-(--duration-modal) ease-(--ease-standard) group-hover:scale-[1.03] motion-reduce:transform-none">
         @else
             <div class="grid size-full place-items-center text-fg-subtle"><x-ui.icon :name="$icon" size="24" /></div>
         @endif
@@ -44,7 +44,7 @@
         @elseif ($promoted || $listing->isUrgent())
             <span class="absolute left-2 top-2 flex flex-wrap gap-1">
                 @if ($promoted)<x-ui.badge variant="neutral" data-top-ad-badge>{{ __('boosts.top.badge') }}</x-ui.badge>@endif
-                @if ($listing->isUrgent())<x-ui.badge variant="warning" data-urgent-badge>{{ __('boosts.urgent.badge') }}</x-ui.badge>@endif
+                @if ($listing->isUrgent())<x-ui.badge variant="accent" data-urgent-badge>{{ __('boosts.urgent.badge') }}</x-ui.badge>@endif
             </span>
         @endif
     </div>

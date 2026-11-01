@@ -11,7 +11,7 @@
         <img src="{{ asset($logo) }}" alt="{{ __('layout.home_label', ['name' => $name]) }}" height="32" class="h-8 w-auto {{ $logoDark ? 'dark:hidden' : '' }}">
         @if ($logoDark)<img src="{{ asset($logoDark) }}" alt="{{ __('layout.home_label', ['name' => $name]) }}" height="32" class="hidden h-8 w-auto dark:block">@endif
     @else
-        <span aria-hidden="true" class="grid size-8 shrink-0 place-items-center rounded-control bg-primary text-ui font-bold text-primary-fg">{{ mb_strtoupper(mb_substr($name, 0, 1)) }}</span>
-        <span class="truncate text-h3 font-semibold tracking-tight">{{ $name }}</span><span class="sr-only"> {{ __('layout.home_suffix') }}</span>
+        <span aria-hidden="true" class="grid size-9 shrink-0 place-items-center rounded-control bg-primary text-body font-bold text-primary-fg">{{ mb_strtoupper(mb_substr($name, 0, 1)) }}</span>
+        <span class="truncate text-h2 font-bold tracking-tight">{{ $name }}</span><span class="sr-only"> {{ __('layout.home_suffix') }}</span>
     @endif
 </a>

@@ -146,7 +146,7 @@ class SearchPageTest extends TestCase
 
         $html = $this->get($this->carsUrl(['view' => 'list']))->getContent();
 
-        $this->assertStringContainsString('w-32 sm:w-40', $html);       // row variant photo column
+        $this->assertStringContainsString('w-32 sm:w-44', $html);       // row variant photo column
         $this->assertStringContainsString('85000', $html);              // key fact on the card
         $this->assertMatchesRegularExpression('/aria-label="'.__('search.view_list').'"\s+aria-current="true"/', $html);
     }

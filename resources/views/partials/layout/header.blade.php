@@ -7,14 +7,14 @@
     $savedUrl = \App\View\Navigation::url('saved');
 @endphp
 <header class="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
-    <div class="mx-auto flex h-14 max-w-(--container-page) items-center gap-2 px-4 sm:gap-3 lg:h-16 lg:px-6">
+    <div class="mx-auto flex h-14 max-w-(--container-page) items-center gap-2 px-4 sm:gap-3 lg:h-[72px] lg:px-6">
         @include('partials.layout.brand')
 
-        <form method="GET" action="{{ $searchAction }}" role="search" class="ml-4 hidden max-w-xl flex-1 lg:flex">
+        <form method="GET" action="{{ $searchAction }}" role="search" class="ml-4 hidden max-w-2xl flex-1 lg:flex">
             <label for="header-q" class="sr-only">{{ __('layout.search_label') }}</label>
             <input id="header-q" type="search" name="q" value="{{ request('q') }}" maxlength="100" @include('partials.search.suggest-attributes', ['cc' => $currentCountry ? strtolower($currentCountry->iso2) : null]) placeholder="{{ __('layout.search_placeholder') }}"
-                class="h-10 min-w-0 flex-1 rounded-l-control border border-r-0 border-control bg-surface px-3 text-fg placeholder:text-fg-subtle">
-            <button type="submit" class="grid h-10 w-11 place-items-center rounded-r-control bg-primary text-primary-fg hover:bg-primary-hover" aria-label="{{ __('layout.search') }}">
+                class="h-11 min-w-0 flex-1 rounded-l-full border border-r-0 border-control bg-surface-muted pl-5 pr-3 text-fg placeholder:text-fg-subtle">
+            <button type="submit" class="grid h-11 w-14 place-items-center rounded-r-full bg-primary text-primary-fg hover:bg-primary-hover" aria-label="{{ __('layout.search') }}">
                 <x-ui.icon name="search" size="20" />
             </button>
         </form>
@@ -31,7 +31,7 @@
                     <x-ui.button variant="ghost" icon="heart" :href="$savedUrl" :label="__('layout.saved')" />
                 @endif
                 @if ($postUrl)
-                    <x-ui.button :href="$postUrl" icon="plus">{{ __('layout.post_ad') }}</x-ui.button>
+                    <x-ui.button variant="accent" :href="$postUrl" icon="plus">{{ __('layout.post_ad') }}</x-ui.button>
                 @endif
             </div>
 

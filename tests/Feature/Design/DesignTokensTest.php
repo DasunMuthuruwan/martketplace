@@ -9,23 +9,25 @@ use InvalidArgumentException;
 use Tests\TestCase;
 
 /**
- * F1.1: the CSS tokens match the approved design system (docs/design/01-design-system.md §3) and
+ * F1.1: the CSS tokens match the approved palette (ADR-028) and
  * keep the verified contrast (§3.3); icons and the no-flash theme script work.
  */
 class DesignTokensTest extends TestCase
 {
     private const LIGHT = [
-        'canvas' => '#f7f7f7', 'surface' => '#ffffff', 'surface-muted' => '#f0f0f0', 'surface-hover' => '#f0f0f0',
-        'line' => '#e5e5e5', 'control' => '#858585', 'fg' => '#0a0a0a', 'fg-muted' => '#4d4d4d', 'fg-subtle' => '#666666',
-        'primary' => '#0a0a0a', 'primary-fg' => '#ffffff', 'primary-hover' => '#262626',
-        'success' => '#137333', 'danger' => '#c5221f', 'warning' => '#8a5300', 'info' => '#1a56db',
+        'canvas' => '#f5f7fc', 'surface' => '#ffffff', 'surface-muted' => '#eceff8', 'surface-hover' => '#e6eaf6',
+        'line' => '#dfe3ef', 'control' => '#7c859b', 'fg' => '#0b1020', 'fg-muted' => '#434a5e', 'fg-subtle' => '#586075',
+        'primary' => '#2447e8', 'primary-fg' => '#ffffff', 'primary-hover' => '#1b37be',
+        'accent' => '#ffb020', 'accent-fg' => '#1a1200', 'accent-hover' => '#ffc14d', 'ink' => '#0b1020',
+        'success' => '#0f7a3c', 'danger' => '#c5221f', 'warning' => '#8a5300', 'info' => '#2447e8',
     ];
 
     private const DARK = [
-        'canvas' => '#0a0a0a', 'surface' => '#141414', 'surface-muted' => '#1c1c1c', 'surface-hover' => '#1f1f1f',
-        'line' => '#2a2a2a', 'control' => '#6e6e6e', 'fg' => '#f5f5f5', 'fg-muted' => '#b3b3b3', 'fg-subtle' => '#949494',
-        'primary' => '#f5f5f5', 'primary-fg' => '#0a0a0a', 'primary-hover' => '#d9d9d9',
-        'success' => '#4cc38a', 'danger' => '#ff7a70', 'warning' => '#f5b83d', 'info' => '#7ea6ff',
+        'canvas' => '#0a0e1a', 'surface' => '#121829', 'surface-muted' => '#1a2237', 'surface-hover' => '#212b45',
+        'line' => '#2a3450', 'control' => '#6f7a93', 'fg' => '#f2f4fa', 'fg-muted' => '#b8c0d2', 'fg-subtle' => '#9aa4bb',
+        'primary' => '#8ea6ff', 'primary-fg' => '#0a0e1a', 'primary-hover' => '#aabcff',
+        'accent' => '#ffb020', 'accent-fg' => '#1a1200', 'accent-hover' => '#ffc14d', 'ink' => '#0a0e1a',
+        'success' => '#4cc38a', 'danger' => '#ff7a70', 'warning' => '#f5b83d', 'info' => '#8ea6ff',
     ];
 
     /** @return array<string, string> */
@@ -61,6 +63,7 @@ class DesignTokensTest extends TestCase
                 $this->assertGreaterThanOrEqual(3.0, $this->contrast($t['control'], $t[$bg]), "{$theme}: control on {$bg}");
             }
             $this->assertGreaterThanOrEqual(4.5, $this->contrast($t['primary-fg'], $t['primary']), "{$theme}: primary-fg on primary");
+            $this->assertGreaterThanOrEqual(4.5, $this->contrast($t['accent-fg'], $t['accent']), "{$theme}: accent-fg on accent");
         }
     }
 

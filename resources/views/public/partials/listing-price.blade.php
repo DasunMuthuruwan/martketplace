@@ -9,7 +9,7 @@
     <h1 class="pt-1 text-h1 font-[650] prose-user">{{ $listing->title }}</h1>
     @if ($listing->isUrgent())
         <p class="flex flex-wrap items-center gap-1.5 text-small text-fg-subtle">
-            <x-ui.badge variant="warning" data-urgent-badge>{{ __('boosts.urgent.badge') }}</x-ui.badge>
+            <x-ui.badge variant="accent" data-urgent-badge>{{ __('boosts.urgent.badge') }}</x-ui.badge>
             {{ __('boosts.urgent.note') }}
         </p>
     @endif

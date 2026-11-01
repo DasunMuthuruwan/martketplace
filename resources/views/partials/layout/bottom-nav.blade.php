@@ -23,7 +23,7 @@
                 @if ($url === null)
                     <span aria-disabled="true" title="{{ __('layout.nav.soon') }}" class="flex flex-1 flex-col items-center justify-center gap-0.5 text-micro text-fg-subtle opacity-50">
                         @if ($key === 'post')
-                            <span class="-mt-4 grid size-11 place-items-center rounded-full border-4 border-surface bg-primary text-primary-fg"><x-ui.icon :name="$icon" size="20" /></span>
+                            <span class="-mt-4 grid size-12 place-items-center rounded-full border-4 border-surface bg-accent text-accent-fg"><x-ui.icon :name="$icon" size="20" /></span>
                         @else
                             <x-ui.icon :name="$icon" size="20" />
                         @endif
@@ -31,9 +31,9 @@
                     </span>
                 @else
                     <a href="{{ $url }}" @if ($active) aria-current="page" @endif
-                        class="flex flex-1 flex-col items-center justify-center gap-0.5 text-micro text-fg-subtle aria-[current]:font-semibold aria-[current]:text-fg">
+                        class="flex flex-1 flex-col items-center justify-center gap-0.5 text-micro text-fg-subtle aria-[current]:font-semibold aria-[current]:text-primary">
                         @if ($key === 'post')
-                            <span class="-mt-4 grid size-11 place-items-center rounded-full border-4 border-surface bg-primary text-primary-fg"><x-ui.icon :name="$icon" size="20" /></span>
+                            <span class="-mt-4 grid size-12 place-items-center rounded-full border-4 border-surface bg-accent text-accent-fg"><x-ui.icon :name="$icon" size="20" /></span>
                         @else
                             <x-ui.icon :name="$icon" size="20" />
                         @endif
