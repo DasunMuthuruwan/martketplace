@@ -106,7 +106,7 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] G5a Seller ratings (eligibility, stars, comments, replies) — merged 2026-10-23
   - [x] G5b Review moderation, reporting and trust badges — merged 2026-10-23
   - [x] G6 QA and docs — merged 2026-10-24
-- [ ] M10 Deployment (staging → production, DNS/SSL approval)
+- [~] M10 Deployment (staging → production, DNS/SSL approval) — plan [deployment-plan.md](../operations/deployment-plan.md) awaiting owner review (2026-11-04); tasks D9.1–D9.7
 - [ ] M11 Operations
 
 ## Owner Content
