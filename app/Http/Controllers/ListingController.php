@@ -31,6 +31,8 @@ class ListingController extends Controller
 {
     public const SIMILAR = 4;
 
+    public const SELLER_MORE = 4;
+
     public function __construct(
         private readonly ListingPresenter $present,
         private readonly ContactResolver $contact,
@@ -90,7 +92,8 @@ class ListingController extends Controller
             'attributes' => $this->attributeRows($listing, $labels),
             'buttons' => $this->contact->buttons($listing, $request->user()),
             'favourited' => $request->user()?->favourites()->whereKey($listing->id)->exists() ?? false,
-            'similar' => $this->similar($listing),
+            'sellerMore' => $sellerMore = $this->sellerMore($listing),
+            'similar' => $this->similar($listing, $sellerMore->modelKeys()),
             'makePage' => app(MakePages::class)->forListing($listing), // "More Toyota Aqua ads" (G4)
             'reviewSummary' => app(SellerReviews::class)->summary($listing->user), // seller card (G5)
             'sellerTrusted' => app(TrustBadges::class)->isTrusted($listing->user),
@@ -140,14 +143,35 @@ class ListingController extends Controller
         return $rows;
     }
 
-    /** @return Collection<int, Listing> */
-    private function similar(Listing $listing): Collection
+    /**
+     * Same category and country; ads already in "More from this seller" are left out so the two
+     * sections never repeat each other (U2).
+     *
+     * @param  list<int>  $shown
+     * @return Collection<int, Listing>
+     */
+    private function similar(Listing $listing, array $shown = []): Collection
     {
         return Listing::public()->where('category_id', $listing->category_id)->where('country_id', $listing->country_id)
             ->whereKeyNot($listing->id)
+            ->when($shown !== [], fn ($q) => $q->whereNotIn('listings.id', $shown))
             ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
             ->withCount('images')
             ->orderByDesc('sorted_at')->limit(self::SIMILAR)->get();
+    }
+
+    /**
+     * Other public ads by the same seller in the same country (U2), current ad excluded.
+     *
+     * @return Collection<int, Listing>
+     */
+    private function sellerMore(Listing $listing): Collection
+    {
+        return Listing::public()->where('listings.user_id', $listing->user_id)->where('listings.country_id', $listing->country_id)
+            ->whereKeyNot($listing->id)
+            ->with(['country', 'currencyModel', 'coverImage', 'city', 'region', 'subregion', 'locality', 'category.parent'])
+            ->withCount('images')
+            ->orderByDesc('sorted_at')->limit(self::SELLER_MORE)->get();
     }
 
     private function ownedBy(Request $request, Listing $listing): bool

@@ -6,7 +6,7 @@
             aria-label="{{ __('layout.country_label', ['country' => $currentCountry?->name ?? __('layout.all_countries')]) }}">
             @if ($currentCountry)
                 <x-ui.flag :code="$currentCountry->iso2" class="text-base" />
-                <span class="hidden xl:inline">{{ $currentCountry->name }}</span>
+                <span class="hidden max-w-32 truncate lg:inline">{{ $currentCountry->name }}</span>
             @else
                 <x-ui.icon name="globe" size="20" />
             @endif

@@ -68,6 +68,8 @@ return [
         'report_details_hint' => 'Required for "Something else". Do not include personal information.',
         'report_send' => 'Send report',
         'safety_title' => 'Stay safe',
+        'copy_number' => 'Copy',
+        'number_copied' => 'Number copied',
         'safety_tips' => [
             'Meet in a busy public place, in daylight if you can.',
             'Inspect the item, and test it, before you pay.',

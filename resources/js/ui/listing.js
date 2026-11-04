@@ -131,6 +131,9 @@ async function reveal(button) {
     if (!box || !messages) {
         return;
     }
+    if (button.getAttribute('aria-busy') === 'true') {
+        return; // one request at a time
+    }
     const channel = button.dataset.contactChannel;
     // A popup must open in the click itself; it is pointed at WhatsApp once the link arrives.
     const popup = channel === 'whatsapp' ? window.open('', '_blank') : null;
@@ -145,10 +148,20 @@ async function reveal(button) {
         result.replaceChildren();
         const link = document.createElement('a');
         link.href = `tel:${data.phone}`;
-        link.className = 'flex h-11 items-center justify-center gap-2 rounded-control border border-control bg-surface text-price font-bold tabular text-fg hover:bg-surface-hover';
+        link.className = 'flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-control border border-control bg-surface text-price font-bold tabular text-fg hover:bg-surface-hover';
         link.textContent = data.display;
         link.setAttribute('aria-label', `${messages.callLabel} ${data.display}`);
-        result.append(link);
+        // Copy the number (U2): handy on desktop, where tel: links often do nothing.
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'h-11 shrink-0 rounded-control border border-control bg-surface px-3 text-ui font-medium text-fg hover:bg-surface-hover';
+        copy.textContent = messages.copy;
+        copy.setAttribute('aria-label', `${messages.copy} ${data.display}`);
+        copy.dataset.copyPhone = data.display;
+        const row = document.createElement('div');
+        row.className = 'flex gap-2';
+        row.append(link, copy);
+        result.append(row);
         box.querySelector('[data-contact-challenge]')?.setAttribute('hidden', '');
         return;
     }
@@ -195,7 +208,7 @@ document.addEventListener('click', async (event) => {
     event.preventDefault();
     const { status, data } = await postJson(button.dataset.favouriteUrl, {});
     if (status !== 200) {
-        showToast(document.querySelector('[data-contact-messages]')?.dataset.error ?? '', 'error');
+        showToast(button.dataset.error ?? document.querySelector('[data-contact-messages]')?.dataset.error ?? '', 'error');
         return;
     }
     document.querySelectorAll(`[data-favourite-url="${button.dataset.favouriteUrl}"]`).forEach((b) => {
@@ -255,4 +268,20 @@ document.addEventListener('submit', async (event) => {
     error.textContent = first || form.dataset.error;
     error.hidden = false;
     window.turnstile?.reset?.();
+});
+
+// ---- Copy a revealed number (U2) ----------------------------------------------------------
+
+document.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-copy-phone]');
+    if (!button) {
+        return;
+    }
+    const messages = button.closest('[data-contact-box]')?.querySelector('[data-contact-messages]')?.dataset ?? {};
+    try {
+        await navigator.clipboard.writeText(button.dataset.copyPhone);
+        showToast(messages.copied ?? '', 'success');
+    } catch {
+        showToast(messages.error ?? '', 'error');
+    }
 });

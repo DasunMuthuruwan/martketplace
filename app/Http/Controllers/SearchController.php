@@ -64,6 +64,13 @@ class SearchController extends Controller
             ['category', 'subcategory', 'region', 'city'],
         );
 
+        // The home search's category selector sends ?category=slug: move it into the path.
+        if ($category === null && $region === null && is_string($request->query('category'))) {
+            if ($redirect = $this->queryCategory($request->query('category'), $country, $request)) {
+                return $redirect;
+            }
+        }
+
         [$leaf, $redirect] = $this->pathCategory($category, $subcategory, $country, $request);
         if ($redirect !== null) {
             return $redirect;
@@ -236,6 +243,22 @@ class SearchController extends Controller
      *
      * @return array{0: Category|null, 1: RedirectResponse|null}
      */
+    /** `/{cc}/ads?category=slug` → the category's own path (302), other query values kept; unknown slugs are ignored. */
+    private function queryCategory(string $slug, Country $country, Request $request): ?RedirectResponse
+    {
+        $target = Category::where('slug', $slug)->with('parent')->first();
+        if ($target === null || ! $target->isAvailableIn($country->iso2)) {
+            return null;
+        }
+
+        $params = ['cc' => strtolower($country->iso2)] + ($target->parent === null
+            ? ['category' => $target->slug]
+            : ['category' => $target->parent->slug, 'subcategory' => $target->slug]);
+        $query = Arr::except($request->query(), ['category']);
+
+        return redirect()->to(route('ads.category', $params).($query !== [] ? '?'.http_build_query($query) : ''));
+    }
+
     private function pathCategory(?string $slug, ?string $subSlug, Country $country, Request $request): array
     {
         if ($slug === null) {

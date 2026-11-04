@@ -77,6 +77,7 @@ class HomePagesTest extends TestCase
         $html = $this->get('/'.strtolower($this->country->iso2))->assertOk()->getContent();
 
         $this->assertStringContainsString(__('public.home.hero', ['country' => 'Testland']), $html);
+        $this->assertStringContainsString(e(__('public.home.subline', ['country' => 'Testland'])), $html); // country in the line under the headline
         $this->assertStringContainsString('href="'.route('ads.category', ['cc' => strtolower($this->country->iso2), 'category' => 'vehicles']).'"', $html);
         $this->assertStringContainsString('2 ads', $html);
         $this->assertStringContainsString('listing-grid', $html);
@@ -108,8 +109,10 @@ class HomePagesTest extends TestCase
         $this->assertStringContainsString(__('public.price_types.negotiable'), $html);
         $this->assertMatchesRegularExpression('/2<span class="sr-only"> photos/', $html);
         $this->assertDoesNotMatchRegularExpression('/>\s*·\s*<time/', $html); // no stray separator without a place
-        $this->assertSame(1, substr_count($html, '<a '));                     // the whole card is one link
-        $this->assertStringContainsString('href="'.$listing->publicUrl().'"', $html);
+        // The whole card is one link to the ad; the heart (U2) is its own control (a log-in link for guests).
+        $this->assertSame(1, substr_count($html, 'href="'.$listing->publicUrl().'"'));
+        $this->assertSame(2, substr_count($html, '<a '));
+        $this->assertStringContainsString('data-card-favourite href="'.route('login').'"', $html);
         $this->assertStringContainsString('<time datetime=', $html);
     }
 

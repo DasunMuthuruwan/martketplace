@@ -121,7 +121,8 @@ class ListingPageTest extends TestCase
     public function test_similar_ads_use_the_card_grid(): void
     {
         $listing = $this->ad();
-        $this->ad(['title' => 'Another hatchback']);
+        // Another seller's ad: the same seller's ads go under "More from" instead (U2).
+        Listing::factory()->inCountry($this->country)->create(['category_id' => $this->cars->id, 'title' => 'Another hatchback']);
 
         $html = $this->get($listing->publicUrl())->getContent();
 

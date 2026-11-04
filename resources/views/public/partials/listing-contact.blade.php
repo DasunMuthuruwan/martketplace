@@ -31,7 +31,7 @@
             data-login="{{ __('public.login_to_contact') }}" data-login-url="{{ route('login') }}"
             data-unavailable="{{ __('listings.detail.unavailable') }}" data-limit="{{ __('listings.detail.too_many') }}"
             data-error="{{ __('listings.detail.error') }}" data-whatsapp="{{ __('listings.detail.whatsapp_opened') }}"
-            data-call-label="{{ __('listings.detail.call') }}"></template>
+            data-call-label="{{ __('listings.detail.call') }}" data-copy="{{ __('listings.detail.copy_number') }}" data-copied="{{ __('listings.detail.number_copied') }}"></template>
     @endif
     <p class="flex items-start gap-2 text-small text-fg-subtle"><x-ui.icon name="shield-check" size="16" class="mt-0.5 text-success" />{{ __('public.safety') }}</p>
 </div>

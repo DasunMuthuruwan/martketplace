@@ -8,7 +8,7 @@
     </div>
 @else
     <section aria-label="{{ __('listings.detail.photos') }}" data-gallery class="space-y-2">
-        <div class="relative overflow-hidden rounded-card border border-line bg-[#0a0a0a]">
+        <div class="relative overflow-hidden rounded-card border border-line bg-ink">
             <ul data-gallery-track tabindex="0" aria-label="{{ __('listings.detail.photos_hint') }}"
                 class="flex aspect-[4/3] snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] focus-visible:outline-offset-[-2px] [&::-webkit-scrollbar]:hidden">
                 @foreach ($images as $image)
@@ -32,14 +32,14 @@
                 @foreach ($images as $image)
                     <li class="shrink-0">
                         <button type="button" data-gallery-thumb="{{ $loop->index }}" aria-label="{{ __('listings.detail.photo_n', ['n' => $loop->iteration, 'total' => $images->count()]) }}" @if ($loop->first) aria-current="true" @endif
-                            class="block h-14 w-[75px] overflow-hidden rounded-control border-2 border-transparent opacity-70 aria-[current]:border-primary aria-[current]:opacity-100 hover:opacity-100">
-                            <img src="{{ $image->url('sm') }}" alt="" width="75" height="56" loading="lazy" class="size-full object-cover">
+                            class="block h-16 w-[85px] overflow-hidden rounded-control border-2 border-transparent opacity-70 transition-opacity aria-[current]:border-primary aria-[current]:opacity-100 hover:opacity-100">
+                            <img src="{{ $image->url('sm') }}" alt="" width="85" height="64" loading="lazy" class="size-full object-cover">
                         </button>
                     </li>
                 @endforeach
             </ul>
         @endif
-        <dialog id="gallery-zoom" aria-label="{{ __('listings.detail.photos') }}" class="m-0 size-full max-h-none max-w-none bg-[#0a0a0a] p-0 backdrop:bg-black/90">
+        <dialog id="gallery-zoom" aria-label="{{ __('listings.detail.photos') }}" class="m-0 size-full max-h-none max-w-none bg-ink p-0 backdrop:bg-black/90">
             <x-ui.button variant="secondary" icon="x" :label="__('ui.close')" class="fixed right-4 top-4 z-10" data-modal-close />
             {{-- No src until a photo is opened (an empty src would request the page again). --}}
             <img alt="" data-gallery-zoom-image class="size-full object-contain">

@@ -90,6 +90,8 @@
     --color-accent-fg: var(--accent-fg);
     --color-accent-hover: var(--accent-hover);
     --color-ink: var(--ink);
+    /* Brand cobalt in both themes: for illustration fills on always-dark surfaces such as the hero. */
+    --color-cobalt: #2447e8;
     --color-success: var(--success);
     --color-danger: var(--danger);
     --color-warning: var(--warning);
@@ -449,3 +451,13 @@
     .stat-bar-top::-moz-progress-bar { background: var(--primary); }
 }
 
+/* A modal or drawer is open: the page behind it does not scroll (U2, guide §6.3). */
+html:has(dialog[open]:modal) {
+    overflow: hidden;
+}
+
+/* A contact button waiting for the server (U2). */
+[data-contact-channel][aria-busy="true"] {
+    cursor: progress;
+    opacity: 0.7;
+}

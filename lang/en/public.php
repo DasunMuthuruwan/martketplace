@@ -66,8 +66,22 @@ return [
 
     // Home pages (layout doc §3.1).
     'home' => [
-        'hero' => 'Buy and sell anything in :country',
-        'subline' => 'Vehicles, property, phones and more. Contact sellers directly.',
+        'eyebrow' => ':country marketplace',
+        'hero' => 'Find it. Buy it. Sell it.',
+        'subline' => 'Discover great deals on vehicles, property, electronics and more in :country. Connect directly with sellers.',
+        'hero_category' => 'Category',
+        'hero_all_categories' => 'All categories',
+        'hero_all_places' => 'Everywhere',
+        'featured' => 'Featured ads',
+        'featured_help' => 'Promoted by their sellers.',
+        'latest_help' => 'Fresh from sellers in :country.',
+        'safety_title' => 'Stay safe when you buy',
+        'safety_tips' => [
+            'Meet sellers in public places.',
+            'Inspect the item before you pay.',
+            'Avoid advance payments to sellers you do not know.',
+            'Report ads that look suspicious.',
+        ],
         'post_cta' => 'Post your ad',
         'browse' => 'Browse categories',
         'see_all' => 'See all',
@@ -86,7 +100,11 @@ return [
     'card' => [
         'photos' => 'photos',
         'sold' => 'Sold',
+        'save' => 'Save :title',
+        'save_error' => 'Could not save the ad. Please try again.',
     ],
+    'seller_more' => 'More from :name',
+    'seller_more_all' => 'All ads by this seller',
 
     // Popular, trending, most marked as sold (G2, ADR-027).
     'trends' => [

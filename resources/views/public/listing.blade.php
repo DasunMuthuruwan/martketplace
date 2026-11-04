@@ -35,14 +35,14 @@
     </nav>
 
     {{-- One column on phones (gallery, panel, details); on desktop the panel is a sticky right column. --}}
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-x-8">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,32%)] lg:items-start lg:gap-x-8">
         <div class="min-w-0 lg:col-start-1 lg:row-start-1">
             @include('public.partials.listing-gallery')
         </div>
 
-        <aside class="lg:sticky lg:top-20 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-label="{{ __('public.contact') }}">
+        <aside class="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-label="{{ __('public.contact') }}">
             <div class="space-y-4">
-                <div class="space-y-4 rounded-card border border-line bg-surface p-5">
+                <div class="space-y-4 rounded-card border border-line bg-surface p-5 shadow-card">
                     @include('public.partials.listing-price')
                     @include('public.partials.listing-contact')
                 </div>
@@ -61,12 +61,12 @@
             @if ($attributes !== [] || $listing->condition)
                 <section aria-labelledby="ad-details" class="rounded-card border border-line bg-surface p-5">
                     <h2 id="ad-details" class="mb-3 text-h2 font-semibold">{{ __('public.details') }}</h2>
-                    <dl class="grid gap-x-6 text-ui sm:grid-cols-2">
+                    <dl class="grid gap-x-8 text-ui sm:grid-cols-2">
                         @if ($listing->condition)
-                            <div class="flex justify-between gap-4 border-b border-line py-2"><dt class="text-fg-muted">{{ __('public.condition') }}</dt><dd class="text-right font-medium text-fg">{{ __('public.conditions.'.$listing->condition->value) }}</dd></div>
+                            <div class="flex justify-between gap-4 border-b border-line py-2.5"><dt class="shrink-0 text-fg-muted">{{ __('public.condition') }}</dt><dd class="min-w-0 break-words text-right font-semibold text-fg">{{ __('public.conditions.'.$listing->condition->value) }}</dd></div>
                         @endif
                         @foreach ($attributes as $label => $value)
-                            <div class="flex justify-between gap-4 border-b border-line py-2"><dt class="text-fg-muted">{{ $label }}</dt><dd class="prose-user text-right font-medium text-fg">{{ $value }}</dd></div>
+                            <div class="flex justify-between gap-4 border-b border-line py-2.5"><dt class="shrink-0 text-fg-muted">{{ $label }}</dt><dd class="prose-user min-w-0 break-words text-right font-semibold text-fg">{{ $value }}</dd></div>
                         @endforeach
                     </dl>
                 </section>
@@ -90,6 +90,23 @@
 
     @if (($makePage ?? null) && $listing->isPublic())
         <p class="mt-8"><a href="{{ $makePage['url'] }}" class="inline-flex items-center gap-1 text-ui font-medium text-fg underline-offset-2 hover:underline" data-make-page>{{ __('public.make_page.more', ['what' => $makePage['name']]) }}<x-ui.icon name="chevron-right" size="16" /></a></p>
+    @endif
+
+    {{-- More from this seller (U2): their other public ads in this country; hidden when there are none. --}}
+    @if (($sellerMore ?? collect())->isNotEmpty())
+        <section aria-labelledby="ad-seller-more" class="mt-10" data-seller-more>
+            <div class="mb-3 flex flex-wrap items-baseline justify-between gap-x-4">
+                <h2 id="ad-seller-more" class="text-h2 font-semibold">{{ __('public.seller_more', ['name' => $seller->name]) }}</h2>
+                <a href="{{ $seller->sellerUrl() }}" class="inline-flex items-center gap-1 text-ui font-medium text-primary hover:underline">{{ __('public.seller_more_all') }}<x-ui.icon name="chevron-right" size="16" /></a>
+            </div>
+            <div class="listing-grid-area">
+                <ul class="listing-grid">
+                    @foreach ($sellerMore as $item)
+                        <li><x-listing.card :listing="$item" :present="$present" class="h-full" /></li>
+                    @endforeach
+                </ul>
+            </div>
+        </section>
     @endif
 
     @if ($similar->isNotEmpty())

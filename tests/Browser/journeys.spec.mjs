@@ -259,7 +259,7 @@ test('the moderator approves it with the keyboard shortcut', async ({ page }) =>
 
 test('a guest finds the ad, opens it and reveals the number', async ({ page }) => {
     await page.goto(`/lk/ads?q=${encodeURIComponent(run)}`);
-    await Promise.all([page.waitForLoadState('networkidle'), page.getByRole('link', { name: carTitle }).first().click()]);
+    await Promise.all([page.waitForLoadState('networkidle'), page.getByRole('link', { name: carTitle, exact: true }).first().click()]);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(carTitle);
     await expect(page.getByText(/Nugegoda/).first()).toBeVisible();
     await expect(page.getByText(/5,250,000/).first()).toBeVisible();
@@ -273,9 +273,9 @@ test('a buyer registers, saves the ad and reports it', async ({ page }) => {
     await register(page, buyer);
     await verify(page, buyer);
     await page.goto(`/lk/ads?q=${encodeURIComponent(run)}`);
-    await Promise.all([page.waitForLoadState('networkidle'), page.getByRole('link', { name: carTitle }).first().click()]);
+    await Promise.all([page.waitForLoadState('networkidle'), page.getByRole('link', { name: carTitle, exact: true }).first().click()]);
 
-    await page.getByRole('button', { name: /^save/i }).first().click();
+    await page.getByRole('button', { name: 'Save', exact: true }).first().click();
     await page.waitForLoadState('networkidle');
     await page.goto('/account/favourites');
     await expect(page.getByRole('heading', { name: carTitle }).first()).toBeVisible();
