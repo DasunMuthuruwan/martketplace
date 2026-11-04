@@ -95,8 +95,8 @@ Details for each task: [implementation-plan.md](implementation-plan.md). Update 
   - [x] B7 Payment proof uploads for orders; (owner 2026-10-24: 5 MB, 3 files, deleted 90 days after the order closes, no staff email) + Boost prices status names what is missing
   - [x] B8 Hide Promote while a Top ad is running or queued
   - [x] B9 Urgent badge (paid, 7 days, priced per country; any timed promotion hides Promote)
-  - [~] U1 New palette, shared components, home hero, responsive test (320–1920 px) — not approved (owner 2026-11-04); continued as U2
-  - [~] U2 UI/UX improvement guide (`docs/implementation/marketplace-ui-improvement-guide.md`, plan `ui-improvement-plan.md`): hero, featured ads, card heart, seller ads, banner, filters drawer, ad page — awaiting review
+  - [x] U1 New palette, shared components, home hero, responsive test (320–1920 px) — merged with U2 (owner approved 2026-11-04)
+  - [x] U2 UI/UX improvement guide (`docs/implementation/marketplace-ui-improvement-guide.md`, plan `ui-improvement-plan.md`): hero, featured ads, card heart, seller ads, banner, filters drawer, ad page — merged (owner approved 2026-11-04)
   - [x] B10 Banners managed by staff (image, link, country, placement, dates)
 - [x] M9c Audience features before deployment (owner 2026-10-22; [proposal](../proposals/engagement-features.md), ADR-027)
   - [x] G1 Search terms and live search — merged 2026-10-22
